@@ -5,8 +5,6 @@ import { Domine, Geist_Mono, Ubuntu_Sans_Mono } from 'next/font/google';
 import {
     TooltipProvider
 } from "@/components/ui/tooltip"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from '@vercel/analytics/next';
 import { Toaster } from "@/components/ui/sonner"
 
 const domine = Domine({
@@ -75,8 +73,6 @@ export default async function RootLayout({
                 <TooltipProvider>
                     {children}
                 </TooltipProvider>
-                <SpeedInsights />
-                <Analytics />
                 <Toaster />
             </body>
         </html>
