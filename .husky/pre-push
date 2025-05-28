@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+date '+%Y-%m-%d %H:%M:%S' >> .husky/pre-push.log
+echo "🚀 Running pre-push checks..." >> .husky/pre-push.log
+echo "📦 Building the project..." >> .husky/pre-push.log
+
+if pnpm build >> .husky/pre-push.log; then
+    echo "✅ Build succeeded! Push is allowed to continue." >> .husky/pre-push.log
+    exit 0
+else
+    echo "❌ Build failed! Push has been blocked." >> .husky/pre-push.log
+    echo "💡 Please fix the build errors before pushing." >> .husky/pre-push.log
+    exit 1
+fi
