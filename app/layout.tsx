@@ -6,6 +6,7 @@ import {
     TooltipProvider
 } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
+import { Analytics } from '@vercel/analytics/next';
 
 const domine = Domine({
     subsets: ['latin'],
@@ -73,6 +74,7 @@ export default async function RootLayout({
                 <TooltipProvider>
                     {children}
                 </TooltipProvider>
+                <Analytics />
                 <Toaster />
             </body>
         </html>
