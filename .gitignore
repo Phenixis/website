@@ -36,6 +36,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# blog posts
-/app/blog/posts
 /.husky/*.log
