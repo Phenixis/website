@@ -1,12 +1,16 @@
 import fs from 'fs'
 import path from 'path'
-import projects from '../projects/projects.json'
+
+export const dir = path.join(process.cwd(), 'app', 'blog', 'posts')
 
 type Metadata = {
   title: string
   publishedAt: string
   summary: string
   image?: string
+  isProject?: string
+  state?: string
+  color?: string
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -38,23 +42,32 @@ function readMDXFile(filePath: fs.PathOrFileDescriptor) {
 
 function getMDXData(dir: string) {
   const mdxFiles = getMDXFiles(dir)
-  return mdxFiles.map((file) => {
-    const { metadata, content } = readMDXFile(path.join(dir, file))
-    const slug = path.basename(file, path.extname(file))
-
-    return {
-      metadata,
-      slug,
-      content,
-    }
-  })
+  return mdxFiles.map((file) => getBlogPost(file))
 }
 
 export function getBlogPosts(withProjects: boolean = false) {
-  const posts = getMDXData(path.join(process.cwd(), 'app', '(front-office)', 'blog', 'posts'))
+  const posts = getMDXData(dir)
 
   return posts.filter((post) => {
-    return withProjects || !projects[post.metadata.title as keyof typeof projects]
+    return withProjects || !Boolean(post.metadata.isProject)
+  })
+}
+
+export function getBlogPost(slug: string) {
+  const slugWithMDX = slug.endsWith('.mdx') ? slug : `${slug}.mdx`
+  const slugWithoutMDX = slug.endsWith('.mdx') ? slug.slice(0, -4) : slug
+  const { metadata, content } = readMDXFile(path.join(dir, slugWithMDX))
+
+  return {
+    metadata,
+    slug: slugWithoutMDX,
+    content,
+  }
+}
+
+export function getProjects() {
+  return getBlogPosts(true).filter((post) => {
+    return post.metadata.isProject !== undefined && Boolean(post.metadata.isProject)
   })
 }
 

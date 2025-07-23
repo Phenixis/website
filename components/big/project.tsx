@@ -33,7 +33,7 @@ export const colorVariants = {
     }
 }
 
-export const states = ["Sold", "Running", "Discontinued", "Building", "Built"]
+export const states = ["Running", "Building", "Idea", "Built", "Sold", "Discontinued"]
 
 export default function Project({
     name,
@@ -48,7 +48,7 @@ export default function Project({
     state: typeof states[number]
 }) {
     return (
-        <Link href={`/blog/${name}`}>
+        <Link href={`/blog/${name.replace(/ /g, '_')}`}>
             <div className={`size-full p-4 rounded-md duration-100 selection:${colorVariants[color].image} ${colorVariants[color].background}`}>
                 <div className="flex justify-between items-center">
                     <h3>

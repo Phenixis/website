@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/collapsible"
 import { ChevronDown } from "lucide-react"
 import Project, { colorVariants, states } from "@/components/big/project"
-import projects from "./projects.json"
+import { getProjects } from "@/app/blog/utils"
 
 
 export default function Page() {
+    const projectsList = getProjects()
+
     return (
         <section className="page space-y-4">
             <h1 className="page-title">
@@ -53,9 +55,17 @@ export default function Page() {
                 </CollapsibleContent>
             </Collapsible>
             <div className="grid grid-cols-2 gap-2">
-                {Object.entries(projects).map(([key, value]) => (
-                    <Project key={key} name={value.name} description={value.description} color={value.color as keyof typeof colorVariants} state={value.state as typeof states[number]} />
-                ))}
+                {projectsList.sort(
+                    (a, b) => {
+                        const stateA = states.indexOf(a.metadata.state as typeof states[number])
+                        const stateB = states.indexOf(b.metadata.state as typeof states[number])
+                        return stateA - stateB
+                    }
+                ).map((project) => {
+                    return (
+                        <Project key={project.metadata.title} name={project.metadata.title} description={project.metadata.summary} color={project.metadata.color as keyof typeof colorVariants} state={project.metadata.state as typeof states[number]} />
+                    )
+                })}
             </div>
         </section>
     )
