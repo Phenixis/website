@@ -58,10 +58,21 @@ export default {
           '20%,50%': {
             opacity: '0'
           }
+        },
+        'slide-in-right': {
+          '0%': {
+            transform: 'translateX(100%)',
+            opacity: '0'
+          },
+          '100%': {
+            transform: 'translateX(0)',
+            opacity: '1'
+          }
         }
       },
       animation: {
-        'caret-blink': 'caret-blink 1.25s ease-out infinite'
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
+        'slide-in-right': 'slide-in-right 0.3s ease-in-out'
       }
     }
   },

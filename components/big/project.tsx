@@ -49,7 +49,7 @@ export default function Project({
 }) {
     return (
         <Link href={`/blog/${name.replace(/ /g, '_')}`}>
-            <div className={`size-full p-4 rounded-md duration-1000 flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2 selection:${colorVariants[color].image} ${colorVariants[color].background} ${colorVariants[color].border}`}>
+            <div className={`size-full p-2 rounded-md duration-1000 flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2 selection:${colorVariants[color].image} ${colorVariants[color].background} ${colorVariants[color].border}`}>
                 <div className="w-full md:w-[100px] tabular-nums shrink-0">
                     <div className={`text-xs p-1 rounded-md w-fit md:mx-auto ${colorVariants[color].image}`}>
                         {state}

@@ -3,6 +3,7 @@
 import Navbar from './nav'
 import Footer from './footer'
 import { usePathname } from 'next/navigation';
+import TwitchPlayer from './twitch/player';
 
 export default function Main({
     children,
@@ -17,6 +18,7 @@ export default function Main({
                 <Navbar actualPath={actualPath} />
                 {children}
             </div>
+            <TwitchPlayer />
             <Footer actualPath={actualPath} />
         </div>
     )
