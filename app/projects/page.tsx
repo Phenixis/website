@@ -54,7 +54,7 @@ export default function Page() {
                     </p>
                 </CollapsibleContent>
             </Collapsible>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {projectsList.sort(
                     (a, b) => {
                         const stateA = states.indexOf(a.metadata.state as typeof states[number])
