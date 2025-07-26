@@ -42,7 +42,7 @@
   "devDependencies": {
     "@types/node": "20.17.52",
     "drizzle-kit": "^0.27.2",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "eslint-config-next": "15.3.2",
     "husky": "^9.1.7",
     "typescript": "5.8.3"
