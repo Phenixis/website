@@ -13,12 +13,12 @@ export default function Main({
 	const actualPath = usePathname().split('/').slice(0, 2).join('/');
 
     return (
-        <div className="min-h-screen flex flex-col justify-between min-w-0 p-2 font-mono max-w-4xl md:mx-auto">
+        <div className="min-h-screen flex flex-col justify-between min-w-0 p-2 font-mono max-w-7xl md:mx-auto">
             <div>
                 <Navbar actualPath={actualPath} />
                 {children}
             </div>
-            <TwitchPlayer />
+            {/* <TwitchPlayer /> */}
             <Footer actualPath={actualPath} />
         </div>
     )
