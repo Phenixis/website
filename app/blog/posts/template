@@ -2,5 +2,8 @@
 title: TITLE
 publishedAt: DATE
 summary: SUMMARY
+isProject: BOOLEAN
+state: "Running" | "Building" | "Idea" | "Built" | "Sold" | "Discontinued"
+color: "blue" | "green" | "red" | "yellow" | "purple" | "orange" 
 ---
 CONTENT
