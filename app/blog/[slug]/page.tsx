@@ -86,19 +86,20 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 					}),
 				}}
 			/>
-			<header className="flex items-center gap-12">
+			<header className="flex flex-col md:flex-row items-center gap-4 md:gap-12">
 				<h1 className="page-title">
 					{post.metadata.title}
 				</h1>
 				{
 					post.metadata.isProject && post.metadata.tags && post.metadata.tags.length > 0 ? (
-						<div className="md:col-span-5 text-xs font-light">
+						<div className="md:col-span-5 text-xs font-light flex flex-col md:flex-row">
 							{post.metadata.tags.map((tag) => (
 								<BadgeTrimmed
 									key={tag.index}
 									className={cn("mr-1 mb-1", tag.color)}
 									text={kebabCasetoTitleCase(tag.name)}
 									untilSpace
+									forceFull
 								/>
 							))}
 						</div>

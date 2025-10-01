@@ -12,11 +12,13 @@ export function BadgeTrimmed({
     className = "",
     trimmedLength = 3,
     untilSpace = false,
+    forceFull
 }: {
     text: string
     className?: string
     trimmedLength?: number
     untilSpace?: boolean
+    forceFull?: boolean
 }) {
     const isMobile = useIsMobile();
     const defaultValue = untilSpace ? text.split(" ")[0] : (text.length > trimmedLength ? text.slice(0, trimmedLength) : text)
@@ -71,18 +73,26 @@ export function BadgeTrimmed({
         };
     }, [isHovered, text, defaultValue]);
 
+    if (forceFull) {
+        return (
+            <Badge className={cn("transition-all duration-200 hover:border", className)}>
+                {text}
+            </Badge>
+        )
+    }
+
     // On mobile, display the full text without animation
     if (isMobile) {
         return (
-            <Badge className={cn("transition-all duration-200", className)}>
-                {text}
+            <Badge className={cn("transition-all duration-200 hover:border", className)}>
+                {defaultValue}
             </Badge>
         )
     }
 
     return (
         <Badge
-            className={cn("transition-all duration-200", className)}
+            className={cn("transition-all duration-200 hover:border", className)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >

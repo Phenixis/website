@@ -56,7 +56,7 @@ export default function LifeElapsed() {
     const totalDays = daysSpent + daysLeft;
 
     return (
-        <div className="flex flex-col items-center" title={`${((daysSpent / totalDays) * 100).toFixed(2)}% (${daysSpent}/${totalDays})`}>
+        <div className="flex flex-col items-center group" title={`${((daysSpent / totalDays) * 100).toFixed(2)}% (${daysSpent}/${totalDays})`}>
             <span className="text-sm mb-1">{currentLifeYear}</span>
             <div className="relative w-8 h-8">
                 {/* Border SVG with reduced height for triangles */}

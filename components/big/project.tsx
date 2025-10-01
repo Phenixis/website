@@ -66,7 +66,7 @@ export const skills = [
     },
     {
         index: 4,
-        name: "Gérer les données pour les mettre à disposition",
+        name: "Gérer les données pour les rendre disponibles",
         color: "bg-green-500/50 hover:bg-green-500/70 dark:bg-green-500/80 dark:hover:bg-green-500"
     },
     {
@@ -121,7 +121,7 @@ export default function Project({
                 </div>
                 {
                     project.metadata.tags && project.metadata.tags.length > 0 ? (
-                        <div className="md:col-span-5 text-xs font-light flex items-end gap-2">
+                        <div className="md:col-span-5 text-xs font-light flex flex-row items-end gap-2">
                             {project.metadata.tags.map((tag) => (
                                 <BadgeTrimmed
                                     key={tag.index}

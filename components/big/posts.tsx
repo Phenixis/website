@@ -34,7 +34,7 @@ export default function BlogPosts({
                                 <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
                                     {post.metadata.title}
                                 </p>
-                                <p className="text-neutral-500 dark:text-neutral-400 tracking-tight">
+                                <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2">
                                     {post.metadata.summary}
                                 </p>
                             </div>

@@ -337,6 +337,10 @@
 
   /* Component Page */
 
+  section.page {
+    @apply px-1
+  }
+
   section.page h1.page-title {
     @apply mb-2 text-2xl font-semibold tracking-tighter;
   }

@@ -27,7 +27,7 @@ const links = [
 
 export default function Footer({ actualPath }: { actualPath: string }) {
     return (
-        <footer className="flex justify-between items-center mt-2">
+        <footer className="flex justify-between items-end mt-2 mb-4">
             <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm text-neutral-500 md:gap-4 list-none">
                 {
                     links
