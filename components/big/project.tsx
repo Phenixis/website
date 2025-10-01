@@ -95,40 +95,40 @@ export default function Project({
     return (
         <Link href={`/blog/${project.slug}`}>
             <div className={cn(
-                "size-full p-2 rounded-md duration-1000 grid grid-cols-1",
-                showBadge ? "md:items-center" : "",
-                "md:grid-cols-5 gap-2",
+                "size-full p-2 rounded-md duration-1000 space-y-2",
                 colorVariant.selection,
                 colorVariant.background,
                 colorVariant.border)
             }>
-                {
-                    showBadge ? (
-                        <div className="md:col-span-1 tabular-nums shrink-0">
-                            <div className={`text-xs p-1 rounded-md w-fit md:mx-auto ${colorVariant.image}`}>
-                                {project.metadata.state}
-                            </div>
-                        </div>
-                    ) : null
-                }
-                <div className={showBadge ? "md:col-span-4" : "md:col-span-5"}>
-                    <h3 className="text-neutral-900 dark:text-neutral-100 tracking-tight">
-                        {project.metadata.title}
-                    </h3>
+                <div>
+                    <header className="flex items-center flex-wrap gap-2">
+                        {
+                            showBadge ? (
+                                <div className="md:col-span-1 tabular-nums shrink-0">
+                                    <div className={`text-xs p-1 rounded-md w-fit md:mx-auto ${colorVariant.image}`}>
+                                        {project.metadata.state}
+                                    </div>
+                                </div>
+                            ) : null
+                        }
+                        <h3 className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+                            {project.metadata.title}
+                        </h3>
+                    </header>
                     <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2">
                         {project.metadata.summary}
                     </p>
                 </div>
                 {
                     project.metadata.tags && project.metadata.tags.length > 0 ? (
-                        <div className="md:col-span-5 text-xs font-light flex flex-row flex-wrap items-end gap-2">
+                        <div className="text-xs font-light flex flex-row flex-wrap items-end gap-2">
                             {project.metadata.tags.map((tag) => (
                                 <BadgeTrimmed
                                     key={tag.index}
                                     className={cn(tag.color)}
                                     text={kebabCasetoTitleCase(tag.name)}
                                     untilSpace
-                                    />
+                                />
                             ))}
                         </div>
                     ) : null

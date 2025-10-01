@@ -92,7 +92,7 @@ export function BadgeTrimmed({
 
     return (
         <Badge
-            className={cn("transition-all duration-200 hover:border", className)}
+            className={cn("transition-all duration-200 hover:border duration-1000", className)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
