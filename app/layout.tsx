@@ -63,7 +63,8 @@ export default async function RootLayout({
     return (
         <html
             lang="en"
-            className={"overflow-x-hidden"}
+            className={"overflow-x-hidden" + 
+                (theme === 'dark' ? ' dark' : '')}
         >
             <head>
                 <link rel="icon" href="/favicon.png" sizes='any' />
@@ -74,8 +75,7 @@ export default async function RootLayout({
                 'antialiased text-black bg-white dark:text-white dark:bg-black h-full min-h-screen w-full min-w-screen max-w-screen',
                 domine.className,
                 geistMono.className,
-                ubuntuSansMono.className,
-                theme === 'dark' ? 'dark' : ''
+                ubuntuSansMono.className
             )}>
                 <TooltipProvider>
                     <Main>
