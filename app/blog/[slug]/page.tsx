@@ -4,6 +4,7 @@ import { formatDate, getBlogPosts, kebabCasetoTitleCase } from '@/app/blog/utils
 import { baseUrl } from 'app/sitemap'
 import { BadgeTrimmed } from '@/components/ui/badge-trimmed'
 import { cn } from '@/lib/utils'
+import { ExternalLink } from 'lucide-react'
 
 export async function generateStaticParams() {
 	const posts = getBlogPosts(true)
@@ -86,7 +87,7 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 					}),
 				}}
 			/>
-			<header className="flex flex-col md:flex-row items-center gap-4 md:gap-12">
+			<header className="flex flex-col md:flex-row items-center gap-2 md:gap-12">
 				<h1 className="page-title">
 					{post.metadata.title}
 				</h1>
@@ -106,15 +107,23 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 					) : null
 				}
 			</header>
-			<div className="flex flex-col md:flex-row justify-between md:items-center mt-2 mb-8 text-sm">
-				<p className="text-sm text-neutral-600 dark:text-neutral-400 basis-1/6">
+			<div className="flex flex-col gap-1 md:flex-row justify-between md:items-center mt-2 mb-8 text-xs md:text-sm text-neutral-600 dark:text-neutral-400 ">
+				<p className="basis-1/6">
 					{formatDate(post.metadata.publishedAt)}
 				</p>
-				<p className="text-sm text-neutral-500 dark:text-neutral-400 basis-5/6">
+				<p className="basis-5/6">
 					{post.metadata.summary}
 				</p>
+				{
+					post.metadata.link ? (
+						<a href={post.metadata.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+							Link
+							<ExternalLink className="size-4" />
+						</a>
+					) : null
+				}
 			</div>
-			<article className="prose font-serif text-lg max-w-full">
+			<article className="prose font-serif text-sm md:text-base lg:text-lg max-w-full">
 				<CustomMDX source={post.content} />
 			</article>
 			<footer>

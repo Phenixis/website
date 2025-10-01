@@ -8,6 +8,7 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
+  link?: string
   image?: string
   isProject?: string
   state?: typeof states[number]
@@ -85,13 +86,13 @@ export function getBlogPosts(withProjects: boolean = false) {
 }
 
 export function getBlogPost(slug: string) {
-  const slugWithMDX = slug.endsWith('.mdx') ? slug : `${slug}.mdx`
-  const slugWithoutMDX = slug.endsWith('.mdx') ? slug.slice(0, -4) : slug
+  const slugWithoutMDX = slug.replace(/\.mdx?$/, '')
+  const slugWithMDX = `${slugWithoutMDX}.mdx`
   const { metadata, content } = readMDXFile(path.join(dir, slugWithMDX))
 
   return {
     metadata,
-    slug: slugWithoutMDX,
+    slug: formatToKebabCase(slugWithoutMDX),
     content,
   } as ProjectType
 }
@@ -143,4 +144,12 @@ export function kebabCasetoTitleCase(str: string) {
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+export function formatToKebabCase(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-') // Replace non-alphanumeric (except dot) with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+    .replace(/--+/g, '-') // Replace multiple hyphens with a single hyphen
 }

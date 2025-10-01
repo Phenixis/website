@@ -256,8 +256,14 @@
   }
 
   .prose p,
+  .prose a:not(.anchor),
+  .prose li {
+    @apply text-neutral-800 dark:text-neutral-200;
+  }
+
+  .prose p,
   .prose a:not(.anchor) {
-    @apply my-4 text-neutral-800 dark:text-neutral-200;
+    @apply my-4;
   }
 
   .prose h1,

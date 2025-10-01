@@ -38,17 +38,18 @@ export default function Page() {
                     <p>
                         As I was learning how to code in Python, I decided that I would build a small program that would do it for me. There was no API so I used the graphical interface. I searched for a library to move the mouse to click on the 3 dots button, click on &quot;Delete&quot; and start again for the next error.
                     </p>
-                    <p>
-                        It took me probably a full afternoon to build the program from A to Z, but I had a problem, and I built something to solve it. Since then, the
-                        <Tooltip>
+                    <Tooltip>
+                        <p>
+                            It took me probably a full afternoon to build the program from A to Z, but I had a problem, and I built something to solve it. Since then, the{' '}
                             <TooltipTrigger className=" inline-block underline cursor-default">
                                 producer mindset
                             </TooltipTrigger>
                             <TooltipContent>
                                 In opposition with the &quot;consumer&quot; mindset, producters build the solution to their problems instead of buying them.
                             </TooltipContent>
-                        </Tooltip> has a little place in a corner of my mind.
-                    </p>
+                            {' '}has a little place in a corner of my mind.
+                        </p>
+                    </Tooltip>
                     <p>
                         That&apos;s why to this day, I build my own solutions to my problems, and here are the solutions I built.
                     </p>
