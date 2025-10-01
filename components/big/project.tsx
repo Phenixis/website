@@ -52,32 +52,32 @@ export const skills = [
     {
         index: 1,
         name: "Réaliser une solution informatique",
-        color: "bg-red-500/50 hover:bg-red-500/70"
+        color: "bg-red-500/50 hover:bg-red-500/70 dark:bg-red-500/80 dark:hover:bg-red-500"
     },
     {
         index: 2,
         name: "Optimiser des programmes",
-        color: "bg-orange-800/50 hover:bg-orange-800/70"
+        color: "bg-orange-500/50 hover:bg-orange-500/70 dark:bg-orange-500/80 dark:hover:bg-orange-500"
     },
     {
         index: 3,
         name: "Administrer des infrastructures et services",
-        color: "bg-yellow-800/50 hover:bg-yellow-800/70"
+        color: "bg-yellow-500/50 hover:bg-yellow-500/70 dark:bg-yellow-500/80 dark:hover:bg-yellow-500"
     },
     {
         index: 4,
         name: "Gérer les données pour les mettre à disposition",
-        color: "bg-green-800/50 hover:bg-green-800/70"
+        color: "bg-green-500/50 hover:bg-green-500/70 dark:bg-green-500/80 dark:hover:bg-green-500"
     },
     {
         index: 5,
         name: "Conduire un projet en méthode agile",
-        color: "bg-blue-800/50 hover:bg-blue-800/70"
+        color: "bg-blue-500/50 hover:bg-blue-500/70 dark:bg-blue-500/80 dark:hover:bg-blue-500"
     },
     {
         index: 6,
         name: "Collaborer pour travailler en équipe",
-        color: "bg-neutral-800/50 hover:bg-neutral-800/70"
+        color: "bg-neutral-500/50 hover:bg-neutral-500/70 dark:bg-neutral-500/80 dark:hover:bg-neutral-500 "
     },
 ]
 

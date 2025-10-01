@@ -8,6 +8,7 @@ import {
 import { Toaster } from "@/components/ui/sonner"
 import { Analytics } from '@vercel/analytics/next';
 import Main from '@/components/big/main';
+import { cookies } from 'next/headers';
 
 const domine = Domine({
     subsets: ['latin'],
@@ -56,6 +57,9 @@ export default async function RootLayout({
 }: {
     children: React.ReactNode
 }) {
+    const cookieStore = await cookies();
+    const theme = cookieStore.get('theme')?.value;
+
     return (
         <html
             lang="en"
@@ -71,6 +75,7 @@ export default async function RootLayout({
                 domine.className,
                 geistMono.className,
                 ubuntuSansMono.className,
+                theme === 'dark' ? 'dark' : ''
             )}>
                 <TooltipProvider>
                     <Main>
