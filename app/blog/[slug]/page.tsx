@@ -120,7 +120,7 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 			<footer>
 				<p className="text-sm text-neutral-500 dark:text-neutral-400">
 					Best Regards,<br />
-					Maxime Duhamel
+					Maxime Duhamel :)
 				</p>
 			</footer>
 		</section>

@@ -52,32 +52,32 @@ export const skills = [
     {
         index: 1,
         name: "Réaliser une solution informatique",
-        color: "bg-red-500/50 hover:bg-red-500/70 dark:bg-red-500/80 dark:hover:bg-red-500"
+        color: "bg-red-500/50 hover:bg-red-500/70 text-black dark:bg-red-500/80 dark:hover:bg-red-500 dark:text-white"
     },
     {
         index: 2,
         name: "Optimiser des programmes",
-        color: "bg-orange-500/50 hover:bg-orange-500/70 dark:bg-orange-500/80 dark:hover:bg-orange-500"
+        color: "bg-orange-500/50 hover:bg-orange-500/70 text-black dark:bg-orange-500/80 dark:hover:bg-orange-500 dark:text-white"
     },
     {
         index: 3,
         name: "Administrer des infrastructures et services",
-        color: "bg-yellow-500/50 hover:bg-yellow-500/70 dark:bg-yellow-500/80 dark:hover:bg-yellow-500"
+        color: "bg-yellow-500/50 hover:bg-yellow-500/70 text-black dark:bg-yellow-500/80 dark:hover:bg-yellow-500 dark:text-white"
     },
     {
         index: 4,
         name: "Gérer les données pour les rendre disponibles",
-        color: "bg-green-500/50 hover:bg-green-500/70 dark:bg-green-500/80 dark:hover:bg-green-500"
+        color: "bg-green-500/50 hover:bg-green-500/70 text-black dark:bg-green-500/80 dark:hover:bg-green-500 dark:text-white"
     },
     {
         index: 5,
         name: "Conduire un projet en méthode agile",
-        color: "bg-blue-500/50 hover:bg-blue-500/70 dark:bg-blue-500/80 dark:hover:bg-blue-500"
+        color: "bg-blue-500/50 hover:bg-blue-500/70 text-black dark:bg-blue-500/80 dark:hover:bg-blue-500 dark:text-white"
     },
     {
         index: 6,
         name: "Collaborer pour travailler en équipe",
-        color: "bg-neutral-500/50 hover:bg-neutral-500/70 dark:bg-neutral-500/80 dark:hover:bg-neutral-500 "
+        color: "bg-neutral-500/50 hover:bg-neutral-500/70 text-black dark:bg-neutral-500/80 dark:hover:bg-neutral-500 dark:text-white"
     },
 ]
 
@@ -121,7 +121,7 @@ export default function Project({
                 </div>
                 {
                     project.metadata.tags && project.metadata.tags.length > 0 ? (
-                        <div className="md:col-span-5 text-xs font-light flex flex-row items-end gap-2">
+                        <div className="md:col-span-5 text-xs font-light flex flex-row flex-wrap items-end gap-2">
                             {project.metadata.tags.map((tag) => (
                                 <BadgeTrimmed
                                     key={tag.index}
