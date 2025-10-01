@@ -80,7 +80,7 @@ export function getBlogPosts(withProjects: boolean = false) {
   const posts = getMDXData(dir)
 
   return posts.filter((post) => {
-    return withProjects || !Boolean(post.metadata.isProject)
+    return post.metadata.publishedAt != "" && (withProjects || !Boolean(post.metadata.isProject))
   })
 }
 
