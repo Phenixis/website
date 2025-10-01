@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from '@/components/big/mdx'
-import { formatDate, getBlogPosts } from '@/app/blog/utils'
+import { formatDate, getBlogPosts, kebabCasetoTitleCase } from '@/app/blog/utils'
 import { baseUrl } from 'app/sitemap'
+import { BadgeTrimmed } from '@/components/ui/badge-trimmed'
+import { cn } from '@/lib/utils'
 
 export async function generateStaticParams() {
 	const posts = getBlogPosts(true)
@@ -84,9 +86,25 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 					}),
 				}}
 			/>
-			<h1 className="page-title">
-				{post.metadata.title}
-			</h1>
+			<header className="flex items-center gap-12">
+				<h1 className="page-title">
+					{post.metadata.title}
+				</h1>
+				{
+					post.metadata.isProject && post.metadata.tags && post.metadata.tags.length > 0 ? (
+						<div className="md:col-span-5 text-xs font-light">
+							{post.metadata.tags.map((tag) => (
+								<BadgeTrimmed
+									key={tag.index}
+									className={cn("mr-1 mb-1", tag.color)}
+									text={kebabCasetoTitleCase(tag.name)}
+									untilSpace
+								/>
+							))}
+						</div>
+					) : null
+				}
+			</header>
 			<div className="flex flex-col md:flex-row justify-between md:items-center mt-2 mb-8 text-sm">
 				<p className="text-sm text-neutral-600 dark:text-neutral-400 basis-1/6">
 					{formatDate(post.metadata.publishedAt)}

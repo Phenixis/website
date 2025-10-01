@@ -18,17 +18,17 @@ function ArrowIcon() {
 }
 
 const links = [
-    { name: "X ", ref: "https://twitter.com/maxime_duhamel_", visibleOn: "/projects" },
-    { name: "Github", ref: "https://github.com/Phenixis", visibleOn: "/" },
-    { name: "Youtube", ref: "https://www.youtube.com/@maximeduh", visibleOn: "/projects" },
     { name: "Linkedin", ref: "https://www.linkedin.com/in/maxime-duhamel/", visibleOn: "/projects" },
     { name: "RSS feed", ref: "/rss", visibleOn: "/blog" },
+    { name: "Youtube", ref: "https://www.youtube.com/@maximeduh", visibleOn: "/projects" },
+    { name: "Github", ref: "https://github.com/Phenixis", visibleOn: "/" },
+    { name: "X", ref: "https://twitter.com/maxime_duhamel_", visibleOn: "/projects" },
 ];
 
 export default function Footer({ actualPath }: { actualPath: string }) {
     return (
-        <footer className="flex justify-between items-center">
-            <ul className="font-sm flex flex-col space-x-0 space-y-2 text-neutral-500 md:flex-row md:space-x-4 md:space-y-0 list-image-none">
+        <footer className="flex justify-between items-center mt-2">
+            <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm text-neutral-500 md:gap-4 list-none">
                 {
                     links
                         .filter((link) => actualPath.includes(link.visibleOn))

@@ -22,7 +22,7 @@ export default function Page() {
                 My Projects
             </h1>
             <Collapsible className="group/collapsible data-[state=open]:bg-gray-100 dark:data-[state=open]:bg-gray-900 border-transparent dark:lg:hover:bg-gray-900 lg:hover:bg-gray-100 rounded-md p-2">
-                <CollapsibleTrigger className="flex justify-between items-center gap-4">
+                <CollapsibleTrigger className="flex justify-between items-center gap-4 w-full cursor-pointer">
                     <p className="text-left">
                         I build web applications since Septembre 2024, but my journey started a long time ago...
                     </p>
@@ -63,7 +63,7 @@ export default function Page() {
                     }
                 ).map((project) => {
                     return (
-                        <Project key={project.metadata.title} name={project.metadata.title} description={project.metadata.summary} color={project.metadata.color as keyof typeof colorVariants} state={project.metadata.state as typeof states[number]} />
+                        <Project key={project.metadata.title} project={project} />
                     )
                 })}
             </div>

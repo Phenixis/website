@@ -5,5 +5,6 @@ summary: SUMMARY
 isProject: BOOLEAN
 state: "Running" | "Building" | "Idea" | "Built" | "Sold" | "Discontinued"
 color: "blue" | "green" | "red" | "yellow" | "purple" | "orange" 
+tags: id_tag1, id_tag2
 ---
 CONTENT
