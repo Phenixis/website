@@ -75,7 +75,7 @@ export function BadgeTrimmed({
 
     if (forceFull) {
         return (
-            <Badge className={cn("transition-all duration-200 hover:border", className)}>
+            <Badge className={cn("transition-all hover:border", className)}>
                 {text}
             </Badge>
         )
@@ -84,7 +84,7 @@ export function BadgeTrimmed({
     // On mobile, display the full text without animation
     if (isMobile) {
         return (
-            <Badge className={cn("transition-all duration-200 hover:border", className)}>
+            <Badge className={cn("transition-all border", className)}>
                 {defaultValue}
             </Badge>
         )
@@ -92,7 +92,7 @@ export function BadgeTrimmed({
 
     return (
         <Badge
-            className={cn("transition-all duration-200 hover:border duration-1000", className)}
+            className={cn("transition-all hover:border", className)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
