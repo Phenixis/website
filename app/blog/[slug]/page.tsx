@@ -98,7 +98,7 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 								{post.metadata.tags.map((tag) => (
 									<BadgeTrimmed
 										key={tag.index}
-										className={cn("mr-1 mb-1", tag.color)}
+										className={cn("mr-1 mb-1", tag.color.tag)}
 										text={kebabCasetoTitleCase(tag.name)}
 										untilSpace
 										forceFull

@@ -10,49 +10,49 @@ export let colorVariants = {
         "image": "bg-blue-300/50 lg:group-hover/project:bg-blue-300/70",
         "border": "border border-blue-300/90",
         "selection": "selection:bg-blue-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-blue-300/10 lg:hover:bg-blue-300/30 border border-blue-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-blue-300/10 lg:hover:bg-blue-300/30 border border-blue-300/90"
     },
     "green": {
         "background": "bg-green-300/10 dark:bg-green-300/20 lg:group-hover/project:bg-green-300/20",
         "image": "bg-green-300/50 lg:group-hover/project:bg-green-300/70",
         "border": "border border-green-300/90",
         "selection": "selection:bg-green-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-green-500/10 lg:hover:bg-green-500/20 border border-green-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-green-500/10 lg:hover:bg-green-500/20 border border-green-300/90"
     },
     "red": {
         "background": "bg-red-300/10 dark:bg-red-300/20 lg:group-hover/project:bg-red-300/20",
         "image": "bg-red-300/50 lg:group-hover/project:bg-red-300/70",
         "border": "border border-red-300/90",
         "selection": "selection:bg-red-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-red-500/10 lg:hover:bg-red-500/20 border border-red-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-red-500/10 lg:hover:bg-red-500/20 border border-red-300/90"
     },
     "yellow": {
         "background": "bg-yellow-300/10 dark:bg-yellow-300/20 lg:group-hover/project:bg-yellow-300/20",
         "image": "bg-yellow-300/50 lg:group-hover/project:bg-yellow-300/70",
         "border": "border border-yellow-300/90",
         "selection": "selection:bg-yellow-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-yellow-500/10 lg:hover:bg-yellow-500/20 border border-yellow-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-yellow-500/10 lg:hover:bg-yellow-500/20 border border-yellow-300/90"
     },
     "purple": {
         "background": "bg-purple-300/10 dark:bg-purple-300/20 lg:group-hover/project:bg-purple-300/20",
         "image": "bg-purple-300/50 lg:group-hover/project:bg-purple-300/70",
         "border": "border border-purple-300/90",
         "selection": "selection:bg-purple-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-purple-500/10 lg:hover:bg-purple-500/20 border border-purple-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-purple-500/10 lg:hover:bg-purple-500/20 border border-purple-300/90"
     },
     "orange": {
         "background": "bg-orange-300/10 dark:bg-orange-300/20 lg:group-hover/project:bg-orange-300/20",
         "image": "bg-orange-300/50 lg:group-hover/project:bg-orange-300/70",
         "border": "border border-orange-300/90",
         "selection": "selection:bg-orange-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-orange-500/10 lg:hover:bg-orange-500/20 border border-orange-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-orange-500/10 lg:hover:bg-orange-500/20 border border-orange-300/90"
     },
     "black": {
         "background": "bg-neutral-300/10 dark:bg-neutral-300/20 lg:group-hover/project:bg-neutral-300/20",
         "image": "bg-neutral-800/50 lg:group-hover/project:bg-neutral-800/70",
         "border": "border border-neutral-300/90",
         "selection": "selection:bg-neutral-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
-        "tag": "duration-1000 bg-neutral-500/10 lg:hover:bg-neutral-500/20 border border-neutral-300/90"
+        "tag": "text-black dark:text-white font-light duration-1000 bg-neutral-500/10 lg:hover:bg-neutral-500/20 border border-neutral-300/90"
     }
 }
 export const skills = [
@@ -130,7 +130,7 @@ export default function Project({
                         {project.metadata.tags.map((tag) => (
                             <BadgeTrimmed
                                 key={tag.index}
-                                className={cn(tag.color.tag, "text-black dark:text-white text-xs font-light")}
+                                className={cn(tag.color.tag, "text-xs")}
                                 text={kebabCasetoTitleCase(tag.name)}
                                 untilSpace
                             />
