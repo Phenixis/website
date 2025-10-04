@@ -125,7 +125,7 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
 					}
 				</div>
 			</header>
-			<article className="grow flex flex-col justify-between prose font-serif text-sm md:text-base lg:text-lg">
+			<article className="grow flex flex-col justify-between prose font-serif text-base lg:text-lg">
 				<CustomMDX source={post.content} />
 			</article>
 			<footer>

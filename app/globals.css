@@ -276,25 +276,25 @@
   .prose h4,
   .prose h5,
   .prose h6 {
-    @apply text-black dark:text-white;
+    @apply text-black dark:text-white font-light tracking-tight mt-6 mb-2;
   }
 
   .prose h1 {
-    @apply text-4xl font-medium tracking-tight mt-6 mb-2;
+    @apply text-3xl;
   }
 
   .prose h2 {
-    @apply text-3xl font-medium tracking-tight mt-6 mb-2;
+    @apply text-2xl;
   }
 
   .prose h3 {
-    @apply text-2xl font-medium tracking-tight mt-6 mb-2;
+    @apply text-xl;
   }
 
   .prose h4,
   .prose h5,
   .prose h6 {
-    @apply text-xl font-medium tracking-tight mt-6 mb-2;
+    @apply text-lg;
   }
 
   .prose strong {
@@ -346,7 +346,7 @@
   }
 
   section.page h1.page-title {
-    @apply mb-2 text-2xl font-semibold tracking-tighter;
+    @apply mb-2 text-3xl font-[100] tracking-[-0.12em];
   }
 
   section.page p.page-description,
