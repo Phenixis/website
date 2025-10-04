@@ -56,125 +56,61 @@ export default function LifeElapsed() {
     const totalDays = daysSpent + daysLeft;
 
     return (
-        <div className="flex flex-col items-center" title={`${daysSpent}/${totalDays}`}>
+        <div className="flex flex-col items-center group" title={`${((daysSpent / totalDays) * 100).toFixed(2)}% (${daysSpent}/${totalDays})`}>
             <span className="text-sm mb-1">{currentLifeYear}</span>
-            <a href="https://life-os.xyz?utm_source=portfolio&utm_medium=life-elapsed" target="_blank" rel="noopener noreferrer">
-                <div className="relative w-8 h-8">
-                    {/* Border SVG with reduced height for triangles */}
+            <div className="relative w-8 h-8">
+                {/* Border SVG with reduced height for triangles */}
+                <svg
+                    className="absolute inset-0 stroke-black dark:stroke-white"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                >
+                    {/* Top triangle: common apex at (50,50) */}
+                    <polygon
+                        points="0,0 100,0 50,50"
+                        fill="none"
+                        strokeWidth="3"
+                    />
+                    {/* Bottom triangle: common apex at (50,50) */}
+                    <polygon
+                        points="0,100 100,100 50,50"
+                        fill="none"
+                        strokeWidth="3"
+                    />
+                </svg>
+                {/* Top half: Days Left */}
+                <div
+                    className="absolute top-0 left-0 w-full overflow-hidden"
+                    style={{ height: `${(daysLeft / totalDays) * 50}%` }}
+                >
                     <svg
-                        className="absolute inset-0 dark:hidden"
-                        viewBox="0 0 100 100"
+                        className="w-full h-full fill-black stroke-black dark:fill-white dark:stroke-white"
+                        viewBox="0 0 100 50"
                         preserveAspectRatio="none"
                     >
-                        {/* Top triangle: common apex at (50,50) */}
                         <polygon
                             points="0,0 100,0 50,50"
-                            fill="none"
-                            stroke="black"
-                            strokeWidth="2"
-                        />
-                        {/* Bottom triangle: common apex at (50,50) */}
-                        <polygon
-                            points="0,100 100,100 50,50"
-                            fill="none"
-                            stroke="black"
                             strokeWidth="2"
                         />
                     </svg>
-                    {/* Border SVG with reduced height for triangles */}
-                    <svg
-                        className="hidden inset-0 dark:block absolute"
-                        viewBox="0 0 100 100"
-                        preserveAspectRatio="none"
-                    >
-                        {/* Top triangle: common apex at (50,50) */}
-                        <polygon
-                            points="0,0 100,0 50,50"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="2"
-                        />
-                        {/* Bottom triangle: common apex at (50,50) */}
-                        <polygon
-                            points="0,100 100,100 50,50"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="2"
-                        />
-                    </svg>
-                    {/* Top half: Days Left */}
-                    <div
-                        className="absolute top-0 left-0 w-full overflow-hidden dark:hidden"
-                        style={{ height: `${(daysLeft / totalDays) * 50}%` }}
-                    >
-                        <svg
-                            className="w-full h-full"
-                            viewBox="0 0 100 50"
-                            preserveAspectRatio="none"
-                        >
-                            <polygon
-                                points="0,0 100,0 50,50"
-                                fill="black"
-                                stroke="black"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    </div>
-                    <div
-                        className="hidden top-0 left-0 w-full overflow-hidden dark:block absolute"
-                        style={{ height: `${(daysLeft / totalDays) * 50}%` }}
-                    >
-                        <svg
-                            className="w-full h-full"
-                            viewBox="0 0 100 50"
-                            preserveAspectRatio="none"
-                        >
-                            <polygon
-                                points="0,0 100,0 50,50"
-                                fill="white"
-                                stroke="white"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    </div>
-                    {/* Bottom half: Days Spent */}
-                    <div
-                        className="absolute bottom-0 left-0 w-full overflow-hidden dark:hidden"
-                        style={{ height: `${(daysSpent / totalDays) * 50}%` }}
-                    >
-                        <svg
-                            className="w-full h-full"
-                            viewBox="0 0 100 50"
-                            preserveAspectRatio="none"
-                        >
-                            <polygon
-                                points="0,50 100,50 50,0"
-                                fill="black"
-                                stroke="black"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    </div>
-                    {/* Bottom half: Days Spent */}
-                    <div
-                        className="hidden bottom-0 left-0 w-full overflow-hidden dark:block absolute"
-                        style={{ height: `${(daysSpent / totalDays) * 50}%` }}
-                    >
-                        <svg
-                            className="w-full h-full"
-                            viewBox="0 0 100 50"
-                            preserveAspectRatio="none"
-                        >
-                            <polygon
-                                points="0,50 100,50 50,0"
-                                fill="white"
-                                stroke="white"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    </div>
                 </div>
-            </a>
+                {/* Bottom half: Days Spent */}
+                <div
+                    className="absolute bottom-0 left-0 w-full overflow-hidden"
+                    style={{ height: `${(daysSpent / totalDays) * 50}%` }}
+                >
+                    <svg
+                        className="w-full h-full fill-black stroke-black dark:fill-white dark:stroke-white"
+                        viewBox="0 0 100 50"
+                        preserveAspectRatio="none"
+                    >
+                        <polygon
+                            points="0,50 100,50 50,0"
+                            strokeWidth="2"
+                        />
+                    </svg>
+                </div>
+            </div>
         </div>
     );
 }

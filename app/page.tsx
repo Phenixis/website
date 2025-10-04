@@ -27,9 +27,9 @@ export default function Page() {
                     My current projects
                 </Link>
             </h2>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {projects.filter((project) => project.metadata.state === "Running" || project.metadata.state === "Building").map((project) => (
-                    <Project key={project.metadata.title} name={project.metadata.title} description={project.metadata.summary} color={project.metadata.color as keyof typeof colorVariants} state={project.metadata.state as typeof states[number]} />
+                    <Project key={project.metadata.title} project={project} showBadge={false}  />
                 ))}
             </div>
             <div className="my-8">

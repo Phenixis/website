@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { MDXRemote, MDXRemoteProps } from 'next-mdx-remote/rsc'
 import { highlight } from 'sugar-high'
 import React from 'react'
+import { formatToKebabCase } from '@/app/blog/utils'
 
 let ids: string[] = []
 interface TableData {
@@ -33,11 +34,13 @@ function Table({ data }: { data: TableData }) {
 }
 
 function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-    const href = props.href || ''
+    const href = (props.href || '').split('/').map((value) => formatToKebabCase(value)).join('/')
+	const propsWithoutHref = { ...props }
+	delete propsWithoutHref.href
 
 	if (href.startsWith('/')) {
 		return (
-			<Link href={href} {...props}>
+			<Link href={href} {...propsWithoutHref}>
 				{props.children}
 			</Link>
 		)

@@ -1,3 +1,4 @@
+import { colorVariants, states, skills } from '@/components/big/project'
 import fs from 'fs'
 import path from 'path'
 
@@ -7,10 +8,18 @@ type Metadata = {
   title: string
   publishedAt: string
   summary: string
+  link?: string
   image?: string
   isProject?: string
-  state?: string
-  color?: string
+  state?: typeof states[number]
+  color?: keyof typeof colorVariants
+  tags?: typeof skills
+}
+
+export type ProjectType = {
+  metadata: Metadata
+  slug: string
+  content: string
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -25,7 +34,30 @@ function parseFrontmatter(fileContent: string) {
     const [key, ...valueArr] = line.split(': ')
     let value = valueArr.join(': ').trim()
     value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value
+    const trimmedKey = key.trim()
+
+    switch (trimmedKey) {
+      case 'state':
+        metadata.state = value as typeof states[number]
+        break;
+      case 'color':
+        metadata.color = value as keyof typeof colorVariants
+        break;
+      case 'tags':
+        const localTags = value.split(',').map((tag) => Number(tag.trim()))
+        const localSkills = Array(localTags.length).fill("")
+        for (let i = 0; i < localTags.length; i++) {
+          if (skills[localTags[i] - 1]) {
+            localSkills[i] = skills[localTags[i]-1]
+          }
+        }
+        metadata.tags = localSkills as typeof skills
+        break;
+      default:
+        // @ts-ignore
+        metadata[trimmedKey as keyof Metadata] = value
+
+    }
   })
 
   return { metadata: metadata as Metadata, content }
@@ -49,20 +81,20 @@ export function getBlogPosts(withProjects: boolean = false) {
   const posts = getMDXData(dir)
 
   return posts.filter((post) => {
-    return withProjects || !Boolean(post.metadata.isProject)
+    return post.metadata.publishedAt != "" && (withProjects || !Boolean(post.metadata.isProject))
   })
 }
 
 export function getBlogPost(slug: string) {
-  const slugWithMDX = slug.endsWith('.mdx') ? slug : `${slug}.mdx`
-  const slugWithoutMDX = slug.endsWith('.mdx') ? slug.slice(0, -4) : slug
+  const slugWithoutMDX = slug.replace(/\.mdx?$/, '')
+  const slugWithMDX = `${slugWithoutMDX}.mdx`
   const { metadata, content } = readMDXFile(path.join(dir, slugWithMDX))
 
   return {
     metadata,
-    slug: slugWithoutMDX,
+    slug: formatToKebabCase(slugWithoutMDX),
     content,
-  }
+  } as ProjectType
 }
 
 export function getProjects() {
@@ -105,4 +137,19 @@ export function formatDate(date: string, includeRelative = false) {
   }
 
   return `${fullDate} (${formattedDate})`
+}
+
+export function kebabCasetoTitleCase(str: string) {
+  return str
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+export function formatToKebabCase(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, '-') // Replace non-alphanumeric (except dot) with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+    .replace(/--+/g, '-') // Replace multiple hyphens with a single hyphen
 }

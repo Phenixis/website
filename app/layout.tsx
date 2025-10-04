@@ -8,6 +8,7 @@ import {
 import { Toaster } from "@/components/ui/sonner"
 import { Analytics } from '@vercel/analytics/next';
 import Main from '@/components/big/main';
+import { cookies } from 'next/headers';
 
 const domine = Domine({
     subsets: ['latin'],
@@ -56,10 +57,14 @@ export default async function RootLayout({
 }: {
     children: React.ReactNode
 }) {
+    const cookieStore = await cookies();
+    const theme = cookieStore.get('theme')?.value;
+
     return (
         <html
             lang="en"
-            className={"overflow-x-hidden"}
+            className={"overflow-x-hidden" + 
+                (theme === 'dark' ? ' dark' : '')}
         >
             <head>
                 <link rel="icon" href="/favicon.png" sizes='any' />
@@ -70,7 +75,7 @@ export default async function RootLayout({
                 'antialiased text-black bg-white dark:text-white dark:bg-black h-full min-h-screen w-full min-w-screen max-w-screen',
                 domine.className,
                 geistMono.className,
-                ubuntuSansMono.className,
+                ubuntuSansMono.className
             )}>
                 <TooltipProvider>
                     <Main>

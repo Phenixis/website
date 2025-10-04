@@ -23,7 +23,7 @@ export default function BlogPosts({
                 .map((post) => (
                     <Link
                         key={post.slug}
-                        className="duration-1000 flex flex-col space-y-1 mb-4 p-2 rounded border border-neutral-200 md:border-transparent lg:hover:border-neutral-200 dark:lg:hover:border-neutral-500"
+                        className="duration-1000 flex flex-col space-y-1 mb-4 p-2 rounded-sm border border-neutral-200 md:border-transparent lg:hover:border-neutral-200 dark:lg:hover:border-neutral-500"
                         href={`/blog/${post.slug}`}
                     >
                         <div className="w-full flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2">
@@ -34,7 +34,7 @@ export default function BlogPosts({
                                 <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
                                     {post.metadata.title}
                                 </p>
-                                <p className="text-neutral-500 dark:text-neutral-400 tracking-tight">
+                                <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2">
                                     {post.metadata.summary}
                                 </p>
                             </div>
