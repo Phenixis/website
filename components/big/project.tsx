@@ -6,7 +6,7 @@ import { Badge } from "../ui/badge"
 
 export let colorVariants = {
     "blue": {
-        "background": "bg-blue-100/10 lg:group-hover/project:bg-blue-300/20",
+        "background": "bg-blue-300/10 lg:group-hover/project:bg-blue-300/20",
         "image": "bg-blue-300/50 lg:group-hover/project:bg-blue-300/70",
         "border": "border border-blue-300/90",
         "selection": "selection:bg-blue-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
