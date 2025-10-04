@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatDate, getBlogPosts } from '@/app/blog/utils'
+import { cn } from '@/lib/utils'
 
 export default function BlogPosts({
     limit = 5
@@ -23,7 +24,7 @@ export default function BlogPosts({
                 .map((post) => (
                     <Link
                         key={post.slug}
-                        className="duration-1000 flex flex-col space-y-1 mb-4 p-2 rounded-sm border border-neutral-200 md:border-transparent lg:hover:border-neutral-200 dark:lg:hover:border-neutral-500"
+                        className="flex flex-col space-y-1 mb-4 p-2 rounded-sm group/blog"
                         href={`/blog/${post.slug}`}
                     >
                         <div className="w-full flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2">
@@ -31,7 +32,12 @@ export default function BlogPosts({
                                 {formatDate(post.metadata.publishedAt, false)}
                             </p>
                             <div>
-                                <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+                                <p
+                                    className={cn(
+                                        "text-neutral-900 dark:text-neutral-100 tracking-tight w-fit relative block line-clamp-1",
+                                        "before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-black dark:before:bg-white before:transition-transform before:duration-1000 before:scale-x-100 md:before:scale-x-0 md:group-hover/blog:before:scale-x-100 before:origin-left"
+                                    )}
+                                >
                                     {post.metadata.title}
                                 </p>
                                 <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2">
