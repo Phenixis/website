@@ -49,7 +49,6 @@ const TwitchPlayer = () => {
                     width="100%"
                     allowFullScreen
                     className='rounded-lg w-full'
-                    frameBorder="0"
                 />
             </div>
         </div>
