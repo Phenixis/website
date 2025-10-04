@@ -6,7 +6,7 @@ import { Badge } from "../ui/badge"
 
 export let colorVariants = {
     "blue": {
-        "background": "bg-blue-300/10 lg:group-hover/project:bg-blue-300/20",
+        "background": "bg-blue-100/10 lg:group-hover/project:bg-blue-300/20",
         "image": "bg-blue-300/50 lg:group-hover/project:bg-blue-300/70",
         "border": "border border-blue-300/90",
         "selection": "selection:bg-blue-300/50 selection:text-neutral-900 dark:selection:text-neutral-100",
@@ -104,8 +104,7 @@ export default function Project({
             <div className={cn(
                 "size-full p-2 rounded-md duration-1000 space-y-4 md:space-y-6 flex flex-col justify-between",
                 colorVariant.selection,
-                colorVariant.background,
-                colorVariant.border)
+                colorVariant.background)
             }>
                 <div className="space-y-2">
                     <header className="flex items-center justify-between flex-wrap gap-2">
