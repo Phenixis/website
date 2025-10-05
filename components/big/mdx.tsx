@@ -123,6 +123,7 @@ const components = {
 	a: CustomLink,
 	code: Code,
 	Table,
+	// Add one for the "> " 
 }
 
 export function CustomMDX(props: React.JSX.IntrinsicAttributes & MDXRemoteProps) {
