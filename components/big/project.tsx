@@ -114,30 +114,30 @@ export default function Project({
                         {
                             showBadge ? (
                                 <Badge className={cn("shrink-0", colorVariant.selection, colorVariant.background, colorVariant.border, "text-black dark:text-white text-xs md:text-sm font-light")}>
-                        {project.metadata.state}
-                    </Badge>
-                    ) : null
+                                    {project.metadata.state}
+                                </Badge>
+                            ) : null
                         }
-                </header>
-                <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2 text-sm md:text-base">
-                    {project.metadata.summary}
-                </p>
+                    </header>
+                    <p className="text-neutral-500 dark:text-neutral-400 tracking-tight line-clamp-2 text-sm md:text-base">
+                        {project.metadata.summary}
+                    </p>
+                </div>
+                {
+                    project.metadata.tags && project.metadata.tags.length > 0 ? (
+                        <div className="text-xs font-light flex flex-row flex-wrap items-end gap-2">
+                            {project.metadata.tags.map((tag) => (
+                                <BadgeTrimmed
+                                    key={tag.index}
+                                    className={cn(tag.color.tag, "text-xs")}
+                                    text={kebabCasetoTitleCase(tag.name)}
+                                    untilSpace
+                                />
+                            ))}
+                        </div>
+                    ) : null
+                }
             </div>
-            {
-                project.metadata.tags && project.metadata.tags.length > 0 ? (
-                    <div className="text-xs font-light flex flex-row flex-wrap items-end gap-2">
-                        {project.metadata.tags.map((tag) => (
-                            <BadgeTrimmed
-                                key={tag.index}
-                                className={cn(tag.color.tag, "text-xs")}
-                                text={kebabCasetoTitleCase(tag.name)}
-                                untilSpace
-                            />
-                        ))}
-                    </div>
-                ) : null
-            }
-        </div>
         </Link >
     )
 }

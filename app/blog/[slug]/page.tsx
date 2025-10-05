@@ -136,8 +136,8 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
                             ) : null
                         }
                         <p className="flex items-center gap-1">
-                            <Eye className="size-4"/>
                             {views}
+                            <Eye className="size-4"/>
                         </p>
                     </div>
                 </div>
