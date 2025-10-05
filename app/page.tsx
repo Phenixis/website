@@ -3,7 +3,7 @@ import Project, { colorVariants, states } from "@/components/big/project"
 import { getProjects } from "@/app/blog/utils"
 import Link from "next/link"
 
-export default function Page() {
+export default async function Page() {
     const birthDate = new Date(2005, 3, 18, 10, 1, 0, 0);
     const now = new Date();
     const birthdayThisYear = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
@@ -12,7 +12,7 @@ export default function Page() {
         currentLifeYear--;
     }
     currentLifeYear = Math.max(0, currentLifeYear); // safeguard in case of negative age
-    const projects = getProjects()
+    const projects = await getProjects()
 
     return (
         <section className="page">

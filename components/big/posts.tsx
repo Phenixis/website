@@ -1,13 +1,14 @@
 import Link from 'next/link'
-import { formatDate, getBlogPosts } from '@/app/blog/utils'
-import { cn } from '@/lib/utils'
+import {formatDate, getBlogPosts} from '@/app/blog/utils'
+import {cn} from '@/lib/utils'
+import {Eye} from "lucide-react";
 
-export default function BlogPosts({
-    limit = 5
-}: {
+export default async function BlogPosts({
+                                      limit = 5
+                                  }: {
     limit?: number
 }) {
-    const allBlogs = getBlogPosts()
+    const allBlogs = await getBlogPosts()
 
     return (
         <div>
@@ -28,9 +29,16 @@ export default function BlogPosts({
                         href={`/blog/${post.slug}`}
                     >
                         <div className="w-full flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2">
-                            <p className="text-neutral-600 dark:text-neutral-400 w-full md:w-[100px] tabular-nums shrink-0">
-                                {formatDate(post.metadata.publishedAt, false)}
-                            </p>
+                            <div
+                                className="flex flex-col w-full md:w-[100px] tabular-nums shrink-0 text-neutral-600 dark:text-neutral-400">
+                                <p>
+                                    {formatDate(post.metadata.publishedAt, false)}
+                                </p>
+                                <p className="flex items-center gap-1">
+                                    <Eye className="size-4"/>
+                                    {post.metadata.views}
+                                </p>
+                            </div>
                             <div>
                                 <p
                                     className={cn(

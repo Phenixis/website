@@ -13,8 +13,8 @@ import Project, { colorVariants, states } from "@/components/big/project"
 import { getProjects } from "@/app/blog/utils"
 
 
-export default function Page() {
-    const projectsList = getProjects()
+export default async function Page() {
+    const projectsList = await getProjects()
 
     return (
         <section className="page space-y-4">
