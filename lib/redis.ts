@@ -18,8 +18,6 @@ export function hashIp(ip: string, key?: string) {
 export async function incrementViews(key: string, hashed_ip_address: string) {
     const data = await redis.get(key) as value
 
-    console.log(data)
-
     if (data === null) {
         await redis.set(key, { views: 1, hashedIps: [hashed_ip_address] })
         return

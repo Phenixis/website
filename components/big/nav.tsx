@@ -16,7 +16,7 @@ const navItems = {
 
 export default function Navbar({ actualPath }: { actualPath: string }) {
 	return (
-		<aside className="tracking-tight sticky top-0 py-1 bg-background">
+		<aside className="tracking-tight sticky top-0 py-1 bg-background dark:bg-black">
 			<div className="flex justify-between">
 				<nav
 					className="w-full flex flex-row items-center justify-between relative px-0 pb-0 fade scroll-pr-6 md:relative"

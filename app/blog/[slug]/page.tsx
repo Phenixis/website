@@ -4,10 +4,10 @@ import {formatDate, getBlogPosts, kebabCasetoTitleCase} from '@/app/blog/utils'
 import {baseUrl} from 'app/sitemap'
 import {BadgeTrimmed} from '@/components/ui/badge-trimmed'
 import {cn} from '@/lib/utils'
-import {ExternalLink, Eye, UserIcon} from 'lucide-react'
+import {ExternalLink, Eye} from 'lucide-react'
 import {Metadata} from "next";
 import {headers} from "next/headers"
-import {getViews, incrementViews, hashIp} from "@/lib/redis";
+import {getViews, hashIp, incrementViews} from "@/lib/redis";
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const params = await props.params;
@@ -66,8 +66,6 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
     const secret = process.env.IP_HASH_KEY; // défini dans .env
     const hashedIp = hashIp(ip, secret);
 
-    console.log(`IP: ${ip}, Hashed IP: ${hashedIp}`);
-
     await incrementViews("/blog/" + post.slug, hashedIp)
 
     const views = await getViews("/blog/" + post.slug)
@@ -118,14 +116,14 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
                     }
                 </div>
                 <div
-                    className="flex flex-col gap-1 md:flex-row justify-between md:items-center mt-2 text-xs md:text-sm text-neutral-600 dark:text-neutral-400 ">
-                    <p className="basis-1/6">
+                    className="flex flex-row flex-wrap md:flex-nowrap md:gap-1 justify-between md:items-center mt-2 text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="w-1/2 md:w-full md:basis-1/6 order-1 md:order-0">
                         {formatDate(post.metadata.publishedAt)}
                     </p>
-                    <p className="basis-5/6">
+                    <p className="md:basis-5/6 order-3 md:order-0">
                         {post.metadata.summary}
                     </p>
-                    <div className="flex flex-col basis-1/6 items-end gap-1 md:gap-2 text-right">
+                    <div className="flex flex-row justify-end md:flex-col md:justify-end w-1/2 md:w-full md:basis-1/6 items-end gap-1 md:gap-2 text-right order-2 md:order-0">
                         {
                             post.metadata.link ? (
                                 <a href={post.metadata.link} target="_blank" rel="noopener noreferrer"
@@ -136,13 +134,13 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
                             ) : null
                         }
                         <p className="flex items-center gap-1">
-                            {views}
                             <Eye className="size-4"/>
+                            {views}
                         </p>
                     </div>
                 </div>
             </header>
-            <article className="grow flex flex-col justify-between prose font-serif text-sm md:text-base lg:text-lg">
+            <article className="grow flex flex-col justify-between prose font-serif text-sm/5 md:text-base/7 lg:text-lg/8">
                 <CustomMDX source={post.content}/>
             </article>
             <footer>

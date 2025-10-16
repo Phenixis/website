@@ -5,7 +5,7 @@ import { Badge } from "./badge"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 
-const ANIMATION_SPEED = 20
+const ANIMATION_DURATION = 1000
 
 export function BadgeTrimmed({
     text,
@@ -51,7 +51,7 @@ export function BadgeTrimmed({
                     }
                     return next;
                 });
-            }, ANIMATION_SPEED);
+            }, ANIMATION_DURATION / text.length);
         } else if (isHovered === false) {
             let i = displayedText.length;
             intervalRef.current = setInterval(() => {
@@ -64,7 +64,7 @@ export function BadgeTrimmed({
                     }
                     return next;
                 });
-            }, ANIMATION_SPEED);
+            }, ANIMATION_DURATION / text.length);
         }
 
         // Clean up interval on unmount or when dependencies change

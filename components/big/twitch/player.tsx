@@ -39,7 +39,7 @@ const TwitchPlayer = () => {
                     {/* Close button */}
                     <button
                         onClick={handleClose}
-                        className="flex absolute top-2 right-2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 items-center justify-center text-lg font-bold transition-colors duration-200 backdrop-blur-xs"
+                        className="flex absolute top-2 right-2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full w-8 h-8 items-center justify-center text-lg font-bold transition-colors duration-1000 backdrop-blur-xs"
                         aria-label="Close Twitch player"
                     >
                         ×

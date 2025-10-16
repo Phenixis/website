@@ -20,10 +20,10 @@ export default async function Page() {
                 My Portfolio
             </h1>
             <p className="page-description">
-                I&apos;m Maxime, a {currentLifeYear} years old french student in computer science. I love building useful applications and websites. I&apos;m learning NextJS since Septembre 2024. You can find all my projects <Link href="/projects" className="duration-300 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>. I also write about my projects, my views and my thoughts <Link href="/blog" className="duration-300 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>.
+                I&apos;m Maxime, a {currentLifeYear} years old french student in computer science. I love building useful applications and websites. I&apos;m learning NextJS since Septembre 2024. You can find all my projects <Link href="/projects" className="duration-1000 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>. I also write about my projects, my views and my thoughts <Link href="/blog" className="duration-1000 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>.
             </p>
             <h2 className="page-title text-2xl">
-                <Link href="/projects" className="duration-300 text-gray-700 dark:text-gray-300 lg:hover:text-black dark:lg:hover:text-white" >
+                <Link href="/projects" className="duration-1000 text-gray-700 dark:text-gray-300 lg:hover:text-black dark:lg:hover:text-white" >
                     My current projects
                 </Link>
             </h2>
@@ -34,7 +34,7 @@ export default async function Page() {
             </div>
             <div className="my-8">
                 <h2 className="page-title text-2xl">
-                    <Link href="/blog" className="duration-300 text-gray-700 dark:text-gray-300  lg:hover:text-black dark:lg:hover:text-white" >
+                    <Link href="/blog" className="duration-1000 text-gray-700 dark:text-gray-300  lg:hover:text-black dark:lg:hover:text-white" >
                         My recent blog posts
                     </Link>
                 </h2>

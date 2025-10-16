@@ -205,7 +205,7 @@
   }
   
   .underlineLtoR {
-    @apply w-fit relative block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-black before:transform before:scale-x-0 before:origin-left before:transition-transform before:duration-300 lg:hover:before:scale-x-100;
+    @apply w-fit relative block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-black before:transform before:scale-x-0 before:origin-left before:transition-transform before:duration-1000 lg:hover:before:scale-x-100;
   }
 
   .prose .anchor {
