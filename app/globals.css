@@ -224,7 +224,7 @@
   }
 
   .prose a {
-    @apply underline transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em];
+    @apply underline transition-all decoration-neutral-400 lg:hover:decoration-neutral-600 dark:decoration-neutral-600 dark:lg:hover:decoration-neutral-400 ;
   }
 
   .prose .anchor:after {
@@ -346,7 +346,7 @@
   }
 
   section.page h1.page-title {
-    @apply mb-2 text-3xl font-[100] tracking-[-0.12em];
+    @apply mb-2 text-3xl font-[100];
   }
 
   section.page p.page-description,

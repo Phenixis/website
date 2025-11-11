@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import {formatDate, getBlogPosts} from '@/app/blog/utils'
-import {cn} from '@/lib/utils'
-import {Eye} from "lucide-react";
+import { formatDate, getBlogPosts } from '@/app/blog/utils'
+import { cn } from '@/lib/utils'
+import { Eye } from "lucide-react";
 
 export default async function BlogPosts({
-                                      limit = 5
-                                  }: {
+    limit = 5
+}: {
     limit?: number
 }) {
     const allBlogs = await getBlogPosts()
@@ -35,7 +35,7 @@ export default async function BlogPosts({
                                     {formatDate(post.metadata.publishedAt, false)}
                                 </p>
                                 <p className="flex items-center gap-1">
-                                    <Eye className="size-4"/>
+                                    <Eye className="size-4" />
                                     {post.metadata.views}
                                 </p>
                             </div>

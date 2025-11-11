@@ -1,7 +1,7 @@
 import BlogPosts from '@/components/big/posts'
 import Project, { colorVariants, states } from "@/components/big/project"
 import { getProjects } from "@/app/blog/utils"
-import Link from "next/link"
+import { Link } from '@/components/big/link'
 
 export default async function Page() {
     const birthDate = new Date(2005, 3, 18, 10, 1, 0, 0);
@@ -17,13 +17,13 @@ export default async function Page() {
     return (
         <section className="page">
             <h1 className="page-title">
-                My Portfolio
+                Welcome !
             </h1>
             <p className="page-description">
-                I&apos;m Maxime, a {currentLifeYear} years old french student in computer science. I love building useful applications and websites. I&apos;m learning NextJS since Septembre 2024. You can find all my projects <Link href="/projects" className="duration-1000 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>. I also write about my projects, my views and my thoughts <Link href="/blog" className="duration-1000 underline underline-offset-4 decoration-dashed lg:hover:text-black dark:lg:hover:text-white" >here</Link>.
+                I&apos;m Maxime, a {currentLifeYear} years old french student in computer science. I love building useful applications and websites. I specialize in NextJS, coupled with TailwindCSS and a PostgreSQL database. You can find all my projects <Link href="/projects" dashed>here</Link>. I also write about my projects, my views and my thoughts <Link href="/blog" dashed>here</Link>.
             </p>
             <h2 className="page-title text-2xl">
-                <Link href="/projects" className="duration-1000 text-gray-700 dark:text-gray-300 lg:hover:text-black dark:lg:hover:text-white" >
+                <Link href="/projects" underlined={false}>
                     My current projects
                 </Link>
             </h2>
@@ -34,7 +34,7 @@ export default async function Page() {
             </div>
             <div className="my-8">
                 <h2 className="page-title text-2xl">
-                    <Link href="/blog" className="duration-1000 text-gray-700 dark:text-gray-300  lg:hover:text-black dark:lg:hover:text-white" >
+                    <Link href="/blog" underlined={false}>
                         My recent blog posts
                     </Link>
                 </h2>
