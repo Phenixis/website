@@ -224,7 +224,7 @@
   }
 
   .prose a {
-    @apply underline transition-all decoration-neutral-400 lg:hover:decoration-neutral-600 dark:decoration-neutral-600 dark:lg:hover:decoration-neutral-400 ;
+    @apply duration-1000 transition-all underline-offset-6 lg:hover:text-black dark:lg:hover:text-white decoration-neutral-400 lg:hover:decoration-neutral-600 dark:decoration-neutral-600 dark:lg:hover:decoration-neutral-400 underline decoration-dashed ;
   }
 
   .prose .anchor:after {
@@ -298,7 +298,7 @@
   }
 
   .prose strong {
-    @apply font-medium;
+    @apply font-bold;
   }
 
   .prose ul {

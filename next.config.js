@@ -8,6 +8,20 @@ module.exports = {
         pathname: '/img/wn/**',
         search: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.producthunt.com',
+        port: '',
+        pathname: '/widgets/**',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 's1.qwant.com',
+        port: '',
+        pathname: '/**',
+        search: '',
+      },
     ],
   },
 }

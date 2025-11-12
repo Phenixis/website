@@ -1,6 +1,6 @@
 ---
 title: The launch of Life OS.
-publishedAt: 2025-11-06
+publishedAt: 2025-11-12
 summary: A summary of the launch of Life OS, my personal productivity system, with the numbers, what I learned and how I feel about it.
 link: https://www.producthunt.com/products/life-os-6
 ---
@@ -10,5 +10,53 @@ If you don't know what Life OS is, you can read the story behind this applicatio
 
 So I kept building it, I wanted to make it perfect, so I fixed that, added this feature and this new thing absolutely necessary for the app and soon, without realizing it, we were 1 year later, the app changed **a lot** and it wasn't public yet.
 
-And this Saturday morning, I woke up and I knew it was time to fix as much bugs as I can, write my Product Hunt description and get the load off my shoulders. I worked all day long, and at the end of the day, it was ready.
+And this Saturday morning, I woke up and I knew it was time to fix as much bugs as I can, write my Product Hunt description and get the load off my shoulders. I worked all day long, fixed more bugs than I could, wrote the best Product Hunt description and, finally, everything was done. I felt light, my project felt ready for the first time since I started it and it felt so good.
 
+It felt like I had done something really useful, an application that I use daily and that someone else can use daily and get value from it. I felt proud for building it, even before the Product Hunt launch and the first user subscribes, but we're going to get back to that later. For now, let's talk about the launch itself.
+
+It didn't explode, as I expected, but it drove some views and users to the app. The launch on Product Hunt got 7 upvotes and ranked 59 in the daily leaderboard.
+
+<center>[![Product Hunt badge](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1030793&theme=light&t=1762932059324)](https://www.producthunt.com/products/life-os-6?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-life&#0045;os&#0045;7)</center>
+
+
+These results don't really surprise me, as the marketing was probably too bold to be believed. The tagline was "Your AI-powered operating system for a cluttered life", which can imply several undeserving things:
+
+1. **It's an OS**: which means that the user would have to leave MacOS or Windows or Linux to use it, which implies A LOT of friction. 
+2. **Another "AI-powered" product**: on the user point of view, it feels like every product is AI-powered and it doesn't mean anything anymore, but on the builder point of view, it's almost impossible not to say this because it would feel like you are behind all the other products.
+3. **You must have a cluttered life to use it**: As you are not going to the doctore when you feel good, you don't use a product that solves a problem you don't have. This means that you must 1. realize that you have a cluttered life, 2. accept it, 3. take actions.
+
+All these problems are obviously implicit, of course no one thought about all that just by reading the tagline, but their unconscious understood that and made them click somewhere else. So, the Product Hunt launch didn't bring much views, from the Vercel analytics, it's only 11 visitors that directly came from a click on Product Hunt.
+
+<center>![Referrers from Vercel Analytics](/life_os_launch_vercel_referrers.png)</center>
+
+But as you can see, some clicks went from "com.reddit.frontpage", which is the package name of the Reddit's Android app, and I think Reddit had a bigger impact that this table shows. I posted on the [Roast My Statup](https://www.reddit.com/r/roastmystartup/) sub-reddit (you can check the post right [here](https://www.reddit.com/r/roastmystartup/comments/1og43wg/i_built_another_productivity_tool_but_this_one_is/)), and it got some tractions.
+
+As of today, the post had 3 800 views and 4 persons commented. 1 about the fact that the "Watch demo" button doesn't work (I didn't have the time to record a demo and forgot to remove it), 1 about the fluidity of the website, 1 that I interpreted as being an AI (it turns out not to be), and the last one was a full review of the app. This is the comment we'll focus on because it's really interesting, so here is the comment:
+
+> I like the idea – I am one of those guys who would like to have something like this.
+> 
+> Comments:
+> 
+> - Watch video does not work
+> 
+> - In the email when I click on the button it sends me to regular login not password creation
+> 
+> - The free plan is not useful at all and I am definitely not interested in paying 20€, when I don't know what I get
+> 
+> - Task manager is ok I guess, but nothing more than anything I have in my phone. Hint does not work. The structure is no better than any other project management tool (If anything then worse)
+> 
+> - Note taking sucks ass. This should be made in a similar way as NoteLM is. I know AI tit and tat but this is something that has made my note taking to extreme level in a correct way I want it.
+> 
+> Overall I think you should have put more effort in it and solve at least one of the issues better than other tools. Currently, the free plan looks something a 13 Y.O could vibecode in few hours.
+> 
+> [source](https://www.reddit.com/r/roastmystartup/comments/1og43wg/comment/nlyvpro/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+
+The last sentence hurts, but is probably true. I did put more effort in the paid plan features than in the free plan features, which is a mistake because the free tier should be the most polished version of the app, to give the feeling that you are on well-built application.
+
+It also shows something I was aware of, but never faced for my own apps. One of the feature I'm the most proud of, and worked the most on, is the optimistic updates for every components. When you create, edit or delete a task for example, you have an immediate reaction of the app, because the app doesn't wait for the task to _really_ be created, updated or deleted. It shows a false version of the app, where the action has been done, when it has not been done yet, and then revalidates the version once the action really place.
+
+Here is a footballistic analogy: When you shoot a ball and immediately start running to the corner, celebrating as if the goal was already confirmed, you're acting optimistically. In software, when a user updates a task, we update the UI right away, as if the change was successful, even before the server confirms it. If the server later says 'no,' we roll back the change, just as you would stop celebrating if the referee disallows the goal.
+
+Well, I worked for long hours to make this feature work, and nobody really realize it because it's invisible. It's the kind of features you should be working on when people start complaining about it, so it feels like a problem-solving feature, rather than something already granted by default.
+
+Anyway, this is what I learnt from the launch of Life OS. If you still read this, you should know that with the code "FEEDBACK", you can have 3 months free of the basic plan, so go try Life OS right [here](https://www.life-os.xyz/sign-up?redirect=checkout&priceId=price_1SMAYEE9V9u2VaxP2sQiUiIK) and tell me what you thought about it !

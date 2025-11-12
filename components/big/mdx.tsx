@@ -43,31 +43,17 @@ function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
 
   if (href.startsWith("/")) {
     return (
-      <Link href={href} {...propsWithoutHref} underlined dashed>
+      <Link href={href} {...propsWithoutHref} dashed>
         {props.children}
       </Link>
     );
   }
 
   if (href.startsWith("#")) {
-    return (
-      <Link href={href} {...propsWithoutHref} underlined dashed>
-        {props.children}
-      </Link>
-    );
+    return <a {...props} />;
   }
 
-  return (
-    <Link
-      target="_blank"
-      rel="noopener noreferrer"
-      href={href}
-      {...propsWithoutHref}
-      dashed
-    >
-      {props.children}
-    </Link>
-  );
+  return <a target="_blank" rel="noopener noreferrer" {...props} />;
 }
 
 interface RoundedImageProps {
@@ -78,15 +64,66 @@ interface RoundedImageProps {
   className?: string;
 }
 
-function RoundedImage({ className, alt, ...props }: RoundedImageProps) {
+function RoundedImage({ className, alt, width, height, ...props }: RoundedImageProps) {
+  // If width and height are provided, use Next.js Image for optimization
+  if (width && height) {
+    return (
+      <>
+        <Image 
+          className={`rounded-lg ${className || ""}`} 
+          alt={alt} 
+          width={width}
+          height={height}
+          {...props} 
+        />
+        <span className="w-fit">{alt}</span>
+      </>
+    );
+  }
+
+  // Otherwise, use regular img tag for external images without dimensions
   return (
-    <Image className={`rounded-lg ${className || ""}`} alt={alt} {...props} />
+    <>
+      <img 
+        className={`rounded-lg ${className || ""}`} 
+        alt={alt} 
+        {...props} 
+      />
+      <span className="w-fit">{alt}</span>
+    </>
   );
 }
 
 function Code({ children, ...props }: { children: string }) {
   const codeHTML = highlight(children);
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
+}
+
+function Blockquote({ children, ...props }: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) {
+  return (
+    <blockquote
+      className="rounded border-l-4 border-gray-300 dark:border-gray-600 pl-4 py-2 my-4 italic text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/50 rounded-r-lg"
+      {...props}
+    >
+      {children}
+    </blockquote>
+  );
+}
+
+function Strong({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className="font-bold text-gray-900 dark:text-gray-100" {...props}>
+      {children}
+    </span>
+  );
+}
+
+function Em({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className="italic text-gray-800 dark:text-gray-200" {...props}>
+      {children}
+    </span>
+  );
 }
 
 function slugify(str: string) {
@@ -139,10 +176,13 @@ const components = {
   h5: createHeading(5),
   h6: createHeading(6),
   Image: RoundedImage,
+  img: RoundedImage,
   a: CustomLink,
   code: Code,
   Table,
-  // Add one for the "> "
+  blockquote: Blockquote,
+  strong: Strong,
+  em: Em,
 };
 
 export function CustomMDX(
