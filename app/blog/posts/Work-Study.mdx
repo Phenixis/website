@@ -60,3 +60,22 @@ The tests I write at Nutraveris are focused on forms that creates entities. The 
 > Fill the form > Submit the form > Verify the data saved are the same ones I wrote in the form earlier
 
 So it's quite repetitive, and I don't like doing the same thing over and over again. So, my work quickly went from writing tests, to writing a whole tests architecture. The goal is to write the tests faster, and build reusable tests instead of repeat the code at multiple locations.
+
+As my focus is on the controls of a form, I decided to orientate the architecture on what I called the "form controls", which are the input you fill when you fill a form. I created one component for each of the different types of form controls you can imagine:
+
+- simple text inputs
+- date inputs
+- selects
+- checkboxes
+- toggles
+- sliders
+- ...
+
+
+Each of these components define how you fill it, how you verify the value filled, and how you reset it. So now, instead of writing the same thing over and over again, you simply have to say "this form contains X and Y form controls and you should enter the values A and B in the form controls", and the system will know exactly how to fill them, verify them, etc. based on the components built before.
+
+The system works on an OOP paradigm: it starts with an abstract class `BaseFormControl`, that defines the basic parameters that should be given, basic utilities functions, and the abstract functions `fill()`, `assert()`, `reset()`, `empty()`.
+
+This class is extended to lay the foundations for more complex components: there is a class `InputFormControl`, that defines the basics of a simple input, that is also extended to define a number-only input, then a multi-input (that accepts multiple answers), then an autocomplete input (that suggests a solution), etc...
+
+This kind of hierarchy allows to share common logic without copy-pasting it, and making it hard to maintain on the long run.
