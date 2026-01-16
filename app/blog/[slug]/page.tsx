@@ -1,20 +1,20 @@
-import {notFound} from 'next/navigation'
-import {CustomMDX} from '@/components/big/mdx'
-import {formatDate, getBlogPosts, kebabCasetoTitleCase} from '@/app/blog/utils'
-import {baseUrl} from 'app/sitemap'
-import {BadgeTrimmed} from '@/components/ui/badge-trimmed'
-import {cn} from '@/lib/utils'
-import {ExternalLink, Eye} from 'lucide-react'
-import {Metadata} from "next";
-import {headers} from "next/headers"
-import {getViews, hashIp, incrementViews} from "@/lib/redis";
+import { notFound } from 'next/navigation'
+import { CustomMDX } from '@/components/big/mdx'
+import { formatDate, getBlogPosts, kebabCasetoTitleCase } from '@/app/blog/utils'
+import { baseUrl } from '@/app/sitemap'
+import { BadgeTrimmed } from '@/components/ui/badge-trimmed'
+import { cn } from '@/lib/utils'
+import { ExternalLink, Eye } from 'lucide-react'
+import { Metadata } from "next";
+import { headers } from "next/headers"
+import { getViews, hashIp, incrementViews } from "@/lib/redis";
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const params = await props.params;
     const post = (await getBlogPosts(true)).find((post) => post.slug === params.slug)
 
     if (!post) {
-        return {title: 'Not Found'}
+        return { title: 'Not Found' }
     }
 
     const {
@@ -23,9 +23,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
         summary: description,
         image,
     } = post.metadata
-    const ogImage = image
-        ? image
-        : `${baseUrl}/og?title=${encodeURIComponent(title)}`
+    const ogImage = image || `${baseUrl}/og?title=${encodeURIComponent(title)}`
 
     return {
         title,
@@ -101,7 +99,7 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
                     </h1>
                     {
                         post.metadata.isProject && post.metadata.tags && post.metadata.tags.length > 0 ? (
-                            <div className="md:col-span-5 text-xs font-light flex flex-col md:flex-row">
+                            <div className="md:col-span-5 text-xs font-light flex flex-col md:flex-row md:flex-wrap md:max-w-[60%]">
                                 {post.metadata.tags.map((tag) => (
                                     <BadgeTrimmed
                                         key={tag.index}
@@ -127,25 +125,25 @@ export default async function Blog(props: { params: Promise<{ slug: string }> })
                         {
                             post.metadata.link ? (
                                 <a href={post.metadata.link} target="_blank" rel="noopener noreferrer"
-                                   className="flex items-center gap-1">
+                                    className="flex items-center gap-1">
                                     Link
-                                    <ExternalLink className="size-4"/>
+                                    <ExternalLink className="size-4" />
                                 </a>
                             ) : null
                         }
                         <p className="flex items-center gap-1">
-                            <Eye className="size-4"/>
+                            <Eye className="size-4" />
                             {views}
                         </p>
                     </div>
                 </div>
             </header>
             <article className="grow flex flex-col justify-between prose font-serif text-sm/5 md:text-base/7 lg:text-lg/8">
-                <CustomMDX source={post.content}/>
+                <CustomMDX source={post.content} />
             </article>
             <footer>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    Best Regards,<br/>
+                    Best Regards,<br />
                     Maxime Duhamel :)
                 </p>
             </footer>

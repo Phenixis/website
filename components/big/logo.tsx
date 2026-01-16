@@ -1,6 +1,6 @@
 import Image from 'next/image'
-import ListIconLight from 'public/list-icon-light.png';
-import ListIconDark from 'public/list-icon-dark.png';
+import ListIconLight from '@/public/list-icon-light.png';
+import ListIconDark from '@/public/list-icon-dark.png';
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 

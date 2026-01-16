@@ -5,16 +5,58 @@ summary: In September 2025, I started a work-study program at Nutraveris, part o
 isProject: true
 state: "Running"
 color: green
-tags: 1, 2, 6
+tags: 1, 2, 3, 6
 ---
 
-Nutraveris is a consulting and software company that helps businesses in the nutrition and health industries to market dietary supplements. Since September 2025, I work in there the IT department, as a Junior Developer alternating between periods of study at the university and working at the company, on-site.
+Nutraveris is a consulting and software company that helps businesses in the nutrition and health industries to market dietary supplements. Since September 2025, I work in the IT department, as a Junior Developer alternating between periods of study at the university and working at the company, on-site.
 
 This program has been created by the Government to help students to get a job, real-world experience and money to finance the studies and companies to find workforce cheaper than full-time employees and train students on their technos and methods. It's a win-win situation.
 
 ## How it started
 
-In May 2025, I was in Cardiff for a 3-month internship to fulfill the 2nd year requirement of my Computer Science degree, and one of the professor reached to the students to remind them that some work-study offers made by companies to the university had no applicants. I wasn’t sure if I wanted to do my 3rd year in this work-study program (since it has some drawbacks), so I only looked at the offers vaguely but one stood out. 
+In May 2025, I was in Cardiff for a 3-month internship to fulfill the 2nd year requirement of my Computer Science degree, and one of the professor reached to the students to remind them that some work-study offers made by companies to the university had no applicants. I wasn’t sure if I wanted to do my 3rd year in this work-study program (since it has some drawbacks), so I only looked at the offers vaguely but one stood out.
 
-The company was looking for a web developer *(what I love)* with knowledge on modern technos *(which I had)*, for a 1 year contract *(the duration I wanted)*, in the nearest city of my parents' house *(which was perfect)*. I thought :
+The company was looking for a web developer _(what I love)_ with knowledge on modern technos _(which I had)_, for a 1 year contract _(the duration I wanted)_, in the nearest city of my parents' house _(which was perfect)_. I thought :
+
 > "Well, this is for me. It matches everything I want and there are no applicant ? Let's apply RIGHT NOW"
+
+So I applied, I sent an email describing who I am, what I do and I attached my CV. I heard back from the recruiter about a week later, he was proposing a meeting with him to verify if my application was a fit with what they are looking for. 1 week and a half later, the meeting started at 9am, we talked about my current internship, my personal projects, etc... We also talked about their company, what they do and how they do it, how comfortable I am with their technologies. The meeting went well, and was honestly interesting !
+
+Fast forward to 1 month later, I had another meeting with their HR to be sure my personality was a good match with the company values, and the paperwork started between the university and the company: I've been accepted ! So my first day was set: Monday, 1st September, 2025, 9am.
+
+## My work
+
+My main focus at Nutraveris is building automated test suites on web applications. They have 3 applications with great names: Manager, Compliance and SRDI. These applications have a lot of pages, manage a lot of data, and are used by a lot of people. When you update a page with new datas or a new connection to another page, it can create a problem in another page, an unplanned **side-effect**.
+
+My work is not to remove these side-effects: it's impossible. When coding applications of this size, you will face side-effects. The most important is to detect them before they get in front of your users. This is my work: making sure these side-effects are detected, reported to the developpers, and corrected before they get published publicly.
+
+### Let's get in the technical part
+
+I'm using [Playwright](https://playwright.dev/), which is a programming tool to test web pages. It allows you to write code that will verify if the pages you build verify some conditions. Because a picture is worth a thousand words, here is an example of an usage of Playwright:
+
+```typescript
+test.describe("Page 1 test suite", async () Promise<void> {
+    test("Verify if the title contains 'Mon titre'", async ({ page }): Promise<void> {
+        await assert(page.locator("h1#title").textContent).contains("Mon titre");
+    })
+})
+```
+
+Let me divide the code help you understand it, *even if you don't code*:
+1. You have a first level with: `test.describe("Page 1 test suite", async (): Promise<void> { ... })`
+2. Then, there is another level with: `test("Verify if the title contains 'Mon titre'", async ({ page }): Promise<void> { ... })`
+3. Finally, there is a third level: `await assert(page.locator("h1#title").textContent).contains("Mon titre");`
+
+The first level starts by defining a group of test, with the keyword `test.describe(...)`. It gives the group a name to help organizing the tests and gives the main goal of the group, here it's "Page 1 test suite", so we know we'll test the Page 1.<br/>
+Then, the second level describe a single test with the keyword  `test(...)`. It gives the information of what the test will do, here we "Verify if the title contains 'Mon titre'", which is pretty clear.<br/>
+Finally, there is the keyword `assert(...)` that describes a verification that must be right to describe the test as a success, you can see it as the definition of a requirement. When you use `assert(...)`, you say "This condition must pass to keep going". In the assert, we locate a block in our page, here it's a heading 1, with the id `title`. Then, we say that we want only the `textContent`, basically what's inside the heading. And finally, we say that this text content should contain the string "Mon titre".
+
+This test is quite simple, we just verify the content of a title, and it's kind of too much to group it in a `test.describe(...)`, but it's a good example of what we can do.
+
+### Concrete works
+
+The tests I write at Nutraveris are focused on forms that creates entities. The testing process is always the same:
+
+> Fill the form > Submit the form > Verify the data saved are the same ones I wrote in the form earlier
+
+So it's quite repetitive, and I don't like doing the same thing over and over again. So, my work quickly went from writing tests, to writing a whole tests architecture. The goal is to write the tests faster, and build reusable tests instead of repeat the code at multiple locations.
