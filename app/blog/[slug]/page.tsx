@@ -1,16 +1,17 @@
 import { formatDate, getBlogPosts, kebabCasetoTitleCase } from '@/app/blog/utils'
 import { CustomMDX } from '@/components/big/mdx'
 import { colorVariants, states } from "@/components/big/project"
+import { ViewCounter } from '@/components/big/view-counter'
 import { BadgeTrimmed } from '@/components/ui/badge-trimmed'
-import { getViews, hashIp, incrementViews } from "@/lib/redis"
 import { cn } from '@/lib/utils'
 import { baseUrl } from '@/app/sitemap'
-import { ExternalLink, Eye } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { Metadata } from "next"
-import { headers } from "next/headers"
 import { notFound } from 'next/navigation'
 
-export const revalidate = 1000 * 60 * 60 * 24; // Revalider la page toutes les 24 heures
+export const dynamic = 'force-static'
+export const dynamicParams = true
+// export const revalidate = 1000 * 60 * 60 * 24
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const params = await props.params;
@@ -52,6 +53,14 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     }
 }
 
+export async function generateStaticParams() {
+    const posts = await getBlogPosts()
+
+    return posts.map((post) => ({
+        slug: post.slug,
+    }))
+}
+
 export default async function Blog(props: Readonly<{ params: Promise<{ slug: string }> }>) {
     const params = await props.params;
     const post = (await getBlogPosts()).find((post) => post.slug === params.slug)
@@ -59,17 +68,6 @@ export default async function Blog(props: Readonly<{ params: Promise<{ slug: str
     if (!post) {
         notFound()
     }
-
-    const h = await headers();
-    const xff = h.get('x-forwarded-for');
-    const ip = (xff?.split(',')[0].trim()) || h.get('x-real-ip') || '127.0.0.1';
-
-    const secret = process.env.IP_HASH_KEY; // défini dans .env
-    const hashedIp = hashIp(ip, secret);
-
-    await incrementViews("/blog/" + post.slug, hashedIp)
-
-    const views = await getViews("/blog/" + post.slug)
 
     return (
         <section className='page flex-1 flex flex-col justify-between gap-4 md:gap-12'>
@@ -141,10 +139,7 @@ export default async function Blog(props: Readonly<{ params: Promise<{ slug: str
                                 </a>
                             ) : null
                         }
-                        <p className="flex items-center gap-1">
-                            {views}
-                            <Eye className="size-4" />
-                        </p>
+                        <ViewCounter slug={`/blog/${post.slug}`} />
                     </div>
                 </div>
             </header>

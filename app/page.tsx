@@ -2,6 +2,7 @@ import { getProjects } from "@/app/blog/utils";
 import { Link } from '@/components/big/link';
 import BlogPosts from '@/components/big/posts';
 import Project from "@/components/big/project";
+import { baseUrl } from '@/app/sitemap';
 
 export default async function Page() {
     const birthDate = new Date(2005, 3, 18, 10, 1, 0, 0);

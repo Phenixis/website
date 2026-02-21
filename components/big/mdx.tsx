@@ -86,7 +86,7 @@ function RoundedImage({ className, alt, width, height, ...props }: RoundedImageP
     <>
       <img 
         className={`rounded-lg ${className || ""}`} 
-        alt={alt} 
+        alt={alt}
         {...props} 
       />
       <span className="w-fit">{alt}</span>

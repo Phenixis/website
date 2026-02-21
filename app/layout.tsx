@@ -29,6 +29,9 @@ export const metadata: Metadata = {
         template: '%s | Maxime Duhamel',
     },
     description: 'This is my portfolio.',
+    alternates: {
+        canonical: baseUrl,
+    },
     openGraph: {
         title: "Maxime Duhamel's Portfolio",
         description: "Welcome to my portfolio.",
@@ -36,6 +39,20 @@ export const metadata: Metadata = {
         siteName: "Maxime Duhamel's Portfolio",
         locale: 'en_US',
         type: 'website',
+        images: [
+            {
+                url: `${baseUrl}/og?title=${encodeURIComponent("Maxime Duhamel")}`,
+                width: 1200,
+                height: 630,
+                alt: "Maxime Duhamel's Portfolio",
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: "Maxime Duhamel's Portfolio",
+        description: "Welcome to my portfolio.",
+        images: [`${baseUrl}/og?title=${encodeURIComponent("Maxime Duhamel")}`],
     },
     robots: {
         index: true,
