@@ -3,9 +3,6 @@ title: TITLE
 publishedAt: DATE
 summary: SUMMARY
 link: URL
-isProject: BOOLEAN
-state: "Running" | "Building" | "Idea" | "Built" | "Sold" | "Discontinued"
-color: "blue" | "green" | "red" | "yellow" | "purple" | "orange" 
-tags: id_tag1, id_tag2
+tag: tag1, tag2, ...
 ---
 CONTENT
