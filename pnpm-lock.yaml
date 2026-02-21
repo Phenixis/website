@@ -58,7 +58,7 @@ importers:
         specifier: 16.1.2
         version: 16.1.2(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-mdx-remote:
-        specifier: latest
+        specifier: 6.0.0
         version: 6.0.0(react@19.2.4)(types-react@19.0.0-rc.1)
       next-pwa:
         specifier: ^5.6.0
@@ -5636,7 +5636,7 @@ snapshots:
 
   '@types/hast@3.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/json-schema@7.0.15': {}
 
@@ -5644,7 +5644,7 @@ snapshots:
 
   '@types/mdast@4.0.4':
     dependencies:
-      '@types/unist': 2.0.11
+      '@types/unist': 3.0.3
 
   '@types/mdx@2.0.13': {}
 
