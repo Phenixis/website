@@ -1,10 +1,9 @@
-import { kebabCasetoTitleCase, ProjectType } from "@/app/blog/utils"
+import { ProjectType } from "@/app/blog/utils"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { BadgeTrimmed } from "../ui/badge-trimmed"
 import { Badge } from "../ui/badge"
 
-export let colorVariants = {
+export const colorVariants = {
     "blue": {
         "background": "bg-blue-300/10 lg:group-hover/project:bg-blue-300/20",
         "image": "bg-blue-300/50 lg:group-hover/project:bg-blue-300/70",
@@ -55,48 +54,16 @@ export let colorVariants = {
         "tag": "text-black dark:text-white font-light duration-1000 bg-neutral-500/10 lg:hover:bg-neutral-500/20 border border-neutral-300/90"
     }
 }
-export const skills = [
-    {
-        index: 1,
-        name: "Réaliser une solution informatique",
-        color: colorVariants.red
-    },
-    {
-        index: 2,
-        name: "Optimiser des programmes",
-        color: colorVariants.orange
-    },
-    {
-        index: 3,
-        name: "Administrer des infrastructures et services",
-        color: colorVariants.yellow
-    },
-    {
-        index: 4,
-        name: "Gérer les données pour les rendre disponibles",
-        color: colorVariants.green
-    },
-    {
-        index: 5,
-        name: "Conduire un projet en méthode agile",
-        color: colorVariants.blue
-    },
-    {
-        index: 6,
-        name: "Collaborer pour travailler en équipe",
-        color: colorVariants.black
-    },
-]
 
 export const states = ["Running", "Building", "Idea", "Built", "Sold", "Discontinued"]
 
 export default function Project({
     project,
     showBadge = true,
-}: {
+}: Readonly<{
     project: ProjectType
     showBadge?: boolean,
-}) {
+}>) {
     const colorVariant = project.metadata.color && colorVariants[project.metadata.color] ? colorVariants[project.metadata.color] : colorVariants.blue
 
     return (
@@ -123,20 +90,6 @@ export default function Project({
                         {project.metadata.summary}
                     </p>
                 </div>
-                {
-                    project.metadata.tags && project.metadata.tags.length > 0 ? (
-                        <div className="text-xs font-light flex flex-row flex-wrap items-end gap-2">
-                            {project.metadata.tags.map((tag) => (
-                                <BadgeTrimmed
-                                    key={tag.index}
-                                    className={cn(tag.color.tag, "text-xs")}
-                                    text={kebabCasetoTitleCase(tag.name)}
-                                    untilSpace
-                                />
-                            ))}
-                        </div>
-                    ) : null
-                }
             </div>
         </Link >
     )

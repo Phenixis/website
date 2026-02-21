@@ -54,9 +54,9 @@ const cx = (...classes: string[]) => classes.filter(Boolean).join(' ')
 
 export default async function RootLayout({
     children,
-}: {
+}: Readonly<{
     children: React.ReactNode
-}) {
+}>) {
     const cookieStore = await cookies();
     const theme = cookieStore.get('theme')?.value;
 

@@ -17,21 +17,33 @@ function ArrowIcon() {
     )
 }
 
-const links = [
-    { name: "Linkedin", ref: "https://www.linkedin.com/in/maxime-duhamel/", visibleOn: "/projects" },
-    { name: "RSS feed", ref: "/rss", visibleOn: "/blog" },
-    { name: "Youtube", ref: "https://www.youtube.com/@maximeduh", visibleOn: "/projects" },
-    { name: "Github", ref: "https://github.com/Phenixis", visibleOn: "/" },
-    { name: "X", ref: "https://twitter.com/maxime_duhamel_", visibleOn: "/projects" },
-];
+const links: {
+    name: string,
+    ref: string,
+    visibleOn?: string | string[]
+}[] = [
+        { name: "Linkedin", ref: "https://www.linkedin.com/in/maxime-duhamel/", visibleOn: "/projects" },
+        { name: "RSS feed", ref: "/rss", visibleOn: "/blog" },
+        { name: "Youtube", ref: "https://www.youtube.com/@maximeduh", visibleOn: "/projects" },
+        { name: "Github", ref: "https://github.com/Phenixis", visibleOn: "/" },
+        { name: "X", ref: "https://twitter.com/maxime_duhamel_", visibleOn: "/projects" },
+    ];
 
-export default function Footer({ actualPath }: { actualPath: string }) {
+export default function Footer({ actualPath }: Readonly<{ actualPath: string }>) {
     return (
         <footer className="flex justify-between items-end mt-2 mb-4">
             <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm text-neutral-500 md:gap-4 list-none">
                 {
                     links
-                        .filter((link) => actualPath.includes(link.visibleOn))
+                        .filter((link) => {
+                            if (Array.isArray(link.visibleOn)) {
+                                return link.visibleOn.some((path) => actualPath.includes(path));
+                            } else if (link.visibleOn) {
+                                return actualPath.includes(link.visibleOn);
+                            } else {
+                                return true;
+                            }
+                        })
                         .map((link) => {
                             return (
                                 <li key={link.name}>

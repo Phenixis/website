@@ -2,7 +2,7 @@ import { baseUrl } from '@/app/sitemap'
 import { getBlogPosts } from '@/app/blog/utils'
 
 export async function GET() {
-  const allBlogs = await getBlogPosts()
+  const allBlogs = await getBlogPosts({ excludeTags: ['Project'] })
 
   const itemsXml = allBlogs
     .sort((a, b) => {

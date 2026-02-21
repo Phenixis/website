@@ -8,7 +8,7 @@ export default async function BlogPosts({
 }: {
     limit?: number
 }) {
-    const allBlogs = await getBlogPosts()
+    const allBlogs = await getBlogPosts({ excludeTags: ['Project'] })
 
     return (
         <div>

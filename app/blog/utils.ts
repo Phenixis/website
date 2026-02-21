@@ -1,7 +1,7 @@
-import {colorVariants, states, skills} from '@/components/big/project'
-import fs from 'fs'
-import path from 'path'
-import {getViews} from "@/lib/redis";
+import { colorVariants, states } from '@/components/big/project';
+import { getViews } from "@/lib/redis";
+import fs from 'node:fs';
+import path from 'node:path';
 
 export const dir = path.join(process.cwd(), 'app', 'blog', 'posts')
 
@@ -12,10 +12,10 @@ type Metadata = {
     views: number
     link?: string
     image?: string
-    isProject?: string
-    state?: typeof states[number]
+    isProject?: string // Deprecated: use tags with "Project" instead
+    state?: typeof states[number] // Deprecated: use tags with state name instead
     color?: keyof typeof colorVariants
-    tags?: typeof skills
+    tags?: string[] // Tags array: ["Project", "Discontinued", "TypeScript", etc.]
 }
 
 export type ProjectType = {
@@ -40,27 +40,48 @@ function parseFrontmatter(fileContent: string) {
 
         switch (trimmedKey) {
             case 'state':
-                metadata.state = value as typeof states[number]
+                metadata.state = value
                 break;
             case 'color':
                 metadata.color = value as keyof typeof colorVariants
                 break;
-            case 'tags':
-                const localTags = value.split(',').map((tag) => Number(tag.trim()))
-                const localSkills = Array(localTags.length).fill("")
-                for (let i = 0; i < localTags.length; i++) {
-                    if (skills[localTags[i] - 1]) {
-                        localSkills[i] = skills[localTags[i] - 1]
-                    }
-                }
-                metadata.tags = localSkills as typeof skills
+            case 'tags': {
+                // Tags are comma-separated strings
+                const tagValues = value.split(',').map((tag) => tag.trim()).filter(Boolean)
+                metadata.tags = tagValues
                 break;
+            }
             default:
                 // @ts-ignore
                 metadata[trimmedKey as keyof Metadata] = value
 
         }
     })
+
+    // Backward compatibility: convert old format to new format
+    if (metadata.isProject && Boolean(metadata.isProject)) {
+        metadata.tags ??= []
+        if (!metadata.tags.includes('Project')) {
+            metadata.tags.push('Project')
+        }
+    }
+    
+    if (metadata.state) {
+        metadata.tags ??= []
+        if (!metadata.tags.includes(metadata.state)) {
+            metadata.tags.push(metadata.state)
+        }
+    }
+    
+    // Extract state from tags if not explicitly set (new format to old format)
+    if (!metadata.state && metadata.tags) {
+        for (const tag of metadata.tags) {
+            if (states.includes(tag)) {
+                metadata.state = tag
+                break
+            }
+        }
+    }
 
     return {metadata: metadata as Metadata, content}
 }
@@ -80,11 +101,33 @@ async function getMDXData(dir: string) {
     return Promise.all(postPromises); // Wait for all promises to resolve
 }
 
-export async function getBlogPosts(withProjects: boolean = false) {
+export async function getBlogPosts(options: {
+    includeTags?: string[]
+    excludeTags?: string[]
+} = {}) {
+    const { includeTags = [], excludeTags = [] } = options
     const posts = await getMDXData(dir)
 
     return posts.filter((post) => {
-        return post.metadata.publishedAt != "" && (withProjects || !Boolean(post.metadata.isProject))
+        if (post.metadata.publishedAt === "") return false
+        
+        const postTags = post.metadata.tags || []
+        const isProject = postTags.includes('Project') || Boolean(post.metadata.isProject)
+        const allTags = isProject ? [...postTags, 'Project'] : postTags
+        
+        // If includeTags is specified, post must have at least one of those tags
+        if (includeTags.length > 0) {
+            const hasIncludedTag = includeTags.some(tag => allTags.includes(tag))
+            if (!hasIncludedTag) return false
+        }
+        
+        // Post must not have any of the excluded tags
+        if (excludeTags.length > 0) {
+            const hasExcludedTag = excludeTags.some(tag => allTags.includes(tag))
+            if (hasExcludedTag) return false
+        }
+        
+        return true
     })
 }
 
@@ -103,10 +146,7 @@ export async function getBlogPost(slug: string) {
 }
 
 export async function getProjects() {
-    const posts = await getBlogPosts(true)
-    return posts.filter((post) => {
-        return post.metadata.isProject !== undefined && Boolean(post.metadata.isProject)
-    })
+    return await getBlogPosts({ includeTags: ['Project'] })
 }
 
 export function formatDate(date: string, includeRelative = false) {
@@ -155,7 +195,7 @@ export function kebabCasetoTitleCase(str: string) {
 export function formatToKebabCase(str: string) {
     return str
         .toLowerCase()
-        .replace(/[^a-z0-9.]+/g, '-') // Replace non-alphanumeric (except dot) with hyphens
-        .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
-        .replace(/--+/g, '-') // Replace multiple hyphens with a single hyphen
+        .replaceAll(/[^a-z0-9.]+/g, '-') // Replace non-alphanumeric (except dot) with hyphens
+        .replaceAll(/(^-+)|(-+$)/g, '') // Remove leading and trailing hyphens
+        .replaceAll(/--+/g, '-') // Replace multiple hyphens with a single hyphen
 }

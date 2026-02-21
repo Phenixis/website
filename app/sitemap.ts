@@ -3,7 +3,7 @@ import { getBlogPosts } from '@/app/blog/utils'
 export const baseUrl = 'https://www.maximeduhamel.com'
 
 export default async function sitemap() {
-  const blogs = (await getBlogPosts()).map((post) => ({
+  const blogs = (await getBlogPosts({ excludeTags: ['Project'] })).map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.metadata.publishedAt,
   }))

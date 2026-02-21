@@ -58,7 +58,7 @@ export default async function Page() {
                 </CollapsibleContent>
             </Collapsible>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {projectsList.sort(
+                {projectsList.toSorted(
                     (a, b) => {
                         const stateA = states.indexOf(a.metadata.state as typeof states[number])
                         const stateB = states.indexOf(b.metadata.state as typeof states[number])
