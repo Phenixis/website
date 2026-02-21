@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils';
 
 export default function Time({
     className,
-}: {
+}: Readonly<{
     className?: string
-}) {
+}>) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [locale, setLocale] = useState("fr-FR");
 

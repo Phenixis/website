@@ -6,11 +6,11 @@ export default function Help({
     message = "",
     size = "base",
     className = "",
-} : {
+} : Readonly<{
     message?: string;
     size?: "xs" | "sm" | "base" | "lg" | "xl" ;
     className?: string;
-}) {
+}>) {
     const sizeClass = {
         xs: "w-3 h-3",
         sm: "w-4 h-4",

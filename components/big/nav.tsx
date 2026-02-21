@@ -14,7 +14,7 @@ const navItems = {
 	},
 }
 
-export default function Navbar({ actualPath }: { actualPath: string }) {
+export default function Navbar({ actualPath }: Readonly<{ actualPath: string }>) {
 	return (
 		<aside className="tracking-tight sticky top-0 py-1 bg-background dark:bg-black">
 			<div className="flex justify-between">

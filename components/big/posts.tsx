@@ -5,15 +5,15 @@ import { Eye } from "lucide-react";
 
 export default async function BlogPosts({
     limit = 5
-}: {
+}: Readonly<{
     limit?: number
-}) {
+}>) {
     const allBlogs = await getBlogPosts({ excludeTags: ['Project'] })
 
     return (
         <div>
             {allBlogs
-                .sort((a, b) => {
+                .toSorted((a, b) => {
                     if (
                         new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)
                     ) {
@@ -21,7 +21,7 @@ export default async function BlogPosts({
                     }
                     return 1
                 })
-                .slice(0, limit !== 0 ? limit : allBlogs.length)
+                .slice(0, limit === 0 ? allBlogs.length : limit)
                 .map((post) => (
                     <Link
                         key={post.slug}
@@ -30,7 +30,7 @@ export default async function BlogPosts({
                     >
                         <div className="w-full flex flex-col md:items-center md:flex-row space-x-0 md:space-x-2">
                             <div
-                                className="flex flex-row justify-between md:flex-col w-full md:w-[100px] tabular-nums shrink-0 text-neutral-600 dark:text-neutral-400">
+                                className="flex flex-row justify-between md:flex-col w-full md:w-25 tabular-nums shrink-0 text-neutral-600 dark:text-neutral-400">
                                 <p>
                                     {formatDate(post.metadata.publishedAt, false)}
                                 </p>
@@ -43,7 +43,7 @@ export default async function BlogPosts({
                                 <p
                                     className={cn(
                                         "text-neutral-900 dark:text-neutral-100 tracking-tight w-fit relative block line-clamp-1",
-                                        "before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-black dark:before:bg-white before:transition-transform before:duration-1000 before:scale-x-100 md:before:scale-x-0 md:group-hover/blog:before:scale-x-100 before:origin-left"
+                                        "before:absolute before:left-0 before:bottom-0 before:h-0.5 before:w-full before:bg-black dark:before:bg-white before:transition-transform before:duration-1000 before:scale-x-100 md:before:scale-x-0 md:group-hover/blog:before:scale-x-100 before:origin-left"
                                     )}
                                 >
                                     {post.metadata.title}

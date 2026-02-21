@@ -11,7 +11,7 @@ interface TableData {
   rows: string[][];
 }
 
-function Table({ data }: { data: TableData }) {
+function Table({ data }: Readonly<{ data: TableData }>) {
   const headers = data.headers.map((header: string, index: number) => (
     <th key={index}>{header}</th>
   ));
@@ -33,7 +33,7 @@ function Table({ data }: { data: TableData }) {
   );
 }
 
-function CustomLink(props: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
+function CustomLink(props: Readonly<React.AnchorHTMLAttributes<HTMLAnchorElement>>) {
   const href = (props.href || "")
     .split("/")
     .map((value) => formatToKebabCase(value))
@@ -64,7 +64,7 @@ interface RoundedImageProps {
   className?: string;
 }
 
-function RoundedImage({ className, alt, width, height, ...props }: RoundedImageProps) {
+function RoundedImage({ className, alt, width, height, ...props }: Readonly<RoundedImageProps>) {
   // If width and height are provided, use Next.js Image for optimization
   if (width && height) {
     return (
@@ -94,12 +94,12 @@ function RoundedImage({ className, alt, width, height, ...props }: RoundedImageP
   );
 }
 
-function Code({ children, ...props }: { children: string }) {
+function Code({ children, ...props }: Readonly<{ children: string }>) {
   const codeHTML = highlight(children);
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
 }
 
-function Blockquote({ children, ...props }: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) {
+function Blockquote({ children, ...props }: Readonly<React.BlockquoteHTMLAttributes<HTMLQuoteElement>>) {
   return (
     <blockquote
       className="rounded border-l-4 border-gray-300 dark:border-gray-600 pl-4 py-2 my-4 italic text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800/50 rounded-r-lg"
@@ -110,7 +110,7 @@ function Blockquote({ children, ...props }: React.BlockquoteHTMLAttributes<HTMLQ
   );
 }
 
-function Strong({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+function Strong({ children, ...props }: Readonly<React.HTMLAttributes<HTMLSpanElement>>) {
   return (
     <span className="font-bold text-gray-900 dark:text-gray-100" {...props}>
       {children}
@@ -118,7 +118,7 @@ function Strong({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
   );
 }
 
-function Em({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+function Em({ children, ...props }: Readonly<React.HTMLAttributes<HTMLSpanElement>>) {
   return (
     <span className="italic text-gray-800 dark:text-gray-200" {...props}>
       {children}
@@ -131,10 +131,10 @@ function slugify(str: string) {
     .toString()
     .toLowerCase()
     .trim() // Remove whitespace from both ends of a string
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/&/g, "-and-") // Replace & with 'and'
-    .replace(/[^\w\-]+/g, "") // Remove all non-word characters except for -
-    .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+    .replaceAll(/\s+/g, "-") // Replace spaces with -
+    .replaceAll(/&/g, "-and-") // Replace & with 'and'
+    .replaceAll(/[^\w\-]+/g, "") // Remove all non-word characters except for -
+    .replaceAll(/\-\-+/g, "-"); // Replace multiple - with single -
 }
 
 function createHeading(level: number) {
@@ -193,7 +193,7 @@ export function CustomMDX(
   return (
     <MDXRemote
       {...props}
-      components={{ ...components, ...(props.components || {}) }}
+      components={{ ...components, ...(props.components) }}
     />
   );
 }

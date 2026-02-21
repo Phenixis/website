@@ -8,11 +8,11 @@ export default function Tooltip({
     children,
     tooltip,
     cursor,
-}: {
+}: Readonly<{
     children: React.ReactNode
     tooltip: string
     cursor?: "cursor-auto" | "cursor-pointer" | "cursor-default" | "cursor-help" | "cursor-wait" | "cursor-not-allowed" 
-}) {
+}>) {
     return (
         <TooltipRoot>
             <TooltipTrigger className={`${cursor}`}>{children}</TooltipTrigger>

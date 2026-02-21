@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 
 export default function DarkModeToggleFrontOffice({
     className
-}: {
+}: Readonly<{
     className?: string
-}) {
+}>) {
     const [isDarkMode, setIsDarkMode] = useState(false)
 
     // Small helpers to read/write the 'theme' cookie from the browser.
@@ -24,7 +24,7 @@ export default function DarkModeToggleFrontOffice({
     };
     const getThemeCookie = (): 'light' | 'dark' | null => {
         try {
-            const match = document.cookie.match(/(?:^|; )theme=([^;]+)/);
+            const match = new RegExp(/(?:^|; )theme=([^;]+)/).exec(document.cookie);
             const value = match ? decodeURIComponent(match[1]) : null;
             return value === 'dark' || value === 'light' ? value : null;
         } catch {
