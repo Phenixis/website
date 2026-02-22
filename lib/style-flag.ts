@@ -7,7 +7,7 @@ export interface StyleOption {
 
 export const styleOptions: StyleOption[] = [
     { value: "classical", label: "Classical" },
-    { value: "modern", label: "Modern" },
+    { value: "modern", label: "Modern (Beta)" },
 ] as const;
 
 /**
