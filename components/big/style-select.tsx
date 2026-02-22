@@ -40,7 +40,7 @@ function StyleSelectClassical() {
             onValueChange={handleStyleChange}
             disabled={isPending}
         >
-            <SelectTrigger className="w-45">
+            <SelectTrigger className="w-fit mr-2">
                 <SelectValue placeholder="Style" />
             </SelectTrigger>
             <SelectContent>

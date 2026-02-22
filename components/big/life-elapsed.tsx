@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 
 /**
  * Generates hourglass data for a given life year.
@@ -41,7 +42,11 @@ function generateHourglassData(year: number, birthDate: Date) {
     return { year, daysSpent, daysLeft };
 }
 
-export default function LifeElapsed() {
+export default function LifeElapsed({
+    className = '',
+} : Readonly<{
+    className?: string;
+}>) {
     const birthDate = new Date(2005, 3, 18, 10, 1, 0, 0);
     const now = new Date();
     const birthdayThisYear = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
@@ -56,7 +61,7 @@ export default function LifeElapsed() {
     const totalDays = daysSpent + daysLeft;
 
     return (
-        <div className="flex flex-col items-center group" title={`${((daysSpent / totalDays) * 100).toFixed(2)}% (${daysSpent}/${totalDays})`}>
+        <div className={cn('flex flex-col items-center group', className)} title={`${((daysSpent / totalDays) * 100).toFixed(2)}% (${daysSpent}/${totalDays})`}>
             <span className="text-sm mb-1">{currentLifeYear}</span>
             <div className="relative w-8 h-8">
                 {/* Border SVG with reduced height for triangles */}

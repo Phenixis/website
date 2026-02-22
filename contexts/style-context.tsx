@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { setStyleFlag } from '@/lib/flags';
-import type { StyleVariant } from '@/components/style-registry';
+import type { StyleVariant } from '@/lib/style-flag';
 
 interface StyleContextType {
     currentStyle: StyleVariant;

@@ -2,15 +2,16 @@
 
 import { vercelAdapter } from '@flags-sdk/vercel';
 import { flag } from 'flags/next';
-import { cookies } from 'next/headers';
 import { StyleVariant, isValidStyleVariant, styleOptions } from './style-flag';
+import { cookies } from 'next/headers';
 
 export const styleFlag = flag<StyleVariant>({
     key: "style",
     options: styleOptions,
-    decide: async () => {
-        const cookieStore = await cookies();
-        const styleCookie = cookieStore.get('style_flag');
+    decide: async ({ cookies: requestCookies }) => {
+        console.log("cookies=", requestCookies.getAll())
+        const styleCookie = requestCookies.get('style_flag');
+        console.log("Style cookie:", styleCookie)
         const value = styleCookie?.value as StyleVariant | undefined;
 
         // Validate the cookie value against known styles
@@ -30,6 +31,5 @@ export async function setStyleFlag(style: StyleVariant) {
         maxAge: 60 * 60 * 24 * 365, // 1 year
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
     });
 }

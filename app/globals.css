@@ -203,7 +203,7 @@
   html {
     min-width: 360px;
   }
-  
+
   .underlineLtoR {
     @apply w-fit relative block before:absolute before:left-0 before:bottom-0 before:h-[2px] before:w-full before:bg-black before:transform before:scale-x-0 before:origin-left before:transition-transform before:duration-1000 lg:hover:before:scale-x-100;
   }
@@ -224,7 +224,7 @@
   }
 
   .prose a {
-    @apply duration-1000 transition-all underline-offset-6 lg:hover:text-black dark:lg:hover:text-white decoration-neutral-400 lg:hover:decoration-neutral-600 dark:decoration-neutral-600 dark:lg:hover:decoration-neutral-400 underline decoration-dashed ;
+    @apply duration-1000 transition-all underline-offset-6 lg:hover:text-black dark:lg:hover:text-white decoration-neutral-400 lg:hover:decoration-neutral-600 dark:decoration-neutral-600 dark:lg:hover:decoration-neutral-400 underline decoration-dashed;
   }
 
   .prose .anchor:after {
@@ -366,6 +366,55 @@
 
   .scrollbar-hide {
     scrollbar-width: none;
+  }
+
+  /* Apple Glass Effect */
+  .glass {
+    position: relative;
+    padding: 0.5rem 0.5rem;
+    border-radius: 24px;
+
+    /* translucent “pane” */
+    background: rgba(
+      255,
+      255,
+      255,
+      0.25
+    ); /* tweak alpha for more/less glass */ /* [web:11] */
+
+    /* frosted blur of what’s behind */
+    backdrop-filter: blur(36px) saturate(200%); /* [web:7][web:11] */
+    -webkit-backdrop-filter: blur(36px) saturate(200%); /* Safari / iOS */ /* [web:7] */
+
+    /* glass edges + depth */
+    border: 1px solid rgba(255, 255, 255, 0.35); /* [web:11] */
+    box-shadow:
+      0 18px 35px rgba(15, 23, 42, 0.45),
+      /* outer shadow */ /* [web:3] */ inset 0 1px 0 rgba(255, 255, 255, 0.6); /* inner highlight */ /* [web:5] */
+  }
+
+  .dark .glass {
+    position: relative;
+    padding: 0.5rem 0.5rem;
+    border-radius: 24px;
+
+    /* translucent “pane” */
+    background: rgba(
+      0,
+      0,
+      0,
+      0.25
+    ); /* tweak alpha for more/less glass */ /* [web:11] */
+
+    /* frosted blur of what’s behind */
+    backdrop-filter: blur(36px) saturate(200%); /* [web:7][web:11] */
+    -webkit-backdrop-filter: blur(36px) saturate(200%); /* Safari / iOS */ /* [web:7] */
+
+    /* glass edges + depth */
+    border: 1px solid rgba(0, 0, 0, 0.35); /* [web:11] */
+    box-shadow:
+      0 18px 35px rgba(3, 5, 8, 0.45),
+      /* outer shadow */ /* [web:3] */ inset 0 1px 0 rgba(0, 0, 0, 0.6); /* inner highlight */ /* [web:5] */
   }
 }
 
