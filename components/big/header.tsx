@@ -9,6 +9,7 @@ import DarkModeToggle from './dark-mode-toggle';
 import { Link } from './link';
 import Logo from './logo';
 import StyleSelect from './style-select';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const record: Record<StyleVariant, React.ComponentType> = {
     classical: HeaderClassical,
@@ -24,6 +25,7 @@ export default function Header() {
 }
 
 export function HeaderModern() {
+    const isMobile = useIsMobile();
     const pathname = usePathname();
 
     const currentValue = pathname.includes('/blog') ? '/blog' : pathname;
@@ -39,10 +41,11 @@ export function HeaderModern() {
     });
 
     return (
-        <aside className="tracking-tight px-12 py-2">
-            <nav className="flex items-center justify-between gap-4">
-                <div className="group/Logo glass">
-                    <Logo className="mr-2 py-1 px-2 m-1 align-middle" size={32} />
+        <aside className="tracking-tight px-2 lg:px-12 py-2">
+            <nav className="flex items-start justify-between gap-4">
+                <div className="group/Logo glass shrink-0">
+                    <Logo className="mr-2 py-1 px-2 m-1 align-middle hidden md:block" size={32} />
+                    <Logo className="mr-2 py-1 px-2 m-1 align-middle md:hidden" size={20} />
                 </div>
 
                 <HoverExpandPill
@@ -50,7 +53,7 @@ export function HeaderModern() {
                     currentValue={currentValue}
                 />
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-start gap-2 shrink-0">
                     <StyleSelect />
                     <DarkModeToggle />
                 </div>

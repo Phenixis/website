@@ -349,9 +349,8 @@
     @apply mb-2 text-3xl font-[100];
   }
 
-  section.page p.page-description,
-  section.page div.page-description {
-    @apply mb-4 text-justify text-neutral-600 dark:text-neutral-300 leading-[1.8];
+  section.page .page-description {
+    @apply text-justify text-neutral-600 dark:text-neutral-300 leading-[1.8];
   }
 
   /* ul */
@@ -370,8 +369,8 @@
 
   /* Apple Glass Effect */
   .glass {
+    @apply p-0.5 lg:p-2;
     position: relative;
-    padding: 0.5rem 0.5rem;
     border-radius: 24px;
 
     /* translucent “pane” */
@@ -379,7 +378,7 @@
       255,
       255,
       255,
-      0.25
+      0.35
     ); /* tweak alpha for more/less glass */ /* [web:11] */
 
     /* frosted blur of what’s behind */
@@ -394,8 +393,8 @@
   }
 
   .dark .glass {
+    @apply p-0.5 lg:p-2;
     position: relative;
-    padding: 0.5rem 0.5rem;
     border-radius: 24px;
 
     /* translucent “pane” */
@@ -403,7 +402,7 @@
       0,
       0,
       0,
-      0.25
+      0.35
     ); /* tweak alpha for more/less glass */ /* [web:11] */
 
     /* frosted blur of what’s behind */

@@ -43,7 +43,7 @@ export default async function BlogPosts({
                                 <p
                                     className={cn(
                                         "text-neutral-900 dark:text-neutral-100 tracking-tight w-fit relative block line-clamp-1",
-                                        "before:absolute before:left-0 before:bottom-0 before:h-0.5 before:w-full before:bg-black dark:before:bg-white before:transition-transform before:duration-1000 before:scale-x-100 md:before:scale-x-0 md:group-hover/blog:before:scale-x-100 before:origin-left"
+                                        "before:absolute before:left-0 before:bottom-0 before:h-0.5 before:w-full before:bg-black dark:before:bg-white before:transition-transform before:duration-1000 before:scale-x-0 group-hover/blog:before:scale-x-100 before:origin-left"
                                     )}
                                 >
                                     {post.metadata.title}

@@ -97,22 +97,22 @@ const modernStyles: PillStyles = {
         "glass rounded-2xl! " +
         "transition-all duration-300 ease-in-out",
     activeBtn:
-        "px-4 py-2 text-sm font-semibold whitespace-nowrap w-full md:w-fit " +
+        "px-1 lg:px-4 py-2 text-sm font-semibold whitespace-nowrap w-full md:w-fit " +
         "rounded-full flex items-center justify-center " +
         "cursor-pointer select-none transition-all duration-200 " +
-        "group-hover:bg-white/20 dark:group-hover:bg-black/30 ",
+        "group-hover:bg-white/20 dark:group-hover:bg-gray-500/30 ",
     activeBtnIcon: "shrink-0 transition-all duration-200 group-hover:mr-1",
     activeBtnLabel: {
         withIcon:
             "transition-all duration-300 overflow-hidden " +
-            "max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100",
+            "max-w-0 opacity-0 group-data-[state=open]:pl-2 group-data-[state=open]:max-w-xs group-hover:max-w-xs group-data-[state=open]:opacity-100 group-hover:opacity-100",
         noIcon: "transition-all duration-300 overflow-hidden",
     },
     option:
-        "mx-1 px-3 py-1.5 text-sm font-medium whitespace-nowrap " +
+        "cursor-pointer mx-1 px-3 py-1.5 text-sm font-medium whitespace-nowrap " +
         "transition-all duration-200 rounded-full " +
         "flex items-center justify-center gap-2 " +
-        "hover:bg-white/15 dark:hover:bg-black/15 " +
+        "hover:bg-white/15 dark:hover:bg-gray-500/15 " +
         "disabled:opacity-40 disabled:cursor-not-allowed",
 };
 
@@ -227,7 +227,7 @@ function ActiveButton({
             type="button"
             aria-expanded={isOpen}
             onClick={onToggle}
-            className={styles.activeBtn}
+            className={cn(styles.activeBtn, isOpen && "bg-white/20 dark:bg-black/30")}
         >
             {hasIcon && (
                 <span className={styles.activeBtnIcon}>{current.icon}</span>
@@ -295,18 +295,19 @@ export function HoverExpandPill({
     return (
         <div
             ref={containerRef}
+            data-state={isOpen ? "open" : "closed"}
             className={cn("relative group rounded-full", className)}
         >
             {/* ── MOBILE layout (<md) ────────────────────────────────────────── */}
             <div className="md:hidden">
                 {/* Invisible spacer — reserves the layout footprint of the active option */}
-                <div
+                {/* <div
                     aria-hidden="true"
                     className="invisible px-4 py-2 text-sm font-medium flex items-center gap-2 pointer-events-none select-none whitespace-nowrap"
                 >
                     {current?.icon != null && <span className="shrink-0">{current.icon}</span>}
                     {current?.label}
-                </div>
+                </div> */}
 
                 {/* Floating pill — expands vertically on tap */}
                 <div className={cn(styles.mobileContainer, isOpen && "shadow-lg")}>

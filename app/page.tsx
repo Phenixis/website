@@ -15,22 +15,26 @@ export default async function Page() {
     const projects = await getProjects()
 
     return (
-        <section className="page">
-            <h1 className="page-title">
-                Hello there !
-            </h1>
-            <p className="page-description">
-                I&apos;m Maxime, a {currentLifeYear} years old french student in computer science.
-            </p>
-            <h2 className="page-title text-2xl">
-                <Link href="/projects" underlined={false}>
-                    My current projects
-                </Link>
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {projects.filter((project) => project.metadata.state === "Running" || project.metadata.state === "Building").map((project) => (
-                    <Project key={project.metadata.title} project={project} showBadge={false} />
-                ))}
+        <section className="page space-y-4">
+            <div>
+                <h1 className="page-title">
+                    Hello there !
+                </h1>
+                <p className="page-description">
+                    I&apos;m Maxime, a {currentLifeYear} years old french student in computer science.
+                </p>
+            </div>
+            <div>
+                <h2 className="page-title text-2xl">
+                    <Link href="/projects" underlined={false}>
+                        My current projects
+                    </Link>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {projects.filter((project) => project.metadata.state === "Running" || project.metadata.state === "Building").map((project) => (
+                        <Project key={project.metadata.title} project={project} showBadge={false} />
+                    ))}
+                </div>
             </div>
             <div className="my-8">
                 <h2 className="page-title text-2xl">
