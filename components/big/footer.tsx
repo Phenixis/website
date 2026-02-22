@@ -1,4 +1,9 @@
+'use client';
+
 import LifeElapsed from '@/components/big/life-elapsed'
+import { footerLinks } from '@/lib/footer-links';
+import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
 
 function ArrowIcon() {
     return (
@@ -17,48 +22,37 @@ function ArrowIcon() {
     )
 }
 
-const links: {
-    name: string,
-    ref: string,
-    visibleOn?: string | string[]
-}[] = [
-        { name: "Linkedin", ref: "https://www.linkedin.com/in/maxime-duhamel/", visibleOn: "/projects" },
-        { name: "RSS feed", ref: "/rss", visibleOn: "/blog" },
-        { name: "Youtube", ref: "https://www.youtube.com/@maximeduh", visibleOn: "/projects" },
-        { name: "Github", ref: "https://github.com/Phenixis", visibleOn: "/" },
-        { name: "X", ref: "https://twitter.com/maxime_duhamel_", visibleOn: "/projects" },
-    ];
-
-export default function Footer({ actualPath }: Readonly<{ actualPath: string }>) {
+export default function Footer() {
+    const pathname = usePathname();
+    
+    const visibleLinks = useMemo(() => 
+        footerLinks.filter((link) => 
+            link.visibleOn.some((path) => pathname.includes(path))
+        ), [pathname]
+    );
+    
     return (
         <footer className="flex justify-between items-end mt-2 mb-4">
             <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm text-neutral-500 md:gap-4 list-none">
                 {
-                    links
-                        .filter((link) => {
-                            if (Array.isArray(link.visibleOn)) {
-                                return link.visibleOn.some((path) => actualPath.includes(path));
-                            } else if (link.visibleOn) {
-                                return actualPath.includes(link.visibleOn);
-                            } else {
-                                return true;
-                            }
-                        })
-                        .map((link) => {
-                            return (
-                                <li key={link.name}>
-                                    <a
-                                        className="flex duration-1000 items-center transition-all lg:hover:text-neutral-900 dark:lg:hover:text-neutral-100"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                        href={link.ref}
-                                    >
-                                        <ArrowIcon />
-                                        <p className="ml-2 h-7">{link.name}</p>
-                                    </a>
-                                </li>
-                            );
-                        })
+                    visibleLinks.map((link) => {
+                        return (
+                            <li 
+                                key={link.name}
+                                className="animate-in fade-in duration-300"
+                            >
+                                <a
+                                    className="flex duration-1000 items-center transition-all lg:hover:text-neutral-900 dark:lg:hover:text-neutral-100"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                    href={link.ref}
+                                >
+                                    <ArrowIcon />
+                                    <p className="ml-2 h-7">{link.name}</p>
+                                </a>
+                            </li>
+                        );
+                    })
                 }
             </ul>
 

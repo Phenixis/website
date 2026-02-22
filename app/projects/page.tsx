@@ -4,7 +4,6 @@ import {ChevronDown} from "lucide-react"
 import Project, {states} from "@/components/big/project"
 import {getProjects} from "@/app/blog/utils"
 
-
 export default async function Page() {
     const projectsList = await getProjects()
 

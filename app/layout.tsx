@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/sonner"
 import { Analytics } from '@vercel/analytics/next';
 import Main from '@/components/big/main';
 import { cookies } from 'next/headers';
+import { StyleProvider } from '@/contexts/style-context';
+import { styleFlag } from '@/lib/flags';
 
 const domine = Domine({
     subsets: ['latin'],
@@ -76,6 +78,7 @@ export default async function RootLayout({
 }>) {
     const cookieStore = await cookies();
     const theme = cookieStore.get('theme')?.value;
+    const initialStyle = await styleFlag();
 
     return (
         <html
@@ -94,11 +97,13 @@ export default async function RootLayout({
                 // domine.className,
                 // ubuntuSansMono.className
             )}>
-                <TooltipProvider>
-                    <Main>
-                        {children}
-                    </Main>
-                </TooltipProvider>
+                <StyleProvider initialStyle={initialStyle}>
+                    <TooltipProvider>
+                        <Main>
+                            {children}
+                        </Main>
+                    </TooltipProvider>
+                </StyleProvider>
                 <Analytics />
                 <Toaster />
             </body>
