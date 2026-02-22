@@ -9,9 +9,7 @@ export const styleFlag = flag<StyleVariant>({
     key: "style",
     options: styleOptions,
     decide: async ({ cookies: requestCookies }) => {
-        console.log("cookies=", requestCookies.getAll())
         const styleCookie = requestCookies.get('style_flag');
-        console.log("Style cookie:", styleCookie)
         const value = styleCookie?.value as StyleVariant | undefined;
 
         // Validate the cookie value against known styles
