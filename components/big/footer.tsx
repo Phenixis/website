@@ -49,7 +49,7 @@ export function FooterClassical() {
 
     return (
         <footer className="flex justify-between items-end mt-2 mb-4">
-            <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm text-neutral-500 md:gap-4 list-none">
+            <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 text-sm text-neutral-500 md:gap-4 list-none">
                 {
                     visibleLinks.map((link) => {
                         return (
@@ -88,7 +88,7 @@ export function FooterModern() {
 
     return (
         <footer className="flex justify-between items-center px-2 lg:px-12 py-2">
-            <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 font-sm md:gap-4 list-none">
+            <ul className="grid gap-2 grid-cols-2 lg:grid-cols-4 text-xs lg:text-sm md:gap-4 list-none">
                 {
                     visibleLinks.map((link) => {
                         return (
@@ -103,7 +103,7 @@ export function FooterModern() {
                                     href={link.ref}
                                 >
                                     <ArrowIcon />
-                                    <p className={cn("ml-2 h-6")}>{link.name}</p>
+                                    <p className={cn("ml-2")}>{link.name}</p>
                                 </a>
                             </li>
                         );

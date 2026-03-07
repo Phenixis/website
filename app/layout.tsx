@@ -1,27 +1,25 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { baseUrl } from './sitemap'
-import { Domine, Geist_Mono, Ubuntu_Sans_Mono } from 'next/font/google';
+import Main from '@/components/big/main';
+import { Toaster } from "@/components/ui/sonner";
 import {
     TooltipProvider
-} from "@/components/ui/tooltip"
-import { Toaster } from "@/components/ui/sonner"
-import { Analytics } from '@vercel/analytics/next';
-import Main from '@/components/big/main';
-import { cookies } from 'next/headers';
+} from "@/components/ui/tooltip";
 import { StyleProvider } from '@/contexts/style-context';
 import { styleFlag } from '@/lib/flags';
-
-const domine = Domine({
-    subsets: ['latin'],
-})
+import { cn } from '@/lib/utils';
+import { Analytics } from '@vercel/analytics/next';
+import type { Metadata } from 'next';
+import { Faculty_Glyphic, Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
+import './globals.css';
+import { baseUrl } from './sitemap';
 
 const geistMono = Geist_Mono({
     subsets: ['latin'],
 })
 
-const ubuntuSansMono = Ubuntu_Sans_Mono({
+const facultyGlyphic = Faculty_Glyphic({
     subsets: ['latin'],
+    weight: '400'
 })
 
 export const metadata: Metadata = {
@@ -69,8 +67,6 @@ export const metadata: Metadata = {
     },
 }
 
-const cx = (...classes: string[]) => classes.filter(Boolean).join(' ')
-
 export default async function RootLayout({
     children,
 }: Readonly<{
@@ -83,19 +79,16 @@ export default async function RootLayout({
     return (
         <html
             lang="en"
-            className={"overflow-x-hidden" + 
-                (theme === 'dark' ? ' dark' : '')}
+            className={cn("overflow-x-hidden", theme, initialStyle)}
         >
             <head>
                 <link rel="icon" href="/favicon.png" sizes='any' />
                 <link rel="manifest" href="/manifest.json" />
                 <link rel="apple-touch-icon" href="/favicon.png" />
             </head>
-            <body className={cx(
+            <body className={cn(
                 'antialiased text-black bg-white dark:text-white dark:bg-black h-full min-h-screen w-full min-w-screen max-w-screen',
-                geistMono.className,
-                // domine.className,
-                // ubuntuSansMono.className
+                initialStyle === 'classical' ? geistMono.className : facultyGlyphic.className
             )}>
                 <StyleProvider initialStyle={initialStyle}>
                     <TooltipProvider>

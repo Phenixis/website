@@ -1,7 +1,8 @@
 import {Tooltip, TooltipContent, TooltipTrigger,} from "@/components/ui/tooltip"
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "@/components/ui/collapsible"
 import {ChevronDown} from "lucide-react"
-import Project, {states} from "@/components/big/project"
+import Project from "@/components/big/project"
+import {states} from "@/lib/project-states"
 import {getProjects} from "@/app/blog/utils"
 
 export default async function Page() {
@@ -56,11 +57,11 @@ export default async function Page() {
                     </p>
                 </CollapsibleContent>
             </Collapsible>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {projectsList.toSorted(
                     (a, b) => {
-                        const stateA = states.indexOf(a.metadata.state as typeof states[number])
-                        const stateB = states.indexOf(b.metadata.state as typeof states[number])
+                        const stateA = states.indexOf(a.metadata.tags?.find(tag => states.includes(tag)) ?? '')
+                        const stateB = states.indexOf(b.metadata.tags?.find(tag => states.includes(tag)) ?? '')
                         return stateA - stateB
                     }
                 ).map((project) => {

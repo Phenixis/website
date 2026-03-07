@@ -59,61 +59,75 @@ interface PillStyles {
 }
 
 const classicalStyles: PillStyles = {
-    desktopContainer:
-        "hidden md:flex items-center rounded-full " +
-        "transition-all duration-300 ease-in-out group-hover:shadow-lg",
-    mobileContainer:
-        "absolute top-0 left-1/2 -translate-x-1/2 z-50 " +
-        "flex flex-col items-center rounded-2xl " +
-        "transition-all duration-300 ease-in-out",
-    activeBtn:
-        "px-4 py-2 text-sm font-medium whitespace-nowrap w-full md:w-fit " +
-        "rounded-full flex items-center justify-center " +
-        "cursor-pointer select-none " +
-        "bg-primary text-primary-foreground",
+    desktopContainer: cn(
+        "hidden md:flex items-center rounded-full",
+        "transition-all duration-300 ease-in-out group-hover:shadow-lg"
+    ),
+    mobileContainer: cn(
+        "absolute top-0 left-1/2 -translate-x-1/2 z-50",
+        "flex flex-col items-center rounded-2xl",
+        "transition-all duration-300 ease-in-out"
+    ),
+    activeBtn: cn(
+        "px-4 py-2 text-sm font-medium whitespace-nowrap w-full md:w-fit",
+        "rounded-full flex items-center justify-center",
+        "cursor-pointer select-none",
+        "bg-primary text-primary-foreground"
+    ),
     activeBtnIcon: "shrink-0 group-hover:pr-2",
     activeBtnLabel: {
-        withIcon:
-            "w-0 opacity-0 duration-500 transition-all " +
-            "group-hover:opacity-100 group-hover:w-fit",
+        withIcon: cn(
+            "w-0 opacity-0 duration-500 transition-all",
+            "group-hover:opacity-100 group-hover:w-fit"
+        ),
         noIcon: "",
     },
-    option:
-        "px-3 py-1.5 text-sm font-medium whitespace-nowrap " +
-        "transition-colors rounded-full " +
-        "flex items-center justify-center gap-2 " +
-        "hover:bg-accent hover:text-accent-foreground " +
-        "disabled:opacity-50 disabled:cursor-not-allowed",
+    option: cn(
+        "px-3 py-1.5 text-sm font-medium whitespace-nowrap",
+        "transition-colors rounded-full",
+        "flex items-center justify-center gap-2",
+        "hover:bg-accent hover:text-accent-foreground",
+        "disabled:opacity-50 disabled:cursor-not-allowed"
+    ),
 };
 
 const modernStyles: PillStyles = {
-    desktopContainer:
-        "hidden md:flex items-center p-1 " +
-        "glass rounded-full! " +
-        "transition-all duration-300 ease-in-out",
-    mobileContainer:
-        "absolute top-0 left-1/2 -translate-x-1/2 z-50 " +
-        "flex flex-col items-center " +
-        "glass rounded-2xl! " +
-        "transition-all duration-300 ease-in-out",
-    activeBtn:
-        "px-1 lg:px-4 py-2 text-sm font-semibold whitespace-nowrap w-full md:w-fit " +
-        "rounded-full flex items-center justify-center " +
-        "cursor-pointer select-none transition-all duration-200 " +
-        "group-hover:bg-white/20 dark:group-hover:bg-gray-500/30 ",
-    activeBtnIcon: "shrink-0 transition-all duration-200 group-hover:mr-1",
+    desktopContainer: cn(
+        "hidden md:flex items-center p-1",
+        "glass rounded-full!",
+        "transition-all duration-300 ease-in-out"
+    ),
+    mobileContainer: cn(
+        "absolute top-0 left-1/2 -translate-x-1/2 z-50",
+        "flex flex-col items-center",
+        "glass rounded-2xl!",
+        "transition-all duration-300 ease-in-out"
+    ),
+    activeBtn: cn(
+        "px-1 lg:px-4 py-2 text-sm whitespace-nowrap w-full md:w-fit",
+        "rounded-full flex items-center justify-center",
+        "cursor-pointer select-none transition-all duration-200",
+        "group-hover:bg-white/20 dark:group-hover:bg-gray-500/30"
+    ),
+    activeBtnIcon: cn(
+        "shrink-0 transition-all duration-200 group-hover:mr-1"
+    ),
     activeBtnLabel: {
-        withIcon:
-            "transition-all duration-300 overflow-hidden " +
-            "max-w-0 opacity-0 group-data-[state=open]:pl-2 group-data-[state=open]:max-w-xs group-hover:max-w-xs group-data-[state=open]:opacity-100 group-hover:opacity-100",
-        noIcon: "transition-all duration-300 overflow-hidden",
+        withIcon: cn(
+            "transition-all duration-300 overflow-hidden",
+            "max-w-0 opacity-0 group-data-[state=open]:pl-2 group-data-[state=open]:max-w-xs group-hover:max-w-xs group-data-[state=open]:opacity-100 group-hover:opacity-100"
+        ),
+        noIcon: cn(
+            "transition-all duration-300 overflow-hidden"
+        ),
     },
-    option:
-        "cursor-pointer mx-1 px-3 py-1.5 text-sm font-medium whitespace-nowrap " +
-        "transition-all duration-200 rounded-full " +
-        "flex items-center justify-center gap-2 " +
-        "hover:bg-white/15 dark:hover:bg-gray-500/15 " +
-        "disabled:opacity-40 disabled:cursor-not-allowed",
+    option: cn(
+        "cursor-pointer mx-1 px-3 py-1.5 text-sm font-medium whitespace-nowrap",
+        "transition-all duration-200 rounded-full",
+        "flex items-center justify-center gap-2",
+        "hover:bg-white/25 dark:hover:bg-gray-500/35",
+        "disabled:opacity-40 disabled:cursor-not-allowed"
+    ),
 };
 
 const styleVariants: Record<string, PillStyles> = {

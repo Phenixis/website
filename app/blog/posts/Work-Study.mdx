@@ -2,9 +2,11 @@
 title: Work-Study
 publishedAt: 2025-09-30
 summary: Implementation of E2E testings using Playwright.
-isProject: true
-state: "Running"
 color: green
+tags:
+  - Project
+  - Running
+image: /work-study.png
 ---
 
 Nutraveris is a consulting and software company that helps businesses in the nutrition and health industries to market dietary supplements. Since September 2025, I work in the IT department, as a Junior Developer alternating between periods of study at the university and working at the company, on-site.
@@ -42,9 +44,9 @@ test.describe("Page 1 test suite", async () Promise<void> {
 ```
 
 Let me divide the code help you understand it, *even if you don't code*:
-1. You have a first level with: `test.describe("Page 1 test suite", async (): Promise<void> { ... })`
-2. Then, there is another level with: `test("Verify if the title contains 'Mon titre'", async ({ page }): Promise<void> { ... })`
-3. Finally, there is a third level: `await assert(page.locator("h1#title").textContent).contains("Mon titre");`
+1. You have a first level with:<br/>`test.describe("Page 1 test suite", async (): Promise<void> { ... })`
+2. Then, there is another level with:<br/>`test("Verify if the title contains 'Mon titre'", async ({ page }): Promise<void> { ... })`
+3. Finally, there is a third level:<br/>`await assert(page.locator("h1#title").textContent).contains("Mon titre");`
 
 The first level starts by defining a group of test, with the keyword `test.describe(...)`. It gives the group a name to help organizing the tests and gives the main goal of the group, here it's "Page 1 test suite", so we know we'll test the Page 1.<br/>
 Then, the second level describe a single test with the keyword  `test(...)`. It gives the information of what the test will do, here we "Verify if the title contains 'Mon titre'", which is pretty clear.<br/>

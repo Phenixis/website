@@ -4,6 +4,7 @@ import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import { highlight } from "sugar-high";
 import React from "react";
 import { formatToKebabCase } from "@/app/blog/utils";
+import { cn } from "@/lib/utils";
 
 let ids: string[] = [];
 interface TableData {
@@ -69,12 +70,12 @@ function RoundedImage({ className, alt, width, height, ...props }: Readonly<Roun
   if (width && height) {
     return (
       <>
-        <Image 
-          className={`rounded-lg ${className || ""}`} 
-          alt={alt} 
+        <Image
+          className={`rounded-lg ${className || ""}`}
+          alt={alt}
           width={width}
           height={height}
-          {...props} 
+          {...props}
         />
         <span className="w-fit">{alt}</span>
       </>
@@ -84,19 +85,30 @@ function RoundedImage({ className, alt, width, height, ...props }: Readonly<Roun
   // Otherwise, use regular img tag for external images without dimensions
   return (
     <>
-      <img 
-        className={`rounded-lg ${className || ""}`} 
+      <img
+        className={`rounded-lg ${className || ""}`}
         alt={alt}
-        {...props} 
+        {...props}
       />
       <span className="w-fit">{alt}</span>
     </>
   );
 }
 
-function Code({ children, ...props }: Readonly<{ children: string }>) {
+function Code({ children, className, ...props }: Readonly<{ children: string, className: string }>) {
   const codeHTML = highlight(children);
-  return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
+  // Fenced code blocks get a `language-*` class; inline code does not.
+  // Only apply break-words to inline code to avoid disrupting block code formatting.
+  const isInline = !className?.includes("language-");
+  return <code className={cn(isInline && "wrap-break-word", className)} dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
+}
+
+function Pre({ children, ...props }: Readonly<React.HTMLAttributes<HTMLPreElement>>) {
+  return (
+    <pre className="overflow-x-auto" {...props}>
+      {children}
+    </pre>
+  );
 }
 
 function Blockquote({ children, ...props }: Readonly<React.BlockquoteHTMLAttributes<HTMLQuoteElement>>) {
@@ -179,6 +191,7 @@ const components = {
   img: RoundedImage,
   a: CustomLink,
   code: Code,
+  pre: Pre,
   Table,
   blockquote: Blockquote,
   strong: Strong,

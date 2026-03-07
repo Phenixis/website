@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@custom-variant modern (&:is(.modern *));
+
+@custom-variant classical (&:is(.classical *));
+
 @theme {
   --color-sidebar: hsl(var(--sidebar-background));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
@@ -340,17 +344,24 @@
   }
 
   /* Component Page */
-
   section.page {
     @apply px-1;
   }
 
   section.page h1.page-title {
-    @apply mb-2 text-3xl font-[100];
+    @apply mb-2 text-3xl font-thin;
   }
 
   section.page .page-description {
-    @apply text-justify text-neutral-600 dark:text-neutral-300 leading-[1.8];
+    @apply text-justify leading-[1.8];
+  }
+
+  .classical section.page .page-description {
+    @apply text-neutral-600 dark:text-neutral-300;
+  }
+
+  .modern section.page .page-description {
+    @apply text-black dark:text-white;
   }
 
   /* ul */
@@ -388,7 +399,7 @@
     /* glass edges + depth */
     border: 1px solid rgba(255, 255, 255, 0.35); /* [web:11] */
     box-shadow:
-      0 18px 35px rgba(15, 23, 42, 0.45),
+      0 8px 12px rgba(15, 23, 42, 0.45),
       /* outer shadow */ /* [web:3] */ inset 0 1px 0 rgba(255, 255, 255, 0.6); /* inner highlight */ /* [web:5] */
   }
 

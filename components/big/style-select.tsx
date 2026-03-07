@@ -25,7 +25,7 @@ export default function StyleSelect() {
     return <Component />;
 }
 
-function StyleSelectClassical() {
+export function StyleSelectClassical() {
     const { currentStyle, setStyle, isPending } = useStyle();
 
     const handleStyleChange = (value: string) => {
@@ -56,7 +56,7 @@ function StyleSelectClassical() {
     );
 }
 
-function StyleSelectModern() {
+export function StyleSelectModern() {
     const { currentStyle, setStyle, isPending } = useStyle();
 
     const pillOptions = styleOptions.map((option) => ({

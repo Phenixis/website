@@ -9,7 +9,6 @@ import DarkModeToggle from './dark-mode-toggle';
 import { Link } from './link';
 import Logo from './logo';
 import StyleSelect from './style-select';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const record: Record<StyleVariant, React.ComponentType> = {
     classical: HeaderClassical,
@@ -25,7 +24,6 @@ export default function Header() {
 }
 
 export function HeaderModern() {
-    const isMobile = useIsMobile();
     const pathname = usePathname();
 
     const currentValue = pathname.includes('/blog') ? '/blog' : pathname;

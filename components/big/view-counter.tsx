@@ -1,13 +1,15 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ViewCounterProps {
-    readonly slug: string;
+    slug: string;
+    className?: string;
 }
 
-export function ViewCounter({ slug }: Readonly<ViewCounterProps>) {
+export function ViewCounter({ slug, className }: Readonly<ViewCounterProps>) {
     const [views, setViews] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -41,18 +43,15 @@ export function ViewCounter({ slug }: Readonly<ViewCounterProps>) {
         trackView();
     }, [slug]);
 
-    if (isLoading) {
-        return (
-            <p className="flex items-center gap-1">
-                <span className="animate-pulse">...</span>
-                <Eye className="size-4" />
-            </p>
-        );
-    }
-
     return (
-        <p className="flex items-center gap-1">
-            {views ?? 0}
+        <p className={cn("flex items-center gap-1", className)}>
+        {
+            isLoading ? (
+                <span className="animate-pulse">...</span>
+            ) : (
+                views ?? 0
+            )
+        }
             <Eye className="size-4" />
         </p>
     );
