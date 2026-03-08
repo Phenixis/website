@@ -26,9 +26,10 @@ export default function Header() {
 export function HeaderModern() {
     const pathname = usePathname();
 
-    const currentValue = pathname.includes('/blog') ? '/blog' : pathname;
-
     const entries = Object.entries(navItems);
+    // Resolve to the matching base nav path (e.g. /experiences/work-study → /experiences)
+    const currentValue = entries.find(([path]) => path !== '/' && pathname.startsWith(path))?.[0] ?? '/';
+
     // Determine the index of the active page so items before it go left,
     // items after it go right — keeping the active pill in the centre.
     const currentIndex = entries.findIndex(([path]) => path === currentValue);
@@ -80,8 +81,8 @@ export function HeaderClassical() {
                                     key={path}
                                     href={path}
                                     prefetch={true}
-                                    className={`group/nav flex items-center lg:hover:text-neutral-800 dark:lg:hover:text-neutral-200 align-middle relative py-1 px-2 m-1 ${pathname === path ? 'decoration-2' : 'text-neutral-500 dark:text-neutral-400'}`}
-                                    underlined={pathname === path}
+                                    className={`group/nav flex items-center lg:hover:text-neutral-800 dark:lg:hover:text-neutral-200 align-middle relative py-1 px-2 m-1 ${pathname === path || (path !== '/' && pathname.startsWith(path)) ? 'decoration-2' : 'text-neutral-500 dark:text-neutral-400'}`}
+                                    underlined={pathname === path || (path !== '/' && pathname.startsWith(path))}
                                 >
                                     {name}
                                 </Link>

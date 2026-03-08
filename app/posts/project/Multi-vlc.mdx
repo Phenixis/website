@@ -1,0 +1,38 @@
+---
+title: Multi-vlc
+publishedAt: 2026-03-08
+summary: A simple application that controls multiple VLC instances on different computers.
+color: green
+tags:
+  - Built
+---
+From April to June 2025, I lived in Cardiff and worked at the [Cyber Innovation Hub](https://cyberinnovationhub.wales/) as an intern, thanks to a program between my university and the Cardiff University (you can read more about this internship [here](/cyber-innovation-hub)). During my time with the amazing team there, I learned a lot of things on cyber security, cyber incidents and obviously cyber defense, I worked on a variety of projets: from [implementing an industrial control simulation](/GRFICS_implementation) to [learning a card game](https://www.blackhillsinfosec.com/tools/backdoorsandbreaches/) to help non-technician people to understand cyber security better.
+
+I loved working on so many things, because it made me learn so much more than if I had work on 1 big project the whole time. Particularly, I worked on 1 tiny project that my supervisor gave me: the multi-vlc project.
+
+## The problem
+
+In the Cyber Innovation Hub offices, there is kind of a presentation room (that is also used for many other things), with 8 screens. These screens are inter-connected so they can be linked together to "merge", as you can see on the picture, the 4 in the middle are considered as one, but they can also each display a different video, so that when the CIH is making a presentation to someone, they can show 8 different projects. 
+
+<center>![CIH Screen Wall](/cih-screen-wall.jpg)</center>
+
+I remember that, one morning, someone from the government came to be pitched what we were working on, and kind of decide if they were gonna give some money to the lab. Each screen was displaying a different video, and my supervisor was presenting the projects displayed. Every time he had finished to present one project, he was moving on to the next project but, as the videos are always running and repeating again and again, the video was always in the middle and he had to wait for the video to start again to present the project.
+
+That's when he came to me and ask if I could find a way to create something to control the videos, pause them, start them again, mute them, etc... That's when the little project multi-vlc started.
+
+## The solution
+
+I started by going to the presentation room and check all the arduinos that control the videos. There is one arduino per screen, but they can be disabled when the layout is merging screen together. All the arduinos were running a [vlc](https://www.videolan.org/) instance, that was playing a playlist on repeat. Fortunately, vlc is amazing and has a lot of different ways to receive command, and one of them is called "Remote Control" (RC). RC allows the vlc instance to receive command through internet, which means that your phone can control the vlc on your desktop, etc...
+
+When I discovered that, I wanted to build an application to control the instances, I wanted to make something big ! But then, my supervisor told me to check on the internet if something was already done, and just adapt it to our situation. So I did, and found [this](https://github.com/flosse/multi-vlc) github repository. This repo creates a simple web app which connects to the instances you define, and allows you to control them one by one. It is not perfect, because it uses the http interface instead of the RC interface, and it was really more a Proof Of Concept than a working and useful app.
+
+I [forked](https://github.com/Phenixis/multi-vlc) it, and changed several things:
+- I switched to the RC interface, because it's more reliable and easier to use
+- I changed the web interface to be more intuitive, responsive and have more options (you can control the speed of the video now)
+- I added the ability to control 1 or multiple instances at the same time. Instead of pausing them all one by one, you can simply select the ones you want and pause them at the same time.
+- I added a command queue, with priority level for each command, so if you run multiple commands at the same time, the most important ones will be done first.
+
+So now, when they have to pitch to someone from the government their work, they can do it perfectly well, with a simple interface on their phone.
+## Conclusion
+
+Honestly, this project was very short, it was completely done in 2 days I think, but I really loved it ! It made me work on something that was useful to them from day 1 and I used some open-source project and improved it (and it's still available for free).

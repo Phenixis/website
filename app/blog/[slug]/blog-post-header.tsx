@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate, kebabCasetoTitleCase, type ProjectType } from '@/app/blog/blog-types'
+import { formatDate, getPostRoutePrefix, kebabCasetoTitleCase, type ProjectType } from '@/app/blog/blog-types'
 import { colorVariants } from '@/components/big/project'
 import { states } from '@/lib/project-states'
 import { ViewCounter } from '@/components/big/view-counter'
@@ -58,10 +58,10 @@ export function BlogPostHeaderModern({ post }: Readonly<BlogPostHeaderProps>) {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                        {metadata.tags?.includes('Project') && metadata.tags.length > 0 ? (
+                        {post.type === 'project' && metadata.tags && metadata.tags.length > 0 ? (
                             <div className="text-xs font-light flex flex-row flex-wrap justify-end">
                                 {metadata.tags
-                                    .filter((tag) => !states.includes(tag) && tag !== 'Project')
+                                    .filter((tag) => !states.includes(tag))
                                     .map((tag) => {
                                         const colorVariant =
                                             metadata.color && colorVariants[metadata.color]
@@ -93,7 +93,7 @@ export function BlogPostHeaderModern({ post }: Readonly<BlogPostHeaderProps>) {
                         ) : null}
 
                         <ViewCounter
-                            slug={`/blog/${slug}`}
+                            slug={`${getPostRoutePrefix(post.type)}/${slug}`}
                             className="text-xs text-white/70 md:text-black"
                         />
                     </div>
@@ -119,10 +119,10 @@ export function BlogPostHeaderClassical({ post }: Readonly<BlogPostHeaderProps>)
             <div className="flex flex-col md:flex-row items-center gap-2 md:gap-12">
                 <h1 className="page-title">{metadata.title}</h1>
 
-                {metadata.tags?.includes('Project') && metadata.tags.length > 0 ? (
+                {post.type === 'project' && metadata.tags && metadata.tags.length > 0 ? (
                     <div className="md:col-span-5 text-xs font-light flex flex-col md:flex-row">
                         {metadata.tags
-                            .filter((tag) => !states.includes(tag) && tag !== 'Project')
+                            .filter((tag) => !states.includes(tag))
                             .map((tag) => {
                                 const colorVariant =
                                     metadata.color && colorVariants[metadata.color]
@@ -157,7 +157,7 @@ export function BlogPostHeaderClassical({ post }: Readonly<BlogPostHeaderProps>)
                             <ExternalLink className="size-4" />
                         </a>
                     ) : null}
-                    <ViewCounter slug={`/blog/${slug}`} />
+                    <ViewCounter slug={`${getPostRoutePrefix(post.type)}/${slug}`} />
                 </div>
             </div>
         </header>

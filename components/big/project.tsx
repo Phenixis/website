@@ -94,7 +94,7 @@ export function ProjectClassical({
     const state = project.metadata.tags?.find(tag => (states as readonly string[]).includes(tag))
 
     return (
-        <Link href={`/blog/${project.slug}`} className="group/project">
+        <Link href={`/projects/${project.slug}`} className="group/project">
             <div className={cn(
                 "size-full p-2 rounded-md duration-1000 space-y-4 md:space-y-6 flex flex-col justify-between",
                 colorVariant.selection,
@@ -135,7 +135,7 @@ export function ProjectModern({
     const image = project.metadata.image
 
     return (
-        <Link href={`/blog/${project.slug}`} className="group/project block">
+        <Link href={`/projects/${project.slug}`} className="group/project block">
             {/* Card: rounded by default, square on hover */}
             <div className={cn(
                 "relative overflow-hidden rounded-b rounded-t-3xl lg:rounded-3xl lg:group-hover/project:rounded-b",

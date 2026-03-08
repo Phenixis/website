@@ -8,4 +8,7 @@ export const navItems = {
     '/projects': {
         name: 'Projects',
     },
+    '/experiences': {
+        name: 'Experiences',
+    },
 } as const;

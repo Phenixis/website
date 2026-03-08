@@ -1,18 +1,17 @@
-import { getBlogPosts, findPostByAlias, getAliasSlugsForRoute, getPostRoutePrefix } from '@/app/blog/utils'
+import { getProjects, findPostByAlias, getAliasSlugsForRoute, getPostRoutePrefix } from '@/app/blog/utils'
 import { CustomMDX } from '@/components/big/mdx'
 import { resolveImageSrc } from '@/lib/utils'
 import { baseUrl } from '@/app/sitemap'
 import { Metadata } from "next"
 import { notFound, redirect } from 'next/navigation'
-import BlogPostHeader from './blog-post-header'
+import BlogPostHeader from '@/app/blog/[slug]/blog-post-header'
 
 export const dynamic = 'force-static'
 export const dynamicParams = true
-// export const revalidate = 1000 * 60 * 60 * 24
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const params = await props.params;
-    const post = (await getBlogPosts()).find((post) => post.slug === params.slug)
+    const post = (await getProjects()).find((post) => post.slug === params.slug)
 
     if (!post) {
         return { title: 'Not Found' }
@@ -36,12 +35,8 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
             description,
             type: 'article',
             publishedTime,
-            url: `${baseUrl}/blog/${post.slug}`,
-            images: [
-                {
-                    url: ogImage,
-                },
-            ],
+            url: `${baseUrl}/projects/${post.slug}`,
+            images: [{ url: ogImage }],
         },
         twitter: {
             card: 'summary_large_image',
@@ -53,8 +48,8 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 }
 
 export async function generateStaticParams() {
-    const posts = await getBlogPosts()
-    const aliasSlugs = getAliasSlugsForRoute('/blog')
+    const posts = await getProjects()
+    const aliasSlugs = getAliasSlugsForRoute('/projects')
 
     return [
         ...posts.map((post) => ({ slug: post.slug })),
@@ -62,13 +57,13 @@ export async function generateStaticParams() {
     ]
 }
 
-export default async function Blog(props: Readonly<{ params: Promise<{ slug: string }> }>) {
+export default async function ProjectPost(props: Readonly<{ params: Promise<{ slug: string }> }>) {
     const params = await props.params;
-    const post = (await getBlogPosts()).find((post) => post.slug === params.slug)
+    const post = (await getProjects()).find((post) => post.slug === params.slug)
 
     if (!post) {
         // Check if this slug is an alias pointing to another post
-        const aliasTarget = findPostByAlias(`/blog/${params.slug}`)
+        const aliasTarget = findPostByAlias(`/projects/${params.slug}`)
         if (aliasTarget) {
             redirect(`${getPostRoutePrefix(aliasTarget.type)}/${aliasTarget.slug}`)
         }
@@ -83,15 +78,14 @@ export default async function Blog(props: Readonly<{ params: Promise<{ slug: str
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
                         '@context': 'https://schema.org',
-                        '@type': 'BlogPosting',
-                        headline: post.metadata.title,
+                        '@type': 'SoftwareSourceCode',
+                        name: post.metadata.title,
                         datePublished: post.metadata.publishedAt,
-                        dateModified: post.metadata.publishedAt,
                         description: post.metadata.summary,
                         image: post.metadata.image
                             ? resolveImageSrc(post.metadata.image, baseUrl)
                             : `${baseUrl}/og?title=${encodeURIComponent(post.metadata.title)}`,
-                        url: `${baseUrl}/blog/${post.slug}`,
+                        url: `${baseUrl}/projects/${post.slug}`,
                         author: {
                             '@type': 'Person',
                             name: 'Maxime Duhamel',

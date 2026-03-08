@@ -34,3 +34,15 @@ export async function getViews(key: string) {
     const data = await redis.get(key) as value
     return data?.views || 1
 }
+
+/**
+ * Returns the sum of views across all provided keys.
+ * Use this to merge view counts from a canonical key and its aliases.
+ */
+export async function getMergedViews(keys: string[]) {
+    const results = await Promise.all(
+        keys.map(key => redis.get<value>(key))
+    )
+    const total = results.reduce((sum, data) => sum + (data?.views ?? 0), 0)
+    return total || 1
+}
