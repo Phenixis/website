@@ -1,6 +1,7 @@
 'use client';
 
-import { Link } from '@/components/big/link'
+import Link from 'next/link'
+import { Link as PersoLink } from '@/components/big/link'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/app/blog/blog-types'
 import type { ProjectType } from '@/app/blog/utils'
@@ -15,7 +16,7 @@ function ExperienceClassical({ experience }: Readonly<{ experience: ProjectType 
     const dateRange = start ? `${formatDate(start)} – ${endLabel}` : null
 
     return (
-        <Link
+        <PersoLink
             href={`/experiences/${experience.slug}`}
             underlined={false}
         >
@@ -45,7 +46,7 @@ function ExperienceClassical({ experience }: Readonly<{ experience: ProjectType 
                     </div>
                 )}
             </article>
-        </Link>
+        </PersoLink>
     )
 }
 
@@ -73,7 +74,7 @@ function ExperienceModern({ experience, isLast }: Readonly<{ experience: Project
                 "flex-1 pb-8 group/experience",
                 isLast && "pb-0"
             )}>
-                <Link href={`/experiences/${experience.slug}`} underlined={false}>
+                <Link href={`/experiences/${experience.slug}`}>
                     <article className="rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-100/25 hover:bg-gray-50 dark:hover:bg-slate-100/10 p-3 -ml-3 transition-all duration-300">
                         {/* Date range */}
                         {(startLabel || endLabel) && (
