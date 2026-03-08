@@ -43,7 +43,7 @@ export default function DarkModeToggle({
 
     const Component = record[currentStyle] || DarkModeToggleClassical;
 
-    return <Component className={className} />;
+    return <Component key={currentStyle} className={className} />;
 }
 
 function DarkModeToggleClassical({

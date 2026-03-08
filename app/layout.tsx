@@ -90,7 +90,11 @@ export default async function RootLayout({
                 'antialiased text-black bg-white dark:text-white dark:bg-black h-full min-h-screen w-full min-w-screen max-w-screen',
                 initialStyle === 'classical' ? geistMono.className : facultyGlyphic.className
             )}>
-                <StyleProvider initialStyle={initialStyle}>
+                <StyleProvider
+                        initialStyle={initialStyle}
+                        classicalBodyClass={geistMono.className}
+                        modernBodyClass={facultyGlyphic.className}
+                    >
                     <TooltipProvider>
                         <Main>
                             {children}

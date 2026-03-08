@@ -20,7 +20,7 @@ export default function Header() {
 
     const Component = record[currentStyle] || HeaderClassical;
 
-    return <Component />;
+    return <Component key={currentStyle} />;
 }
 
 export function HeaderModern() {

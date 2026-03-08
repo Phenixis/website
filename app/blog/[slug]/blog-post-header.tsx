@@ -173,8 +173,8 @@ export default function BlogPostHeader({ post }: Readonly<BlogPostHeaderProps>) 
     const { currentStyle } = useStyle()
 
     if (currentStyle === 'modern' && post.metadata.image) {
-        return <BlogPostHeaderModern post={post} />
+        return <BlogPostHeaderModern key="modern" post={post} />
     }
 
-    return <BlogPostHeaderClassical post={post} />
+    return <BlogPostHeaderClassical key="classical" post={post} />
 }

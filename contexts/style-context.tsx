@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useTransition, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { setStyleFlag } from '@/lib/flags';
 import type { StyleVariant } from '@/lib/style-flag';
 
@@ -16,25 +15,59 @@ const StyleContext = createContext<StyleContextType | undefined>(undefined);
 interface StyleProviderProps {
     readonly children: React.ReactNode;
     readonly initialStyle: StyleVariant;
+    /** CSS class string from next/font applied to <body> for the classical style */
+    readonly classicalBodyClass: string;
+    /** CSS class string from next/font applied to <body> for the modern style */
+    readonly modernBodyClass: string;
 }
 
 /**
- * Provider component that manages the current style state
- * Handles both optimistic updates and server-side persistence
+ * Applies style variant class changes directly to the DOM,
+ * mirroring what the server does in layout.tsx based on the cookie.
+ * This avoids router.refresh() which causes a hooks count crash in
+ * Next.js App Router when called on a not-found page.
  */
-export function StyleProvider({ children, initialStyle }: StyleProviderProps) {
+function applyStyleToDom(
+    style: StyleVariant,
+    classicalBodyClass: string,
+    modernBodyClass: string,
+) {
+    // Update <html> class — consumed by Tailwind @custom-variant modern/classical
+    document.documentElement.classList.remove('classical', 'modern');
+    document.documentElement.classList.add(style);
+
+    // Update <body> font class — next/font class names may be space-separated
+    const toClasses = (cls: string) => cls.split(' ').filter(Boolean);
+    toClasses(classicalBodyClass).forEach((c) => document.body.classList.remove(c));
+    toClasses(modernBodyClass).forEach((c) => document.body.classList.remove(c));
+    const nextFontClass = style === 'classical' ? classicalBodyClass : modernBodyClass;
+    toClasses(nextFontClass).forEach((c) => document.body.classList.add(c));
+}
+
+/**
+ * Provider component that manages the current style state.
+ * Handles optimistic UI updates (DOM + React context) and persists
+ * the choice server-side via a cookie without triggering router.refresh().
+ */
+export function StyleProvider({
+    children,
+    initialStyle,
+    classicalBodyClass,
+    modernBodyClass,
+}: StyleProviderProps) {
     const [currentStyle, setCurrentStyle] = useState<StyleVariant>(initialStyle);
     const [isPending, startTransition] = useTransition();
-    const router = useRouter();
 
     const setStyle = (style: StyleVariant) => {
-        // Optimistic update
+        // Optimistic DOM update (keeps <html> and <body> classes in sync client-side)
+        applyStyleToDom(style, classicalBodyClass, modernBodyClass);
+
+        // Optimistic React context update
         setCurrentStyle(style);
-        
-        // Persist to server and refresh
+
+        // Persist cookie to server (no router.refresh() — DOM is already updated above)
         startTransition(async () => {
             await setStyleFlag(style);
-            router.refresh();
         });
     };
 

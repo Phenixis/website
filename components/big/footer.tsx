@@ -35,7 +35,7 @@ export default function Footer() {
 
     const Component = record[currentStyle] || FooterClassical;
 
-    return <Component />;
+    return <Component key={currentStyle} />;
 }
 
 export function FooterClassical() {

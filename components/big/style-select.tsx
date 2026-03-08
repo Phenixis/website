@@ -22,7 +22,7 @@ export default function StyleSelect() {
 
     const Component = record[currentStyle] || StyleSelectClassical;
 
-    return <Component />;
+    return <Component key={currentStyle} />;
 }
 
 export function StyleSelectClassical() {

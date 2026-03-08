@@ -20,7 +20,7 @@ export default function Main({
 
     const Component = record[currentStyle] || MainClassical;
 
-    return <Component>{children}</Component>;
+    return <Component key={currentStyle}>{children}</Component>;
 }
 
 
