@@ -5,6 +5,8 @@ import path from 'node:path'
 import { type Metadata, type PostType, type ProjectType } from './types'
 import { formatToKebabCase as fmtKebab, getPostRoutePrefix } from './utils'
 
+// process.cwd() in Next.js always returns the app root (where next.config.ts lives),
+// so ../../packages/content/posts correctly resolves from apps/v1 or apps/v2
 export const postsDir = path.join(process.cwd(), '..', '..', 'packages', 'content', 'posts')
 export const blogDir = path.join(postsDir, 'blog')
 export const projectDir = path.join(postsDir, 'project')

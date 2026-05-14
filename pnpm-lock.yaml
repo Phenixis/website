@@ -12,12 +12,18 @@ importers:
         specifier: ^17.4.2
         version: 17.4.2
     devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.17.52
       husky:
         specifier: ^9.1.7
         version: 9.1.7
       turbo:
         specifier: ^2.5.4
         version: 2.9.12
+      typescript:
+        specifier: ^5
+        version: 5.8.3
 
   apps/v1:
     dependencies:
