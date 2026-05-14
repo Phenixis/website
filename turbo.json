@@ -3,7 +3,16 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "FLAGS",
+        "FLAGS_SECRET",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "IP_HASH_KEY",
+        "RESEND_API_KEY",
+        "RESEND_API_ENDPOINT"
+      ]
     },
     "dev": {
       "cache": false,
