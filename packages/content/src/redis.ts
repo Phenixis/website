@@ -1,7 +1,11 @@
 import { Redis } from '@upstash/redis'
 import crypto from 'crypto'
 
-export const redis = Redis.fromEnv()
+const redisConfigured =
+    !!process.env.UPSTASH_REDIS_REST_URL &&
+    !!process.env.UPSTASH_REDIS_REST_TOKEN
+
+export const redis = redisConfigured ? Redis.fromEnv() : null
 
 type RedisValue = {
     views: number,
@@ -16,6 +20,7 @@ export function hashIp(ip: string, key?: string) {
 }
 
 export async function incrementViews(key: string, hashed_ip_address: string) {
+    if (!redis) return
     const data = await redis.get(key) as RedisValue
 
     if (data === null) {
@@ -31,13 +36,15 @@ export async function incrementViews(key: string, hashed_ip_address: string) {
 }
 
 export async function getViews(key: string) {
+    if (!redis) return 0
     const data = await redis.get(key) as RedisValue
     return data?.views || 1
 }
 
 export async function getMergedViews(keys: string[]) {
+    if (!redis) return 0
     const results = await Promise.all(
-        keys.map(key => redis.get<RedisValue>(key))
+        keys.map(key => redis!.get<RedisValue>(key))
     )
     const total = results.reduce((sum, data) => sum + (data?.views ?? 0), 0)
     return total || 1
