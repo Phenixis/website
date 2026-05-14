@@ -64,8 +64,8 @@ export function BlogPostHeaderModern({ post }: Readonly<BlogPostHeaderProps>) {
                                     .filter((tag) => !states.includes(tag))
                                     .map((tag) => {
                                         const colorVariant =
-                                            metadata.color && colorVariants[metadata.color]
-                                                ? colorVariants[metadata.color]
+                                            metadata.color && colorVariants[metadata.color as keyof typeof colorVariants]
+                                                ? colorVariants[metadata.color as keyof typeof colorVariants]
                                                 : colorVariants.blue
                                         return (
                                             <BadgeTrimmed
@@ -125,8 +125,8 @@ export function BlogPostHeaderClassical({ post }: Readonly<BlogPostHeaderProps>)
                             .filter((tag) => !states.includes(tag))
                             .map((tag) => {
                                 const colorVariant =
-                                    metadata.color && colorVariants[metadata.color]
-                                        ? colorVariants[metadata.color]
+                                    metadata.color && colorVariants[metadata.color as keyof typeof colorVariants]
+                                        ? colorVariants[metadata.color as keyof typeof colorVariants]
                                         : colorVariants.blue
                                 return (
                                     <BadgeTrimmed

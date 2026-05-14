@@ -1,18 +1,15 @@
-import { getMergedViews } from "@/lib/redis";
-import matter from 'gray-matter';
-import fs from 'node:fs';
-import path from 'node:path';
-import { type Metadata, type PostType, type ProjectType, formatToKebabCase as fmtKebab, getPostRoutePrefix } from './blog-types';
+import { getMergedViews } from './redis'
+import matter from 'gray-matter'
+import fs from 'node:fs'
+import path from 'node:path'
+import { type Metadata, type PostType, type ProjectType } from './types'
+import { formatToKebabCase as fmtKebab, getPostRoutePrefix } from './utils'
 
-export type { Metadata, PostType, ProjectType } from './blog-types';
-export { formatDate, kebabCasetoTitleCase, formatToKebabCase, getPostRoutePrefix } from './blog-types';
-
-export const postsDir = path.join(process.cwd(), 'app', 'posts')
+export const postsDir = path.join(process.cwd(), '..', '..', 'packages', 'content', 'posts')
 export const blogDir = path.join(postsDir, 'blog')
 export const projectDir = path.join(postsDir, 'project')
 export const experiencesDir = path.join(postsDir, 'experiences')
 
-// Kept for backward compatibility
 export const dir = postsDir
 
 function getMDXFiles(dir: fs.PathLike) {
@@ -23,7 +20,6 @@ function readMDXFile(filePath: fs.PathOrFileDescriptor) {
     const rawContent = fs.readFileSync(filePath, 'utf-8')
     const { data, content } = matter(rawContent)
 
-    // gray-matter parses bare YAML dates as Date objects; normalize to YYYY-MM-DD strings
     if (data.publishedAt instanceof Date) {
         data.publishedAt = data.publishedAt.toISOString().split('T')[0]
     }
@@ -37,10 +33,6 @@ function readMDXFile(filePath: fs.PathOrFileDescriptor) {
     return { metadata: data as Metadata, content }
 }
 
-/**
- * Reads all MDX files in a directory synchronously without fetching view counts.
- * Used for alias resolution at build time.
- */
 function getAllPostsRaw(): ProjectType[] {
     const dirs: [string, PostType][] = [
         [blogDir, 'blog'],
@@ -56,11 +48,6 @@ function getAllPostsRaw(): ProjectType[] {
     )
 }
 
-/**
- * Returns all slug segments that are defined as aliases pointing to a given
- * route prefix (e.g. "/blog", "/experiences", "/projects").
- * Use in generateStaticParams to pre-render alias redirect pages.
- */
 export function getAliasSlugsForRoute(routePrefix: string): string[] {
     return getAllPostsRaw()
         .flatMap(post => post.metadata.alias ?? [])
@@ -68,10 +55,6 @@ export function getAliasSlugsForRoute(routePrefix: string): string[] {
         .map(alias => alias.slice(`${routePrefix}/`.length))
 }
 
-/**
- * Finds the canonical post that lists the given full path as an alias.
- * Returns null if no post claims that alias.
- */
 export function findPostByAlias(aliasPath: string): ProjectType | null {
     return getAllPostsRaw().find(post => post.metadata.alias?.includes(aliasPath)) ?? null
 }
@@ -106,13 +89,11 @@ export async function getBlogPosts(options: {
 
         const postTags = post.metadata.tags || []
 
-        // If includeTags is specified, post must have at least one of those tags
         if (includeTags.length > 0) {
             const hasIncludedTag = includeTags.some(tag => postTags.includes(tag))
             if (!hasIncludedTag) return false
         }
 
-        // Post must not have any of the excluded tags
         if (excludeTags.length > 0) {
             const hasExcludedTag = excludeTags.some(tag => postTags.includes(tag))
             if (hasExcludedTag) return false
@@ -126,7 +107,6 @@ export async function getBlogPost(slug: string) {
     const slugWithoutMDX = slug.replace(/\.mdx?$/, '')
     const slugWithMDX = `${slugWithoutMDX}.mdx`
 
-    // Search across all post sub-directories
     const dirTypeMap: [string, PostType][] = [
         [blogDir, 'blog'],
         [projectDir, 'project'],
@@ -159,7 +139,5 @@ export async function getProjects() {
 
 export async function getExperiences() {
     const posts = await getMDXData(experiencesDir, 'experiences')
-    // Experiences use `start` instead of `publishedAt`
     return posts.filter(post => !!post.metadata.start)
 }
-
