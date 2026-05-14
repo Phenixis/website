@@ -90,6 +90,9 @@ export default async function RootLayout({
                 'antialiased text-black bg-white dark:text-white dark:bg-black h-full min-h-screen w-full min-w-screen max-w-screen',
                 initialStyle === 'classical' ? geistMono.className : facultyGlyphic.className
             )}>
+                <div className="absolute top-0 left-0 w-full h-full z-50 pointer-events-none">
+                    This is an old version of my website, check out <a href="https://maximeduhamel.com" className="underline">the new one</a> !
+                </div>
                 <StyleProvider
                         initialStyle={initialStyle}
                         classicalBodyClass={geistMono.className}

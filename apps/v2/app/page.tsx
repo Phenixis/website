@@ -13,7 +13,7 @@ export default async function Home() {
 
   return (
     <main className="max-w-2xl mx-auto px-6 py-16 font-sans">
-      <h1 className="text-3xl font-bold mb-12">v2 — content demo</h1>
+      <h1 className="text-3xl font-bold mb-12">Maxime Duhamel</h1>
 
       <section className="mb-12">
         <div className="flex items-center justify-between mb-4">
