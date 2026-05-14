@@ -4,9 +4,11 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "prepare": "node -e \"if (!process.env.CI) process.exit(require('child_process').spawnSync('npx', ['husky'], {stdio:'inherit',shell:true}).status)\""
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "turbo": "^2.5.4"
   },
   "dependencies": {

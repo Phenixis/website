@@ -6,8 +6,7 @@
     "build": "next build",
     "start": "next start",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "npx tsx lib/db/migrate.ts",
-    "prepare": "husky"
+    "db:migrate": "npx tsx lib/db/migrate.ts"
   },
   "dependencies": {
     "@flags-sdk/vercel": "^1.0.1",
@@ -54,7 +53,6 @@
     "drizzle-kit": "^0.27.2",
     "eslint": "^9.39.3",
     "eslint-config-next": "15.3.2",
-    "husky": "^9.1.7",
     "typescript": "5.8.3"
   }
 }
