@@ -4,13 +4,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/react': npm:types-react@19.0.0-rc.1
-  '@types/react-dom': npm:types-react-dom@19.0.0-rc.1
-
 importers:
 
   .:
+    devDependencies:
+      turbo:
+        specifier: ^2.5.4
+        version: 2.9.12
+
+  apps/v1:
     dependencies:
       '@flags-sdk/vercel':
         specifier: ^1.0.1
@@ -30,6 +32,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(types-react-dom@19.0.0-rc.1)(types-react@19.0.0-rc.1)
+      '@repo/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@tailwindcss/postcss':
         specifier: ^4.2.0
         version: 4.2.0
@@ -123,6 +128,19 @@ importers:
         version: 9.1.7
       typescript:
         specifier: 5.8.3
+        version: 5.8.3
+
+  packages/content:
+    dependencies:
+      '@upstash/redis':
+        specifier: ^1.36.2
+        version: 1.36.2
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
         version: 5.8.3
 
 packages:
@@ -1717,6 +1735,36 @@ packages:
   '@tailwindcss/postcss@4.2.0':
     resolution: {integrity: sha512-u6YBacGpOm/ixPfKqfgrJEjMfrYmPD7gEFRoygS/hnQaRtV0VCBdpkx5Ouw9pnaLRwwlgGCuJw8xLpaR0hOrQg==}
 
+  '@turbo/darwin-64@2.9.12':
+    resolution: {integrity: sha512-eu3eFRmE9NjgZ0wPdRJ44l+LGSeIky+tz5ZQd8zQkw/Yqi+BM7wq+8nbabeoiVUcICi/IZweMOKl/MCmkrd1+g==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@turbo/darwin-arm64@2.9.12':
+    resolution: {integrity: sha512-RUkAE404z/J8NsyrUosMcBaXT6M4bRFxTQrmkDQBLQVXaC8Jl0e9bMvYDSX0GW7Ffm2m3j9y7RXgR1foeUAM9w==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@turbo/linux-64@2.9.12':
+    resolution: {integrity: sha512-InIUtH7cw/vqXNX1Gr7QgWfmw3ct08pV5CpfdEOR48z2u2rzdmpIuk00B/Q2xCb0PMWtKgiMQynfuphmEuUyTQ==}
+    cpu: [x64]
+    os: [linux]
+
+  '@turbo/linux-arm64@2.9.12':
+    resolution: {integrity: sha512-lC6nD//Xh67fmJM0LKaLsg74Wry0aYrgMklpiNgCbUaMdPIOqj0A00iri3NU7Lb7pZHx8ViisgpeDKlpSgFUCA==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@turbo/windows-64@2.9.12':
+    resolution: {integrity: sha512-conYri8VUl72JOdYnLDPYwzqbPcY5ECoHmo9FWoKznemhaAIilj4maHqs9Uar0aKfNoZIULniy+6iWaLtLO34A==}
+    cpu: [x64]
+    os: [win32]
+
+  '@turbo/windows-arm64@2.9.12':
+    resolution: {integrity: sha512-XoR4bsg62/L/esRVcmoMESEiNZ36+YmyjYGLpoqk8nwMgXzzVjNOgX0lRSz5w/U/ajLGv3nhMsS0Q2QOdvp2AQ==}
+    cpu: [arm64]
+    os: [win32]
+
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
@@ -1765,6 +1813,9 @@ packages:
 
   '@types/node@20.17.52':
     resolution: {integrity: sha512-2aj++KfxubvW/Lc0YyXE3OEW7Es8TWn1MsRzYgcOGyTNQxi0L8rxQUCZ7ZbyOBWZQD5I63PV9egZWMsapVaklg==}
+
+  '@types/react@19.2.14':
+    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
   '@types/resolve@1.17.1':
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
@@ -1839,6 +1890,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@unrs/resolver-binding-android-arm-eabi@1.11.1':
     resolution: {integrity: sha512-ppLRUgHVaGRWUx0R0Ut06Mjo9gBaBkg3v/8AxusGLhsIotbBLuRk51rAzqLC8gq6NyyAojEXglNjzf6R948DNw==}
@@ -4179,6 +4231,10 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
+  turbo@2.9.12:
+    resolution: {integrity: sha512-lCPgus1NuTiBdaITWqzSH/Ff6HVL8HHGBtOXHg1dHRfcshN79XkygSdh0M6g8b0td91ILLG5MTkLOkp5UvyPJw==}
+    hasBin: true
+
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -5966,6 +6022,24 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.2.0
 
+  '@turbo/darwin-64@2.9.12':
+    optional: true
+
+  '@turbo/darwin-arm64@2.9.12':
+    optional: true
+
+  '@turbo/linux-64@2.9.12':
+    optional: true
+
+  '@turbo/linux-arm64@2.9.12':
+    optional: true
+
+  '@turbo/windows-64@2.9.12':
+    optional: true
+
+  '@turbo/windows-arm64@2.9.12':
+    optional: true
+
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
@@ -6021,6 +6095,10 @@ snapshots:
   '@types/node@20.17.52':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/react@19.2.14':
+    dependencies:
+      csstype: 3.2.3
 
   '@types/resolve@1.17.1':
     dependencies:
@@ -8912,6 +8990,15 @@ snapshots:
 
   tslib@2.8.1: {}
 
+  turbo@2.9.12:
+    optionalDependencies:
+      '@turbo/darwin-64': 2.9.12
+      '@turbo/darwin-arm64': 2.9.12
+      '@turbo/linux-64': 2.9.12
+      '@turbo/linux-arm64': 2.9.12
+      '@turbo/windows-64': 2.9.12
+      '@turbo/windows-arm64': 2.9.12
+
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
@@ -8953,7 +9040,7 @@ snapshots:
 
   types-react-dom@19.0.0-rc.1:
     dependencies:
-      '@types/react': types-react@19.0.0-rc.1
+      '@types/react': 19.2.14
 
   types-react@19.0.0-rc.1:
     dependencies:

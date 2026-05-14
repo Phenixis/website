@@ -90,7 +90,7 @@ export function ProjectClassical({
     project: ProjectType
     showBadge?: boolean,
 }>) {
-    const colorVariant = project.metadata.color && colorVariants[project.metadata.color] ? colorVariants[project.metadata.color] : colorVariants.blue
+    const colorVariant = project.metadata.color && colorVariants[project.metadata.color as keyof typeof colorVariants] ? colorVariants[project.metadata.color as keyof typeof colorVariants] : colorVariants.blue
     const state = project.metadata.tags?.find(tag => (states as readonly string[]).includes(tag))
 
     return (
@@ -129,7 +129,7 @@ export function ProjectModern({
     project: ProjectType
     showBadge?: boolean,
 }>) {
-    const colorVariant = project.metadata.color && colorVariants[project.metadata.color] ? colorVariants[project.metadata.color] : colorVariants.blue
+    const colorVariant = project.metadata.color && colorVariants[project.metadata.color as keyof typeof colorVariants] ? colorVariants[project.metadata.color as keyof typeof colorVariants] : colorVariants.blue
     const hasImage = Boolean(project.metadata.image)
     const state = project.metadata.tags?.find(tag => (states as readonly string[]).includes(tag))
     const image = project.metadata.image

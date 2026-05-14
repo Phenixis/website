@@ -3,7 +3,7 @@ import crypto from 'crypto'
 
 export const redis = Redis.fromEnv()
 
-type value = {
+type RedisValue = {
     views: number,
     hashedIps: string[]
 }
@@ -16,7 +16,7 @@ export function hashIp(ip: string, key?: string) {
 }
 
 export async function incrementViews(key: string, hashed_ip_address: string) {
-    const data = await redis.get(key) as value
+    const data = await redis.get(key) as RedisValue
 
     if (data === null) {
         await redis.set(key, { views: 1, hashedIps: [hashed_ip_address] })
@@ -31,17 +31,13 @@ export async function incrementViews(key: string, hashed_ip_address: string) {
 }
 
 export async function getViews(key: string) {
-    const data = await redis.get(key) as value
+    const data = await redis.get(key) as RedisValue
     return data?.views || 1
 }
 
-/**
- * Returns the sum of views across all provided keys.
- * Use this to merge view counts from a canonical key and its aliases.
- */
 export async function getMergedViews(keys: string[]) {
     const results = await Promise.all(
-        keys.map(key => redis.get<value>(key))
+        keys.map(key => redis.get<RedisValue>(key))
     )
     const total = results.reduce((sum, data) => sum + (data?.views ?? 0), 0)
     return total || 1
