@@ -1,0 +1,233 @@
+import { createClient } from "@libsql/client";
+import type { Project, Post, Experience } from "@/app/data";
+
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
+export default db;
+
+/* ── Migrations ────────────────────────────────────────── */
+
+const MIGRATIONS: Array<{ name: string; sql: string }> = [
+  {
+    name: "001_add_published_to_posts",
+    sql: "ALTER TABLE posts ADD COLUMN published INTEGER DEFAULT 1",
+  },
+  {
+    name: "002_create_profile_table",
+    sql: `CREATE TABLE IF NOT EXISTS profile (
+      id       INTEGER PRIMARY KEY DEFAULT 1,
+      name     TEXT NOT NULL,
+      handle   TEXT NOT NULL,
+      tagline  TEXT NOT NULL,
+      location TEXT NOT NULL
+    )`,
+  },
+];
+
+export async function runMigrations(): Promise<void> {
+  await db.execute(
+    `CREATE TABLE IF NOT EXISTS migrations (
+      name       TEXT PRIMARY KEY,
+      applied_at TEXT DEFAULT (datetime('now'))
+    )`,
+  );
+
+  for (const m of MIGRATIONS) {
+    const row = await db.execute({
+      sql: "SELECT 1 FROM migrations WHERE name = ?",
+      args: [m.name],
+    });
+    if (row.rows.length > 0) continue;
+
+    try {
+      await db.execute(m.sql);
+    } catch (err) {
+      // CREATE TABLE IF NOT EXISTS never throws, but ALTER TABLE will if column
+      // already exists in a DB that predates the migrations table — that's fine.
+      console.warn(`[db] migration ${m.name} skipped (already applied at schema level):`, err);
+    }
+
+    await db.execute({
+      sql: "INSERT INTO migrations (name) VALUES (?)",
+      args: [m.name],
+    });
+    console.log(`[db] migration applied: ${m.name}`);
+  }
+}
+
+/* ── Row mappers ───────────────────────────────────────── */
+
+function rowToProject(row: Record<string, unknown>): Project {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    year: row.year as string,
+    kind: row.kind as string,
+    status: row.status as Project["status"],
+    blurb: row.blurb as string,
+    body: JSON.parse(row.body as string),
+    stack: JSON.parse(row.stack as string),
+    color: row.color as string,
+    ...(row.role != null ? { role: row.role as string } : {}),
+    ...(row.links != null ? { links: JSON.parse(row.links as string) } : {}),
+  };
+}
+
+function rowToPost(row: Record<string, unknown>): Post {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    date: row.date as string,
+    readTime: row.read_time as string,
+    tags: JSON.parse(row.tags as string),
+    excerpt: row.excerpt as string,
+    body: JSON.parse(row.body as string),
+    published: row.published == null ? true : Boolean(row.published),
+  };
+}
+
+function rowToExperience(row: Record<string, unknown>): Experience {
+  return {
+    id: row.id as string,
+    when: row.when as string,
+    role: row.role as string,
+    where: row.where as string,
+    kind: row.kind as Experience["kind"],
+    blurb: row.blurb as string,
+    stack: JSON.parse(row.stack as string),
+  };
+}
+
+/* ── Projects ──────────────────────────────────────────── */
+
+export async function getProjects(): Promise<Project[]> {
+  const r = await db.execute("SELECT * FROM projects ORDER BY sort_order ASC, rowid ASC");
+  return r.rows.map((row) => rowToProject(row as unknown as Record<string, unknown>));
+}
+
+export async function getProject(id: string): Promise<Project | null> {
+  const r = await db.execute({ sql: "SELECT * FROM projects WHERE id = ?", args: [id] });
+  if (!r.rows.length) return null;
+  return rowToProject(r.rows[0] as unknown as Record<string, unknown>);
+}
+
+export async function upsertProject(p: Project): Promise<void> {
+  await db.execute({
+    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            title=excluded.title, year=excluded.year, kind=excluded.kind,
+            status=excluded.status, blurb=excluded.blurb, body=excluded.body,
+            stack=excluded.stack, color=excluded.color, role=excluded.role, links=excluded.links`,
+    args: [
+      p.id, p.title, p.year, p.kind, p.status, p.blurb,
+      JSON.stringify(p.body), JSON.stringify(p.stack), p.color,
+      p.role ?? null,
+      p.links?.length ? JSON.stringify(p.links) : null,
+    ],
+  });
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  await db.execute({ sql: "DELETE FROM projects WHERE id = ?", args: [id] });
+}
+
+/* ── Posts ─────────────────────────────────────────────── */
+
+export async function getPosts(): Promise<Post[]> {
+  const r = await db.execute("SELECT * FROM posts ORDER BY sort_order ASC, rowid ASC");
+  return r.rows.map((row) => rowToPost(row as unknown as Record<string, unknown>));
+}
+
+export async function getPublishedPosts(): Promise<Post[]> {
+  const r = await db.execute(
+    "SELECT * FROM posts WHERE published IS NULL OR published != 0 ORDER BY sort_order ASC, rowid ASC",
+  );
+  return r.rows.map((row) => rowToPost(row as unknown as Record<string, unknown>));
+}
+
+export async function getPost(id: string): Promise<Post | null> {
+  const r = await db.execute({ sql: "SELECT * FROM posts WHERE id = ?", args: [id] });
+  if (!r.rows.length) return null;
+  return rowToPost(r.rows[0] as unknown as Record<string, unknown>);
+}
+
+export async function upsertPost(p: Post): Promise<void> {
+  const published = p.published === false ? 0 : 1;
+  await db.execute({
+    sql: `INSERT INTO posts (id, title, date, read_time, tags, excerpt, body, published)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            title=excluded.title, date=excluded.date, read_time=excluded.read_time,
+            tags=excluded.tags, excerpt=excluded.excerpt, body=excluded.body,
+            published=excluded.published`,
+    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, JSON.stringify(p.body), published],
+  });
+}
+
+export async function deletePost(id: string): Promise<void> {
+  await db.execute({ sql: "DELETE FROM posts WHERE id = ?", args: [id] });
+}
+
+/* ── Experiences ───────────────────────────────────────── */
+
+export async function getExperiences(): Promise<Experience[]> {
+  const r = await db.execute("SELECT * FROM experiences ORDER BY sort_order ASC, rowid ASC");
+  return r.rows.map((row) => rowToExperience(row as unknown as Record<string, unknown>));
+}
+
+export async function getExperience(id: string): Promise<Experience | null> {
+  const r = await db.execute({ sql: "SELECT * FROM experiences WHERE id = ?", args: [id] });
+  if (!r.rows.length) return null;
+  return rowToExperience(r.rows[0] as unknown as Record<string, unknown>);
+}
+
+export async function upsertExperience(e: Experience): Promise<void> {
+  await db.execute({
+    sql: `INSERT INTO experiences (id, "when", role, "where", kind, blurb, stack)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            "when"=excluded."when", role=excluded.role, "where"=excluded."where",
+            kind=excluded.kind, blurb=excluded.blurb, stack=excluded.stack`,
+    args: [e.id, e.when, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack)],
+  });
+}
+
+export async function deleteExperience(id: string): Promise<void> {
+  await db.execute({ sql: "DELETE FROM experiences WHERE id = ?", args: [id] });
+}
+
+/* ── Profile / Settings ────────────────────────────────── */
+
+export type SettingsProfile = {
+  name: string;
+  handle: string;
+  tagline: string;
+  location: string;
+};
+
+export async function getProfile(): Promise<SettingsProfile | null> {
+  const r = await db.execute("SELECT * FROM profile LIMIT 1");
+  if (!r.rows.length) return null;
+  const row = r.rows[0] as unknown as Record<string, unknown>;
+  return {
+    name: row.name as string,
+    handle: row.handle as string,
+    tagline: row.tagline as string,
+    location: row.location as string,
+  };
+}
+
+export async function upsertProfile(p: SettingsProfile): Promise<void> {
+  await db.execute({
+    sql: `INSERT INTO profile (id, name, handle, tagline, location)
+          VALUES (1, ?, ?, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET
+            name=excluded.name, handle=excluded.handle,
+            tagline=excluded.tagline, location=excluded.location`,
+    args: [p.name, p.handle, p.tagline, p.location],
+  });
+}

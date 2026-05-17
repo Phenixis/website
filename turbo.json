@@ -11,7 +11,9 @@
         "UPSTASH_REDIS_REST_TOKEN",
         "IP_HASH_KEY",
         "RESEND_API_KEY",
-        "RESEND_API_ENDPOINT"
+        "RESEND_API_ENDPOINT",
+        "TURSO_DATABASE_URL",
+        "TURSO_AUTH_TOKEN"
       ]
     },
     "dev": {

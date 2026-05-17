@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.3",
     "@repo/content": "workspace:*",
     "@tailwindcss/typography": "^0.5.19",
     "next": "16.2.6",

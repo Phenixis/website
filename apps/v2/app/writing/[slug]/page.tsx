@@ -1,32 +1,32 @@
 import "../../portfolio.css";
 import { Portfolio } from "../../_components/Portfolio";
 import { PROFILE } from "../../data";
-import { getProjects, getPublishedPosts, getExperiences, getProject } from "@/lib/db";
+import { getProjects, getPublishedPosts, getExperiences, getPost } from "@/lib/db";
 import { notFound } from "next/navigation";
 
 export const revalidate = 86400;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProject(slug);
-  if (!project) return {};
+  const post = await getPost(slug);
+  if (!post) return {};
   return {
-    title: `${project.title} — Maxime Duhamel`,
-    description: project.blurb,
-    openGraph: { title: project.title, description: project.blurb },
+    title: `${post.title} — Maxime Duhamel`,
+    description: post.excerpt,
+    openGraph: { title: post.title, description: post.excerpt },
   };
 }
 
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [projects, posts, experiences, project] = await Promise.all([
+  const [projects, posts, experiences, post] = await Promise.all([
     getProjects(),
     getPublishedPosts(),
     getExperiences(),
-    getProject(slug),
+    getPost(slug),
   ]);
 
-  if (!project) notFound();
+  if (!post) notFound();
 
   return (
     <Portfolio
@@ -34,8 +34,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       projects={projects}
       posts={posts}
       experiences={experiences}
-      initialFocus="projects"
-      initialProjectId={slug}
+      initialFocus="blog"
+      initialPostId={slug}
     />
   );
 }
