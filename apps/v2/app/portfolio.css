@@ -205,7 +205,9 @@
   line-height: 1;
 }
 
-.v3-content--writing .v3-section-head {
+.v3-content--writing .v3-section-head,
+.v3-content--projects-list .v3-section-head,
+.v3-content--experiences .v3-section-head {
   max-width: 760px;
   margin: 0 auto;
   padding-left: 0;
@@ -225,9 +227,11 @@
 
 /* ── PROJECTS ─────────────────────────────────────────── */
 .v3-projects {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
   padding-top: 8px;
 }
 .v3-pcard {
@@ -321,7 +325,7 @@
 }
 .v3-pcard-kind { color: var(--v3-text-2); }
 .v3-pcard-spacer { flex: 1; }
-.v3-pcard-stack { color: var(--v3-text-dim); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.v3-pcard-stack { color: var(--v3-text-mute); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .v3-pcard-dot { color: var(--v3-text-dim); }
 .v3-vstatus--shipping { color: #74e893; }
 .v3-vstatus--paused { color: #f1c45b; }
@@ -421,6 +425,8 @@
 /* ── EXPERIENCES / TIMELINE ──────────────────────────── */
 .v3-timeline {
   position: relative;
+  max-width: 760px;
+  margin: 0 auto;
   padding: 12px 0 32px 0;
 }
 .v3-timeline-rail {
@@ -540,7 +546,7 @@
 .v3-vkind--self { color: var(--v3-accent); }
 .v3-vkind--role { color: var(--v3-text-2); }
 .v3-vkind--edu { color: #f1c45b; }
-.v3-trow-stack { color: var(--v3-text-dim); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.v3-trow-stack { color: var(--v3-text-mute); text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 
 .v3-timeline-end {
   display: grid;
@@ -885,8 +891,10 @@
   .v3-rail-label { font-size: 26px; }
   .v3-rail-num { font-size: 18px; }
   .v3-content--writing .v3-section-head,
+  .v3-content--projects-list .v3-section-head,
+  .v3-content--experiences .v3-section-head,
   .v3-content--project-detail .v3-section-head { max-width: 100%; }
-  .v3-posts, .v3-article, .v3-project-detail { max-width: 100%; }
+  .v3-posts, .v3-article, .v3-project-detail, .v3-projects, .v3-timeline { max-width: 100%; }
 }
 
 @media (max-width: 720px) {
@@ -954,7 +962,6 @@
   .v3-section-rule { flex-basis: 24px; }
   .v3-scroll { padding: 0 22px 32px 22px; }
 
-  .v3-projects { grid-template-columns: 1fr; gap: 14px; }
   .v3-pcard { grid-template-columns: 36px 72px 1fr; gap: 12px; padding: 14px 0; }
   .v3-pcard-thumb { width: 72px; height: 72px; }
   .v3-pcard-glyph { font-size: 44px; }

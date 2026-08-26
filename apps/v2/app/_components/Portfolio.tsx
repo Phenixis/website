@@ -1,32 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import { useRouter, usePathname } from "next/navigation";
 import type { Project, Post, Experience, Profile } from "../data";
+import { ViewCounter } from "./ViewCounter";
 
 type PortfolioProps = {
   profile: Profile;
   projects: Project[];
   posts: Post[];
   experiences: Experience[];
-  initialFocus?: string;
-  initialProjectId?: string | null;
-  initialPostId?: string | null;
 };
 
-export function Portfolio({
-  profile,
-  projects,
-  posts,
-  experiences,
-  initialFocus = "projects",
-  initialProjectId = null,
-  initialPostId = null,
-}: PortfolioProps) {
+function parsePortfolioRoute(pathname: string): {
+  focused: string;
+  selectedPostId: string | null;
+  selectedProjectId: string | null;
+} {
+  if (pathname === "/writing") return { focused: "blog", selectedPostId: null, selectedProjectId: null };
+  if (pathname.startsWith("/writing/")) {
+    return { focused: "blog", selectedPostId: decodeURIComponent(pathname.slice("/writing/".length)), selectedProjectId: null };
+  }
+  if (pathname === "/itinerary") return { focused: "experiences", selectedPostId: null, selectedProjectId: null };
+  if (pathname.startsWith("/projects/")) {
+    return { focused: "projects", selectedPostId: null, selectedProjectId: decodeURIComponent(pathname.slice("/projects/".length)) };
+  }
+  return { focused: "projects", selectedPostId: null, selectedProjectId: null };
+}
+
+export function Portfolio({ profile, projects, posts, experiences }: PortfolioProps) {
   const router = useRouter();
-  const [focused, setFocused] = useState<string>(initialFocus);
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(initialPostId);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(initialProjectId);
+  const pathname = usePathname();
+  const { focused, selectedPostId, selectedProjectId } = parsePortfolioRoute(pathname);
 
   const panes = [
     { id: "projects", label: "Projects", num: "I", count: projects.length, sub: "What I made" },
@@ -35,24 +40,17 @@ export function Portfolio({
   ];
 
   const handleFocus = (id: string) => {
-    setFocused(id);
-    setSelectedPostId(null);
-    setSelectedProjectId(null);
     if (id === "projects") router.push("/");
     else if (id === "blog") router.push("/writing");
     else if (id === "experiences") router.push("/itinerary");
   };
 
   const handleSelectPost = (id: string | null) => {
-    setSelectedPostId(id);
-    if (id) router.push(`/writing/${id}`);
-    else router.push("/writing");
+    router.push(id ? `/writing/${id}` : "/writing");
   };
 
   const handleSelectProject = (id: string | null) => {
-    setSelectedProjectId(id);
-    if (id) router.push(`/projects/${id}`);
-    else router.push("/");
+    router.push(id ? `/projects/${id}` : "/");
   };
 
   return (
@@ -148,6 +146,8 @@ function PaneFocused({
   const contentClass = [
     "v3-content",
     pane.id === "blog" ? "v3-content--writing" : "",
+    pane.id === "projects" && !selectedProject ? "v3-content--projects-list" : "",
+    pane.id === "experiences" ? "v3-content--experiences" : "",
     selectedProject ? "v3-content--project-detail" : "",
   ].filter(Boolean).join(" ");
 
@@ -307,6 +307,12 @@ function ProjectDetail({
             {project.stack.map((s) => (
               <span key={s} className="v3-project-stack-chip">{s}</span>
             ))}
+          </span>
+        </div>
+        <div className="v3-project-meta-row">
+          <span className="v3-project-meta-key">Views</span>
+          <span className="v3-project-meta-val">
+            <ViewCounter slug={`/projects/${project.id}`} />
           </span>
         </div>
         {project.links && project.links.length > 0 && (
