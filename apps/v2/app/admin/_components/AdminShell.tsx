@@ -3,39 +3,56 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { PROFILE, PROJECTS, POSTS, EXPERIENCES } from "../../data";
+import type { Profile } from "../../data";
 
-const nav = [
-  {
-    group: "Content",
-    items: [
-      { id: "dashboard", href: "/admin", label: "Overview", icon: "✦" },
-      { id: "projects", href: "/admin/projects", label: "Projects", icon: "I", count: PROJECTS.length },
-      { id: "posts", href: "/admin/posts", label: "Writing", icon: "II", count: POSTS.length },
-      { id: "experiences", href: "/admin/experiences", label: "Itinerary", icon: "III", count: EXPERIENCES.length },
-    ],
-  },
-  {
-    group: "Library",
-    items: [
-      { id: "media", href: "/admin/media", label: "Media", icon: "◇", count: 24 },
-      { id: "tags", href: "/admin/tags", label: "Tags", icon: "#", count: 14 },
-    ],
-  },
-  {
-    group: "Workspace",
-    items: [
-      { id: "drafts", href: "/admin/drafts", label: "Drafts", icon: "•", count: 2 },
-      { id: "archive", href: "/admin/archive", label: "Archive", icon: "⌗", count: 4 },
-      { id: "settings", href: "/admin/settings", label: "Settings", icon: "⚙", count: undefined },
-    ],
-  },
-];
+type Counts = {
+  projects: number;
+  posts: number;
+  experiences: number;
+  drafts: number;
+  archived: number;
+  tags: number;
+};
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  profile,
+  counts,
+}: {
+  children: React.ReactNode;
+  profile: Profile;
+  counts: Counts;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const nav = [
+    {
+      group: "Content",
+      items: [
+        { id: "dashboard", href: "/admin", label: "Overview", icon: "✦", count: undefined as number | undefined },
+        { id: "projects", href: "/admin/projects", label: "Projects", icon: "I", count: counts.projects },
+        { id: "posts", href: "/admin/posts", label: "Writing", icon: "II", count: counts.posts },
+        { id: "experiences", href: "/admin/experiences", label: "Itinerary", icon: "III", count: counts.experiences },
+      ],
+    },
+    {
+      group: "Library",
+      items: [
+        { id: "media", href: "/admin/media", label: "Media", icon: "◇", count: undefined as number | undefined },
+        { id: "tags", href: "/admin/tags", label: "Tags", icon: "#", count: counts.tags },
+      ],
+    },
+    {
+      group: "Workspace",
+      items: [
+        { id: "drafts", href: "/admin/drafts", label: "Drafts", icon: "•", count: counts.drafts },
+        { id: "archive", href: "/admin/archive", label: "Archive", icon: "⌗", count: counts.archived },
+        { id: "settings", href: "/admin/settings", label: "Settings", icon: "⚙", count: undefined as number | undefined },
+      ],
+    },
+  ];
 
   const signOut = async () => {
     await fetch("/api/auth/login", { method: "DELETE" });
@@ -64,7 +81,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="a-topbar-left">
           <span className="a-topbar-logo">✦</span>
           <div className="a-topbar-brand">
-            <span className="a-topbar-name">{PROFILE.name}</span>
+            <span className="a-topbar-name">{profile.name}</span>
             <span className="a-topbar-pill">Back-office</span>
           </div>
         </div>
@@ -84,7 +101,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <span>↗</span>
             <span className="a-topbar-link-label"> View site</span>
           </Link>
-          <div className="a-topbar-avatar" title={PROFILE.name}>M</div>
+          <div className="a-topbar-avatar" title={profile.name}>M</div>
         </div>
       </header>
 
