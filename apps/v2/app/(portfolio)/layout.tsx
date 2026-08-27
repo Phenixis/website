@@ -1,4 +1,4 @@
-import { Portfolio } from "../_components/Portfolio";
+import { Portfolio } from "../_components/portfolio/Portfolio";
 import { PROFILE } from "../data";
 import { getProjects, getPublishedPosts, getExperiences, getProfile } from "@/lib/db";
 
