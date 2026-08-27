@@ -1,4 +1,5 @@
 import { getProject, upsertProject, deleteProject } from "@/lib/db";
+import { revalidatePortfolio } from "@/lib/revalidate";
 
 export async function GET(
   _req: Request,
@@ -17,6 +18,7 @@ export async function PUT(
   const { id } = await params;
   const body = await req.json();
   await upsertProject({ ...body, id });
+  revalidatePortfolio();
   return Response.json({ ...body, id });
 }
 
@@ -26,5 +28,6 @@ export async function DELETE(
 ) {
   const { id } = await params;
   await deleteProject(id);
+  revalidatePortfolio();
   return new Response(null, { status: 204 });
 }
