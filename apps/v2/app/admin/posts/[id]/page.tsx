@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import type { Post } from "../../../data";
 import {
   Badge, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Chips, Paragraphs, Segmented,
+  TextInput, Textarea, Chips, Paragraphs, Segmented, editPageCls,
 } from "../../_components/ui";
 
 const BLANK: Post = {
@@ -77,15 +77,11 @@ export default function PostEditPage() {
   }, [p]);
 
   if (loading) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--a-text-mute)" }}>
-        Loading…
-      </div>
-    );
+    return <div className={editPageCls.loading}>Loading…</div>;
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+    <div className={editPageCls.wrapper}>
       <PageHead
         crumbs={[
           { label: "Writing", onClick: back },
@@ -93,15 +89,15 @@ export default function PostEditPage() {
         ]}
         title={
           <input
-            className="a-input a-input--title"
+            className={editPageCls.inputTitle}
             value={p.title}
             onChange={(e) => update("title", e.target.value)}
             placeholder="Post title"
           />
         }
       />
-      <div className="a-form">
-        <div className="a-form-main">
+      <div className={editPageCls.form}>
+        <div className={editPageCls.formMain}>
           <FormSection title="Content">
             <Field label="Excerpt" hint="Lede shown in the list and as the article intro">
               <Textarea value={p.excerpt} onChange={(v) => update("excerpt", v)} variant="lede" placeholder="Opening line…" />
@@ -118,16 +114,16 @@ export default function PostEditPage() {
             savedAt={savedAt}
           />
         </div>
-        <div className="a-form-side">
-          <div className="a-side-card">
-            <div className="a-side-card-title">At a glance</div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">ID</span>
-              <span className="a-side-card-val">{isNew ? "new" : p.id}</span>
+        <div className={editPageCls.formSide}>
+          <div className={editPageCls.sideCard}>
+            <div className={editPageCls.sideCardTitle}>At a glance</div>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>ID</span>
+              <span className={editPageCls.sideCardVal}>{isNew ? "new" : p.id}</span>
             </div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">Status</span>
-              <span className="a-side-card-val">
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>Status</span>
+              <span className={editPageCls.sideCardVal}>
                 <Badge kind={p.published === false ? "draft" : "published"}>
                   {p.published === false ? "draft" : "published"}
                 </Badge>

@@ -6,7 +6,7 @@ import type { Project } from "../../../data";
 import {
   Badge, Btn, FormBar, FormSection, Field, PageHead,
   TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, Paragraphs,
-  COLOR_OPTIONS,
+  COLOR_OPTIONS, editPageCls,
 } from "../../_components/ui";
 
 const BLANK: Project = {
@@ -79,15 +79,11 @@ export default function ProjectEditPage() {
   }, [p]);
 
   if (loading) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--a-text-mute)" }}>
-        Loading…
-      </div>
-    );
+    return <div className={editPageCls.loading}>Loading…</div>;
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+    <div className={editPageCls.wrapper}>
       <PageHead
         crumbs={[
           { label: "Projects", onClick: back },
@@ -95,15 +91,15 @@ export default function ProjectEditPage() {
         ]}
         title={
           <input
-            className="a-input a-input--title"
+            className={editPageCls.inputTitle}
             value={p.title}
             onChange={(e) => update("title", e.target.value)}
             placeholder="Project title"
           />
         }
       />
-      <div className="a-form">
-        <div className="a-form-main">
+      <div className={editPageCls.form}>
+        <div className={editPageCls.formMain}>
           <FormSection title="Content">
             <Field label="Blurb" hint="One-liner shown on card and in meta">
               <Textarea
@@ -130,16 +126,16 @@ export default function ProjectEditPage() {
             savedAt={savedAt}
           />
         </div>
-        <div className="a-form-side">
-          <div className="a-side-card">
-            <div className="a-side-card-title">At a glance</div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">ID</span>
-              <span className="a-side-card-val">{isNew ? "new" : p.id}</span>
+        <div className={editPageCls.formSide}>
+          <div className={editPageCls.sideCard}>
+            <div className={editPageCls.sideCardTitle}>At a glance</div>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>ID</span>
+              <span className={editPageCls.sideCardVal}>{isNew ? "new" : p.id}</span>
             </div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">Status</span>
-              <span className="a-side-card-val"><Badge kind={p.status}>{p.status}</Badge></span>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>Status</span>
+              <span className={editPageCls.sideCardVal}><Badge kind={p.status}>{p.status}</Badge></span>
             </div>
           </div>
           <FormSection title="Status & Kind">

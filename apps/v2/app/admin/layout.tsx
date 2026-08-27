@@ -1,4 +1,3 @@
-import "./admin.css";
 import { AdminShell } from "./_components/AdminShell";
 import { getProjects, getPosts, getExperiences, getProfile } from "@/lib/db";
 import { PROFILE } from "../data";

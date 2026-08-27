@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
-import { Badge, Btn, PageHead, Toolbar } from "../_components/ui";
+import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -34,56 +34,56 @@ export default function ArchivePage() {
         sub="Projects set aside — restore to bring them back."
       />
       <Toolbar>
-        <Btn size="sm">Archived <span className="a-btn-kbd">{items.length}</span></Btn>
-        <span className="a-toolbar-spacer" />
+        <Btn size="sm">Archived <span className={kbdCls}>{items.length}</span></Btn>
+        <span className="flex-1" />
         <Btn size="sm" variant="ghost" onClick={() => router.push("/admin/projects")}>
           View all projects →
         </Btn>
       </Toolbar>
-      <div className="a-page-body">
+      <div className={pageBodyCls}>
         {items.length === 0 ? (
-          <div className="a-empty">
-            <span className="a-empty-icon">⌗</span>
-            <span className="a-empty-label">No archived projects</span>
-            <span className="a-empty-hint">Set a project to "archived" status to move it here.</span>
+          <div className={emptyCls.wrap}>
+            <span className={emptyCls.icon}>⌗</span>
+            <span className={emptyCls.label}>No archived projects</span>
+            <span className={emptyCls.hint}>Set a project to &quot;archived&quot; status to move it here.</span>
           </div>
         ) : (
-          <table className="a-table">
-            <thead>
+          <table className={tableCls.table}>
+            <thead className={tableCls.thead}>
               <tr>
-                <th className="a-th-num">#</th>
-                <th>Title</th>
-                <th className="a-col--md">Year</th>
-                <th className="a-col--md">Kind</th>
-                <th className="a-col--lg">Stack</th>
-                <th className="a-th-actions" />
+                <th className={`${tableCls.th} ${tableCls.thNum}`}>#</th>
+                <th className={tableCls.th}>Title</th>
+                <th className={`${tableCls.th} ${tableCls.colMd}`}>Year</th>
+                <th className={`${tableCls.th} ${tableCls.colMd}`}>Kind</th>
+                <th className={`${tableCls.th} ${tableCls.colLg}`}>Stack</th>
+                <th className={`${tableCls.th} ${tableCls.thActions}`} />
               </tr>
             </thead>
             <tbody>
               {items.map((p, i) => (
-                <tr key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)}>
-                  <td className="a-td-num">{String(i + 1).padStart(2, "0")}</td>
-                  <td className="a-td-title">
-                    <div className="a-td-title-inner">
-                      <span className="a-td-color-dot" style={{ background: p.color }} />
+                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)}>
+                  <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
+                  <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
+                    <div className={tableCls.tdTitleInner}>
+                      <span className={tableCls.tdColorDot} style={{ background: p.color }} />
                       <span>
-                        <span className="a-td-title-name">{p.title}</span>
-                        <span className="a-td-title-sub">
+                        <span className={tableCls.tdTitleName}>{p.title}</span>
+                        <span className={tableCls.tdTitleSub}>
                           {p.blurb.slice(0, 64)}{p.blurb.length > 64 ? "…" : ""}
                         </span>
                       </span>
                     </div>
                   </td>
-                  <td className="a-td-muted a-col--md">{p.year}</td>
-                  <td className="a-td-muted a-col--md">{p.kind}</td>
-                  <td className="a-col--lg">
-                    <div className="a-td-chip-row">
+                  <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.year}</td>
+                  <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.kind}</td>
+                  <td className={`${tableCls.td} ${tableCls.colLg}`}>
+                    <div className={tableCls.tdChipRow}>
                       {p.stack.slice(0, 3).map((s) => (
-                        <span key={s} className="a-td-chip">{s}</span>
+                        <span key={s} className={tableCls.tdChip}>{s}</span>
                       ))}
                     </div>
                   </td>
-                  <td className="a-td-actions" onClick={(ev) => ev.stopPropagation()}>
+                  <td className={`${tableCls.td} ${tableCls.tdActions}`} onClick={(ev) => ev.stopPropagation()}>
                     <Btn
                       size="sm"
                       variant="ghost"

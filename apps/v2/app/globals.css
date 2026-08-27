@@ -1,6 +1,62 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --font-mono: var(--font-jetbrains-mono), "SF Mono", "Menlo", monospace;
+  --font-serif: var(--font-fraunces), "Times New Roman", serif;
+
+  /* ── portfolio (v3) palette ── */
+  --color-v3-bg: #0a0a0d;
+  --color-v3-bg-2: #0e0e12;
+  --color-v3-bg-3: #14141a;
+  --color-v3-border: #1f1f28;
+  --color-v3-border-strong: #2c2c38;
+  --color-v3-text: #ededf3;
+  --color-v3-text-2: #b8b8c4;
+  --color-v3-text-mute: #6e6e80;
+  --color-v3-text-dim: #45455a;
+  --color-v3-accent: #b794f6;
+  --color-v3-accent-2: #d6bcfa;
+  --color-v3-rule: #232330;
+
+  /* ── back-office (a) palette ── */
+  --color-a-bg: #0a0a0d;
+  --color-a-bg-2: #0e0e14;
+  --color-a-bg-3: #14141c;
+  --color-a-bg-4: #1a1a24;
+  --color-a-surface: #161620;
+  --color-a-surface-2: #1c1c28;
+  --color-a-border: #1f1f2c;
+  --color-a-border-strong: #2c2c3c;
+  --color-a-border-focus: #4a4a68;
+  --color-a-text: #ededf3;
+  --color-a-text-2: #b8b8c4;
+  --color-a-text-mute: #6e6e80;
+  --color-a-text-dim: #45455a;
+  --color-a-accent: #b794f6;
+  --color-a-accent-2: #d6bcfa;
+  --color-a-accent-soft: rgba(183, 148, 246, 0.1);
+  --color-a-accent-softer: rgba(183, 148, 246, 0.05);
+  --color-a-green: #74e893;
+  --color-a-green-soft: rgba(116, 232, 147, 0.1);
+  --color-a-amber: #f1c45b;
+  --color-a-amber-soft: rgba(241, 196, 91, 0.1);
+  --color-a-red: #f87171;
+  --color-a-red-soft: rgba(248, 113, 113, 0.1);
+
+  /* ── shared easing curves ── */
+  --ease-v3-fade: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-v3-pane: cubic-bezier(0.7, 0.02, 0.2, 1);
+  --ease-a-drawer: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-v3-fade: v3-fade 480ms var(--ease-v3-fade);
+}
+
+@keyframes v3-fade {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -13,3 +69,27 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* Tailwind has no utility for scrollbar styling; kept as the one
+   unavoidable exception to the utility-classes-in-JSX approach. */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-v3-border-strong) transparent;
+}
+.scroll-thin::-webkit-scrollbar { width: 6px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--color-v3-border-strong); border-radius: 3px; }
+
+.scroll-thin-a {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-a-border-strong) transparent;
+}
+.scroll-thin-a::-webkit-scrollbar { width: 4px; }
+.scroll-thin-a::-webkit-scrollbar-thumb { background: var(--color-a-border-strong); }
+
+.scroll-thin-a-wide {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-a-border-strong) transparent;
+}
+.scroll-thin-a-wide::-webkit-scrollbar { width: 8px; }
+.scroll-thin-a-wide::-webkit-scrollbar-thumb { background: var(--color-a-border-strong); border-radius: 4px; }

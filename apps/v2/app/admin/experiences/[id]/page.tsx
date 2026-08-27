@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import type { Experience } from "../../../data";
 import {
   Badge, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Segmented, Chips,
+  TextInput, Textarea, Segmented, Chips, editPageCls,
 } from "../../_components/ui";
 
 const BLANK: Experience = {
@@ -76,15 +76,11 @@ export default function ExperienceEditPage() {
   }, [e]);
 
   if (loading) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--a-text-mute)" }}>
-        Loading…
-      </div>
-    );
+    return <div className={editPageCls.loading}>Loading…</div>;
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+    <div className={editPageCls.wrapper}>
       <PageHead
         crumbs={[
           { label: "Itinerary", onClick: back },
@@ -92,15 +88,15 @@ export default function ExperienceEditPage() {
         ]}
         title={
           <input
-            className="a-input a-input--title"
+            className={editPageCls.inputTitle}
             value={e.role}
             onChange={(ev) => update("role", ev.target.value)}
             placeholder="Role / title"
           />
         }
       />
-      <div className="a-form">
-        <div className="a-form-main">
+      <div className={editPageCls.form}>
+        <div className={editPageCls.formMain}>
           <FormSection title="Details">
             <Field label="Blurb" hint="One or two sentences">
               <Textarea value={e.blurb} onChange={(v) => update("blurb", v)} variant="lede" placeholder="What you did there…" />
@@ -117,16 +113,16 @@ export default function ExperienceEditPage() {
             savedAt={savedAt}
           />
         </div>
-        <div className="a-form-side">
-          <div className="a-side-card">
-            <div className="a-side-card-title">At a glance</div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">ID</span>
-              <span className="a-side-card-val">{isNew ? "new" : e.id}</span>
+        <div className={editPageCls.formSide}>
+          <div className={editPageCls.sideCard}>
+            <div className={editPageCls.sideCardTitle}>At a glance</div>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>ID</span>
+              <span className={editPageCls.sideCardVal}>{isNew ? "new" : e.id}</span>
             </div>
-            <div className="a-side-card-row">
-              <span className="a-side-card-key">Kind</span>
-              <span className="a-side-card-val"><Badge kind={e.kind}>{e.kind}</Badge></span>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>Kind</span>
+              <span className={editPageCls.sideCardVal}><Badge kind={e.kind}>{e.kind}</Badge></span>
             </div>
           </div>
           <FormSection title="Meta">

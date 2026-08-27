@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PROFILE } from "../../data";
 import type { Profile } from "../../data";
-import { Btn, FormSection, Field, PageHead, TextInput } from "../_components/ui";
+import { Btn, FormSection, Field, PageHead, TextInput, pageBodyCls, editPageCls, formBarCls, kbdCls } from "../_components/ui";
 
 function timeAgo(d: Date): string {
   const s = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -49,9 +49,9 @@ export default function SettingsPage() {
         title="Settings"
         sub="Profile and site metadata."
       />
-      <div className="a-page-body">
-        <div className="a-form" style={{ maxWidth: 720 }}>
-          <div className="a-form-main">
+      <div className={pageBodyCls}>
+        <div className={editPageCls.form} style={{ maxWidth: 720 }}>
+          <div className={editPageCls.formMain}>
             <FormSection title="Profile">
               <Field label="Display name">
                 <TextInput
@@ -83,11 +83,11 @@ export default function SettingsPage() {
               </Field>
             </FormSection>
 
-            <div className="a-formbar">
-              <div className="a-formbar-status">{statusLabel}</div>
-              <div className="a-formbar-spacer" />
+            <div className={formBarCls}>
+              <div className="flex items-center gap-2 text-a-text-mute text-[11px] italic">{statusLabel}</div>
+              <div className="flex-1" />
               <Btn variant="primary" onClick={save}>
-                {saving ? "Saving…" : <>Save changes <span className="a-btn-kbd">⌘S</span></>}
+                {saving ? "Saving…" : <>Save changes <span className={kbdCls}>⌘S</span></>}
               </Btn>
             </div>
           </div>

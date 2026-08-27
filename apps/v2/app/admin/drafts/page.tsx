@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
-import { Badge, Btn, PageHead, Toolbar } from "../_components/ui";
+import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function DraftsPage() {
   const router = useRouter();
@@ -34,49 +34,49 @@ export default function DraftsPage() {
         sub="Posts in progress — publish when ready."
       />
       <Toolbar>
-        <Btn size="sm">Drafts <span className="a-btn-kbd">{items.length}</span></Btn>
-        <span className="a-toolbar-spacer" />
+        <Btn size="sm">Drafts <span className={kbdCls}>{items.length}</span></Btn>
+        <span className="flex-1" />
         <Btn size="sm" variant="ghost" onClick={() => router.push("/admin/posts")}>
           View all posts →
         </Btn>
       </Toolbar>
-      <div className="a-page-body">
+      <div className={pageBodyCls}>
         {items.length === 0 ? (
-          <div className="a-empty">
-            <span className="a-empty-icon">•</span>
-            <span className="a-empty-label">No drafts</span>
-            <span className="a-empty-hint">Create a new post and set its status to "draft" to keep it here.</span>
+          <div className={emptyCls.wrap}>
+            <span className={emptyCls.icon}>•</span>
+            <span className={emptyCls.label}>No drafts</span>
+            <span className={emptyCls.hint}>Create a new post and set its status to &quot;draft&quot; to keep it here.</span>
           </div>
         ) : (
-          <table className="a-table">
-            <thead>
+          <table className={tableCls.table}>
+            <thead className={tableCls.thead}>
               <tr>
-                <th className="a-th-num">#</th>
-                <th>Title</th>
-                <th className="a-col--md">Date</th>
-                <th className="a-col--lg">Tags</th>
-                <th>Status</th>
-                <th className="a-th-actions" />
+                <th className={`${tableCls.th} ${tableCls.thNum}`}>#</th>
+                <th className={tableCls.th}>Title</th>
+                <th className={`${tableCls.th} ${tableCls.colMd}`}>Date</th>
+                <th className={`${tableCls.th} ${tableCls.colLg}`}>Tags</th>
+                <th className={tableCls.th}>Status</th>
+                <th className={`${tableCls.th} ${tableCls.thActions}`} />
               </tr>
             </thead>
             <tbody>
               {items.map((p, i) => (
-                <tr key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)}>
-                  <td className="a-td-num">{String(i + 1).padStart(2, "0")}</td>
-                  <td className="a-td-title">
-                    <span className="a-td-title-name">{p.title}</span>
-                    <span className="a-td-title-sub">
+                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)}>
+                  <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
+                  <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
+                    <span className={tableCls.tdTitleName}>{p.title}</span>
+                    <span className={tableCls.tdTitleSub}>
                       {p.excerpt.slice(0, 72)}{p.excerpt.length > 72 ? "…" : ""}
                     </span>
                   </td>
-                  <td className="a-td-muted a-col--md">{p.date}</td>
-                  <td className="a-col--lg">
-                    <div className="a-td-chip-row">
-                      {p.tags.map((t) => <span key={t} className="a-td-chip">{t}</span>)}
+                  <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.date}</td>
+                  <td className={`${tableCls.td} ${tableCls.colLg}`}>
+                    <div className={tableCls.tdChipRow}>
+                      {p.tags.map((t) => <span key={t} className={tableCls.tdChip}>{t}</span>)}
                     </div>
                   </td>
-                  <td><Badge kind="draft">draft</Badge></td>
-                  <td className="a-td-actions" onClick={(ev) => ev.stopPropagation()}>
+                  <td className={tableCls.td}><Badge kind="draft">draft</Badge></td>
+                  <td className={`${tableCls.td} ${tableCls.tdActions}`} onClick={(ev) => ev.stopPropagation()}>
                     <Btn
                       size="sm"
                       variant="primary"

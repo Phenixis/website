@@ -1,4 +1,3 @@
-import "../portfolio.css";
 import { Portfolio } from "../_components/Portfolio";
 import { PROFILE } from "../data";
 import { getProjects, getPublishedPosts, getExperiences, getProfile } from "@/lib/db";
