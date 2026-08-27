@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Maxime Duhamel",
-  description: "Designer & builder. Lives in Saint-Brieuc, thinks in margins.",
+  description: "Designer & builder. Lives in Saint-Brieuc & Montpellier.",
 };
 
 export default function RootLayout({

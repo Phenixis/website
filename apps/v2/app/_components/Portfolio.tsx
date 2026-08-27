@@ -69,8 +69,6 @@ export function Portfolio({ profile, projects, posts, experiences }: PortfolioPr
         </div>
         <div className="flex items-center gap-[10px] flex-none max-[480px]:gap-[6px]">
           <span className="text-v3-text-mute tabular-nums max-[720px]:hidden">{profile.location}</span>
-          <span className="text-v3-text-dim">·</span>
-          <span className="text-v3-text-mute tabular-nums max-[480px]:hidden">MMXXVI</span>
         </div>
       </header>
 
@@ -626,7 +624,7 @@ function ExperiencesList({ experiences }: { experiences: Experience[] }) {
           <div className="w-[5px] h-[5px] rounded-full bg-v3-text-dim opacity-50 mt-1" />
         </div>
         <div className="pt-0 opacity-50">
-          <span className="font-serif italic text-[14px] text-v3-text-mute">— et cetera —</span>
+          <span className="font-serif italic text-[14px] text-v3-text-mute">— birth —</span>
         </div>
       </div>
     </div>
