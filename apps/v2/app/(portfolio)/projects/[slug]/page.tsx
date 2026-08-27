@@ -1,9 +1,9 @@
-import { getProject } from "@/lib/db";
+import { getPublishedProject } from "@/lib/db";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const project = await getPublishedProject(slug);
   if (!project) return {};
   return {
     title: `${project.title} — Maxime Duhamel`,
@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const project = await getPublishedProject(slug);
   if (!project) notFound();
   return null;
 }

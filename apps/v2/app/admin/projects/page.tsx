@@ -75,7 +75,12 @@ export default function ProjectsListPage() {
                 </td>
                 <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.year}</td>
                 <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.kind}</td>
-                <td className={tableCls.td}><Badge kind={p.status}>{p.status}</Badge></td>
+                <td className={tableCls.td}>
+                  <div className={tableCls.tdChipRow}>
+                    <Badge kind={p.status}>{p.status}</Badge>
+                    {p.published === false && <Badge kind="draft">draft</Badge>}
+                  </div>
+                </td>
                 <td className={`${tableCls.td} ${tableCls.colLg}`}>
                   <div className={tableCls.tdChipRow}>
                     {p.stack.slice(0, 3).map((s) => (

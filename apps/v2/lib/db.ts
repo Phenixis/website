@@ -25,6 +25,14 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
       location TEXT NOT NULL
     )`,
   },
+  {
+    name: "003_add_published_to_projects",
+    sql: "ALTER TABLE projects ADD COLUMN published INTEGER DEFAULT 1",
+  },
+  {
+    name: "004_add_published_to_experiences",
+    sql: "ALTER TABLE experiences ADD COLUMN published INTEGER DEFAULT 1",
+  },
 ];
 
 export async function runMigrations(): Promise<void> {
@@ -71,6 +79,7 @@ function rowToProject(row: Record<string, unknown>): Project {
     body: JSON.parse(row.body as string),
     stack: JSON.parse(row.stack as string),
     color: row.color as string,
+    published: row.published == null ? true : Boolean(row.published),
     ...(row.role != null ? { role: row.role as string } : {}),
     ...(row.links != null ? { links: JSON.parse(row.links as string) } : {}),
   };
@@ -98,6 +107,7 @@ function rowToExperience(row: Record<string, unknown>): Experience {
     kind: row.kind as Experience["kind"],
     blurb: row.blurb as string,
     stack: JSON.parse(row.stack as string),
+    published: row.published == null ? true : Boolean(row.published),
   };
 }
 
@@ -108,25 +118,44 @@ export async function getProjects(): Promise<Project[]> {
   return r.rows.map((row) => rowToProject(row as unknown as Record<string, unknown>));
 }
 
+export async function getPublishedProjects(): Promise<Project[]> {
+  const r = await db.execute(
+    "SELECT * FROM projects WHERE (published IS NULL OR published != 0) AND status != 'archived' ORDER BY sort_order ASC, rowid ASC",
+  );
+  return r.rows.map((row) => rowToProject(row as unknown as Record<string, unknown>));
+}
+
 export async function getProject(id: string): Promise<Project | null> {
   const r = await db.execute({ sql: "SELECT * FROM projects WHERE id = ?", args: [id] });
   if (!r.rows.length) return null;
   return rowToProject(r.rows[0] as unknown as Record<string, unknown>);
 }
 
+export async function getPublishedProject(id: string): Promise<Project | null> {
+  const r = await db.execute({
+    sql: "SELECT * FROM projects WHERE id = ? AND (published IS NULL OR published != 0) AND status != 'archived'",
+    args: [id],
+  });
+  if (!r.rows.length) return null;
+  return rowToProject(r.rows[0] as unknown as Record<string, unknown>);
+}
+
 export async function upsertProject(p: Project): Promise<void> {
+  const published = p.published === false ? 0 : 1;
   await db.execute({
-    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, published)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             title=excluded.title, year=excluded.year, kind=excluded.kind,
             status=excluded.status, blurb=excluded.blurb, body=excluded.body,
-            stack=excluded.stack, color=excluded.color, role=excluded.role, links=excluded.links`,
+            stack=excluded.stack, color=excluded.color, role=excluded.role, links=excluded.links,
+            published=excluded.published`,
     args: [
       p.id, p.title, p.year, p.kind, p.status, p.blurb,
       JSON.stringify(p.body), JSON.stringify(p.stack), p.color,
       p.role ?? null,
       p.links?.length ? JSON.stringify(p.links) : null,
+      published,
     ],
   });
 }
@@ -155,6 +184,15 @@ export async function getPost(id: string): Promise<Post | null> {
   return rowToPost(r.rows[0] as unknown as Record<string, unknown>);
 }
 
+export async function getPublishedPost(id: string): Promise<Post | null> {
+  const r = await db.execute({
+    sql: "SELECT * FROM posts WHERE id = ? AND (published IS NULL OR published != 0)",
+    args: [id],
+  });
+  if (!r.rows.length) return null;
+  return rowToPost(r.rows[0] as unknown as Record<string, unknown>);
+}
+
 export async function upsertPost(p: Post): Promise<void> {
   const published = p.published === false ? 0 : 1;
   await db.execute({
@@ -179,6 +217,13 @@ export async function getExperiences(): Promise<Experience[]> {
   return r.rows.map((row) => rowToExperience(row as unknown as Record<string, unknown>));
 }
 
+export async function getPublishedExperiences(): Promise<Experience[]> {
+  const r = await db.execute(
+    "SELECT * FROM experiences WHERE (published IS NULL OR published != 0) ORDER BY sort_order ASC, rowid ASC",
+  );
+  return r.rows.map((row) => rowToExperience(row as unknown as Record<string, unknown>));
+}
+
 export async function getExperience(id: string): Promise<Experience | null> {
   const r = await db.execute({ sql: "SELECT * FROM experiences WHERE id = ?", args: [id] });
   if (!r.rows.length) return null;
@@ -186,13 +231,15 @@ export async function getExperience(id: string): Promise<Experience | null> {
 }
 
 export async function upsertExperience(e: Experience): Promise<void> {
+  const published = e.published === false ? 0 : 1;
   await db.execute({
-    sql: `INSERT INTO experiences (id, "when", role, "where", kind, blurb, stack)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO experiences (id, "when", role, "where", kind, blurb, stack, published)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             "when"=excluded."when", role=excluded.role, "where"=excluded."where",
-            kind=excluded.kind, blurb=excluded.blurb, stack=excluded.stack`,
-    args: [e.id, e.when, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack)],
+            kind=excluded.kind, blurb=excluded.blurb, stack=excluded.stack,
+            published=excluded.published`,
+    args: [e.id, e.when, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack), published],
   });
 }
 

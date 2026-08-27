@@ -1,6 +1,6 @@
 import { Portfolio } from "../_components/portfolio/Portfolio";
 import { PROFILE } from "../data";
-import { getProjects, getPublishedPosts, getExperiences, getProfile } from "@/lib/db";
+import { getPublishedProjects, getPublishedPosts, getPublishedExperiences, getProfile } from "@/lib/db";
 
 export const revalidate = 86400;
 
@@ -10,9 +10,9 @@ export default async function PortfolioLayout({
   children: React.ReactNode;
 }) {
   const [projects, posts, experiences, profile] = await Promise.all([
-    getProjects(),
+    getPublishedProjects(),
     getPublishedPosts(),
-    getExperiences(),
+    getPublishedExperiences(),
     getProfile(),
   ]);
 

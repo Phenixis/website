@@ -10,6 +10,7 @@ export type Project = {
   color: string;
   role?: string;
   links?: { label: string; href: string }[];
+  published?: boolean;
 };
 
 export type Post = {
@@ -31,6 +32,7 @@ export type Experience = {
   kind: "self" | "role" | "edu";
   blurb: string;
   stack: string[];
+  published?: boolean;
 };
 
 export type Profile = {

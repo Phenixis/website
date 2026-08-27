@@ -19,6 +19,7 @@ const BLANK: Project = {
   body: [""],
   stack: [],
   color: "#a78bfa",
+  published: false,
 };
 
 function slugify(s: string) {
@@ -137,7 +138,27 @@ export default function ProjectEditPage() {
               <span className={editPageCls.sideCardKey}>Status</span>
               <span className={editPageCls.sideCardVal}><Badge kind={p.status}>{p.status}</Badge></span>
             </div>
+            <div className={editPageCls.sideCardRow}>
+              <span className={editPageCls.sideCardKey}>Visibility</span>
+              <span className={editPageCls.sideCardVal}>
+                <Badge kind={p.published === false ? "draft" : "published"}>
+                  {p.published === false ? "draft" : "published"}
+                </Badge>
+              </span>
+            </div>
           </div>
+          <FormSection title="Visibility">
+            <Field label="Visibility" hint="Drafts never show up on the public site">
+              <Segmented
+                value={p.published === false ? "draft" : "published"}
+                onChange={(v) => update("published", v === "published")}
+                options={[
+                  { value: "published", label: "Published", dot: "#74e893" },
+                  { value: "draft", label: "Draft", dot: "#f1c45b" },
+                ]}
+              />
+            </Field>
+          </FormSection>
           <FormSection title="Status & Kind">
             <Field label="Status">
               <Segmented

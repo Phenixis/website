@@ -54,7 +54,12 @@ export default function ExperiencesListPage() {
                 </td>
                 <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{e.where}</td>
                 <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{e.when}</td>
-                <td className={tableCls.td}><Badge kind={e.kind}>{e.kind}</Badge></td>
+                <td className={tableCls.td}>
+                  <div className={tableCls.tdChipRow}>
+                    <Badge kind={e.kind}>{e.kind}</Badge>
+                    {e.published === false && <Badge kind="draft">draft</Badge>}
+                  </div>
+                </td>
                 <td className={`${tableCls.td} ${tableCls.tdActions}`}><span className={tableCls.rowArrow}>→</span></td>
               </tr>
             ))}
