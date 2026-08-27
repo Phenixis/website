@@ -2,9 +2,15 @@
 
 date '+%Y-%m-%d %H:%M:%S' >> .husky/pre-push.log
 echo "🚀 Running pre-push checks..." >> .husky/pre-push.log
-echo "📦 Building the project..." >> .husky/pre-push.log
 
-if pnpm build >> .husky/pre-push.log; then
+BASE_REF="origin/main"
+if ! git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+    BASE_REF=$(git merge-base HEAD @{u} 2>/dev/null || echo "HEAD^")
+fi
+
+echo "📦 Building packages changed since $BASE_REF..." >> .husky/pre-push.log
+
+if pnpm turbo build --filter="...[$BASE_REF...HEAD]" >> .husky/pre-push.log 2>&1; then
     echo "✅ Build succeeded! Push is allowed to continue." >> .husky/pre-push.log
     exit 0
 else
