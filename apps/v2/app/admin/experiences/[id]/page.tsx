@@ -26,20 +26,6 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `exp-${Date.now()}`;
 }
 
-// True if setting `currentId`'s parent to `candidateId` would create a loop
-// (directly, e.g. A ↔ B, or through a longer chain, e.g. A → B → C → A).
-function wouldCreateCycle(candidateId: string, currentId: string, all: Experience[]): boolean {
-  const seen = new Set<string>();
-  let cur: string | undefined = candidateId;
-  while (cur) {
-    if (cur === currentId) return true;
-    if (seen.has(cur)) return false;
-    seen.add(cur);
-    cur = all.find((x) => x.id === cur)?.parentId;
-  }
-  return false;
-}
-
 export default function ExperienceEditPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
@@ -54,6 +40,8 @@ export default function ExperienceEditPage() {
 
   const update = (key: keyof Experience, val: unknown) =>
     setE((prev) => ({ ...prev, [key]: val }));
+
+  const hasChildren = allExperiences.some((x) => x.parentId === e.id);
 
   const back = () => router.push("/admin/experiences");
 
@@ -196,14 +184,24 @@ export default function ExperienceEditPage() {
                 ]}
               />
             </Field>
-            <Field label="Parallel to" hint="Nests this entry under another one happening at the same time, e.g. a work-study under a degree">
+            <Field
+              label="Parallel to"
+              hint={
+                hasChildren
+                  ? "Other entries are already nested under this one, so it can't itself be nested — only one level of parallel is supported"
+                  : "Nests this entry under another one happening at the same time, e.g. a work-study under a degree"
+              }
+            >
               <Select
-                value={e.parentId ?? NO_PARENT}
+                disabled={hasChildren}
+                value={hasChildren ? NO_PARENT : e.parentId ?? NO_PARENT}
                 onChange={(v) => update("parentId", v === NO_PARENT ? undefined : v)}
                 options={[
                   { value: NO_PARENT, label: "— none —" },
+                  // Only entries with no parent of their own can be picked, so
+                  // nesting never goes more than one level deep.
                   ...allExperiences
-                    .filter((x) => x.id !== e.id && !wouldCreateCycle(x.id, e.id, allExperiences))
+                    .filter((x) => x.id !== e.id && !x.parentId)
                     .map((x) => ({ value: x.id, label: `${x.role} — ${x.where}` })),
                 ]}
               />
