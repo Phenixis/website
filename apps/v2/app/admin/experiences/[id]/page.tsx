@@ -5,12 +5,13 @@ import { useRouter, useParams } from "next/navigation";
 import type { Experience } from "../../../data";
 import {
   Badge, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Segmented, Chips, editPageCls,
+  TextInput, Textarea, Segmented, Select, Chips, editPageCls,
 } from "../../_components/ui";
 
 const BLANK: Experience = {
   id: "",
-  when: `${new Date().getFullYear()} →`,
+  startDate: new Date().toISOString().slice(0, 7),
+  endDate: null,
   role: "Untitled role",
   where: "",
   kind: "role",
@@ -19,8 +20,24 @@ const BLANK: Experience = {
   published: false,
 };
 
+const NO_PARENT = "";
+
 function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `exp-${Date.now()}`;
+}
+
+// True if setting `currentId`'s parent to `candidateId` would create a loop
+// (directly, e.g. A ↔ B, or through a longer chain, e.g. A → B → C → A).
+function wouldCreateCycle(candidateId: string, currentId: string, all: Experience[]): boolean {
+  const seen = new Set<string>();
+  let cur: string | undefined = candidateId;
+  while (cur) {
+    if (cur === currentId) return true;
+    if (seen.has(cur)) return false;
+    seen.add(cur);
+    cur = all.find((x) => x.id === cur)?.parentId;
+  }
+  return false;
 }
 
 export default function ExperienceEditPage() {
@@ -32,11 +49,17 @@ export default function ExperienceEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [allExperiences, setAllExperiences] = useState<Experience[]>([]);
 
   const update = (key: keyof Experience, val: unknown) =>
     setE((prev) => ({ ...prev, [key]: val }));
 
   const back = () => router.push("/admin/experiences");
+
+  useEffect(() => {
+    fetch("/api/experiences").then((r) => r.json()).then(setAllExperiences);
+  }, []);
 
   useEffect(() => {
     if (isNew) return;
@@ -51,13 +74,18 @@ export default function ExperienceEditPage() {
 
   const save = async () => {
     setSaving(true);
+    setSaveError(null);
     const payload = isNew ? { ...e, id: slugify(e.role) } : e;
-    await fetch(isNew ? "/api/experiences" : `/api/experiences/${e.id}`, {
+    const res = await fetch(isNew ? "/api/experiences" : `/api/experiences/${e.id}`, {
       method: isNew ? "POST" : "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
     setSaving(false);
+    if (!res.ok) {
+      setSaveError(`Save failed (${res.status})`);
+      return;
+    }
     setSavedAt(new Date());
     if (isNew) router.push("/admin/experiences");
   };
@@ -112,6 +140,7 @@ export default function ExperienceEditPage() {
             onDelete={remove}
             saving={saving}
             savedAt={savedAt}
+            error={saveError}
           />
         </div>
         <div className={editPageCls.formSide}>
@@ -147,8 +176,11 @@ export default function ExperienceEditPage() {
             </Field>
           </FormSection>
           <FormSection title="Meta">
-            <Field label="When">
-              <TextInput value={e.when} onChange={(v) => update("when", v)} placeholder="2024 — 2025" />
+            <Field label="Start date">
+              <TextInput type="month" value={e.startDate} onChange={(v) => update("startDate", v)} />
+            </Field>
+            <Field label="End date" hint="Leave empty if this is ongoing">
+              <TextInput type="month" value={e.endDate ?? ""} onChange={(v) => update("endDate", v || null)} />
             </Field>
             <Field label="Where">
               <TextInput value={e.where} onChange={(v) => update("where", v)} placeholder="Company / institution" />
@@ -161,6 +193,18 @@ export default function ExperienceEditPage() {
                   { value: "self", label: "Self", dot: "#b794f6" },
                   { value: "role", label: "Role", dot: "#b8b8c4" },
                   { value: "edu", label: "Edu", dot: "#f1c45b" },
+                ]}
+              />
+            </Field>
+            <Field label="Parallel to" hint="Nests this entry under another one happening at the same time, e.g. a work-study under a degree">
+              <Select
+                value={e.parentId ?? NO_PARENT}
+                onChange={(v) => update("parentId", v === NO_PARENT ? undefined : v)}
+                options={[
+                  { value: NO_PARENT, label: "— none —" },
+                  ...allExperiences
+                    .filter((x) => x.id !== e.id && !wouldCreateCycle(x.id, e.id, allExperiences))
+                    .map((x) => ({ value: x.id, label: `${x.role} — ${x.where}` })),
                 ]}
               />
             </Field>

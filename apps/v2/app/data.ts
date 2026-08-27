@@ -26,13 +26,19 @@ export type Post = {
 
 export type Experience = {
   id: string;
-  when: string;
+  /** "YYYY-MM" */
+  startDate: string;
+  /** "YYYY-MM", or null if ongoing */
+  endDate: string | null;
   role: string;
   where: string;
   kind: "self" | "role" | "edu";
   blurb: string;
   stack: string[];
   published?: boolean;
+  /** id of another experience this one runs alongside (e.g. a work-study or
+   *  internship happening during a longer degree) — renders nested under it. */
+  parentId?: string;
 };
 
 export type Profile = {
@@ -324,7 +330,8 @@ export const POSTS: Post[] = [
 export const EXPERIENCES: Experience[] = [
   {
     id: "indep-26",
-    when: "2026 →",
+    startDate: "2026-01",
+    endDate: null,
     role: "Independent",
     where: "Saint-Brieuc",
     kind: "self",
@@ -333,7 +340,8 @@ export const EXPERIENCES: Experience[] = [
   },
   {
     id: "linear",
-    when: "2024 — 2025",
+    startDate: "2024-06",
+    endDate: "2025-12",
     role: "Design Lead",
     where: "Linear",
     kind: "role",
@@ -342,7 +350,8 @@ export const EXPERIENCES: Experience[] = [
   },
   {
     id: "shopify",
-    when: "2022 — 2024",
+    startDate: "2022-06",
+    endDate: "2024-06",
     role: "Senior Product Designer",
     where: "Shopify",
     kind: "role",
@@ -351,7 +360,8 @@ export const EXPERIENCES: Experience[] = [
   },
   {
     id: "cartograph-v1",
-    when: "2020 — 2022",
+    startDate: "2020-01",
+    endDate: "2022-01",
     role: "Founder",
     where: "Cartograph (v1)",
     kind: "self",
@@ -360,7 +370,8 @@ export const EXPERIENCES: Experience[] = [
   },
   {
     id: "apple",
-    when: "2018 — 2020",
+    startDate: "2018-01",
+    endDate: "2020-01",
     role: "Designer",
     where: "Apple",
     kind: "role",
@@ -369,11 +380,44 @@ export const EXPERIENCES: Experience[] = [
   },
   {
     id: "school",
-    when: "2014 — 2018",
+    startDate: "2014-09",
+    endDate: "2018-06",
     role: "B.A. Design",
     where: "ENSCI — Les Ateliers, Paris",
     kind: "edu",
     blurb: "Studied industrial design. Wrote my thesis on the typography of train tickets.",
     stack: [],
+  },
+  {
+    id: "school-2",
+    startDate: "2023-09",
+    endDate: "2026-08",
+    role: "BUT Informatique",
+    where: "IUT de Lannion",
+    kind: "edu",
+    blurb: "Studied computer science, alongside a work-study placement and an internship below.",
+    stack: [],
+  },
+  {
+    id: "internship",
+    startDate: "2025-04",
+    endDate: "2025-06",
+    role: "Intern",
+    where: "Cyber Innovation Hub, Cardiff",
+    kind: "role",
+    blurb: "10-week internship on OT security, run during the degree above.",
+    stack: ["OT Security"],
+    parentId: "school-2",
+  },
+  {
+    id: "work-study-2",
+    startDate: "2025-09",
+    endDate: null,
+    role: "Junior Developer (Work-Study)",
+    where: "Nutraveris",
+    kind: "role",
+    blurb: "Work-study contract alternating between university and on-site work, run during the degree above.",
+    stack: ["Playwright", "TypeScript"],
+    parentId: "school-2",
   },
 ];

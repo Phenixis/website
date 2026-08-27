@@ -211,12 +211,14 @@ export function FormBar({
   onDelete,
   saving,
   savedAt,
+  error,
 }: {
   onSave: () => void;
   onDiscard: () => void;
   onDelete: () => void;
   saving?: boolean;
   savedAt?: Date | null;
+  error?: string | null;
 }) {
   const status = saving
     ? "Saving…"
@@ -226,7 +228,9 @@ export function FormBar({
 
   return (
     <div className={formBarCls}>
-      <div className="flex items-center gap-2 text-a-text-mute text-[11px] italic">{status}</div>
+      <div className={`flex items-center gap-2 text-[11px] italic ${error ? "text-red-400" : "text-a-text-mute"}`}>
+        {error ?? status}
+      </div>
       <div className="flex-1" />
       <Btn variant="danger" onClick={onDelete}>Delete</Btn>
       <Btn variant="ghost" onClick={onDiscard}>Discard</Btn>
@@ -261,13 +265,16 @@ export function TextInput({
   value,
   onChange,
   placeholder,
+  type,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  type?: string;
 }) {
   return (
     <input
+      type={type}
       className={inputBase}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -310,16 +317,17 @@ export function Select({
 }: {
   value: string;
   onChange: (v: string) => void;
-  options: string[];
+  options: string[] | { value: string; label: string }[];
 }) {
+  const normalized = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
   return (
     <select
       className={`${inputBase} appearance-none bg-[url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%226%22%20viewBox%3D%220%200%2010%206%22%3E%3Cpath%20d%3D%22M1%201l4%204%204-4%22%20stroke%3D%22%236e6e80%22%20fill%3D%22none%22%20stroke-width%3D%221.4%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center] pr-7 resize-none`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >
-      {options.map((o) => (
-        <option key={o} value={o}>{o}</option>
+      {normalized.map((o) => (
+        <option key={o.value} value={o.value}>{o.label}</option>
       ))}
     </select>
   );

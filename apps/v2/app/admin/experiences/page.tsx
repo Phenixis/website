@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Experience } from "../../data";
 import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls } from "../_components/ui";
+import { formatRange } from "@/lib/experience-dates";
 
 export default function ExperiencesListPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function ExperiencesListPage() {
                   <span className={tableCls.tdTitleSub}>{e.blurb.slice(0, 64)}{e.blurb.length > 64 ? "…" : ""}</span>
                 </td>
                 <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{e.where}</td>
-                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{e.when}</td>
+                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{formatRange(e)}</td>
                 <td className={tableCls.td}>
                   <div className={tableCls.tdChipRow}>
                     <Badge kind={e.kind}>{e.kind}</Badge>

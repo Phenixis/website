@@ -99,8 +99,9 @@ for (let i = 0; i < POSTS.length; i++) {
 console.log(`✓ Seeded ${POSTS.length} posts`);
 
 const EXPERIENCES = [
-  { id: "work-study", when: "Sep 2025 →", role: "Junior Developer (Work-Study)", where: "Nutraveris", kind: "role", blurb: "Building automated E2E test suites and a reusable form-testing architecture for Nutraveris's web applications, alternating between university and on-site work.", stack: ["Playwright", "TypeScript"] },
-  { id: "cyber-innovation-hub", when: "Apr 2025 — Jun 2025", role: "Cybersecurity Intern", where: "Cyber Innovation Hub, Cardiff", kind: "role", blurb: "A 10-week internship on cybersecurity in Operational Technology — industrial-control simulations, PLCs, Modbus and Wireshark — including the GRFICS and Cardiff Metro Railway Emulator training environments.", stack: ["OT Security", "ProxMox"] },
+  { id: "iut-lannion", startDate: "2023-09", endDate: "2026-08", role: "BUT Informatique", where: "IUT de Lannion", kind: "edu", blurb: "Computer science degree, run alongside the work-study contract and internship below.", stack: [] },
+  { id: "work-study", startDate: "2025-09", endDate: null, role: "Junior Developer (Work-Study)", where: "Nutraveris", kind: "role", blurb: "Building automated E2E test suites and a reusable form-testing architecture for Nutraveris's web applications, alternating between university and on-site work.", stack: ["Playwright", "TypeScript"], parentId: "iut-lannion" },
+  { id: "cyber-innovation-hub", startDate: "2025-04", endDate: "2025-06", role: "Cybersecurity Intern", where: "Cyber Innovation Hub, Cardiff", kind: "role", blurb: "A 10-week internship on cybersecurity in Operational Technology — industrial-control simulations, PLCs, Modbus and Wireshark — including the GRFICS and Cardiff Metro Railway Emulator training environments.", stack: ["OT Security", "ProxMox"], parentId: "iut-lannion" },
 ];
 
 await db.execute("DELETE FROM experiences");
@@ -108,9 +109,9 @@ await db.execute("DELETE FROM experiences");
 for (let i = 0; i < EXPERIENCES.length; i++) {
   const e = EXPERIENCES[i];
   await db.execute({
-    sql: `INSERT OR REPLACE INTO experiences (id, "when", role, "where", kind, blurb, stack, sort_order)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [e.id, e.when, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack), i],
+    sql: `INSERT OR REPLACE INTO experiences (id, start_date, end_date, role, "where", kind, blurb, stack, sort_order, parent_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [e.id, e.startDate, e.endDate, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack), i, e.parentId ?? null],
   });
 }
 console.log(`✓ Seeded ${EXPERIENCES.length} experiences`);

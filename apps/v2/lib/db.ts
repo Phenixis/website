@@ -33,6 +33,22 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
     name: "004_add_published_to_experiences",
     sql: "ALTER TABLE experiences ADD COLUMN published INTEGER DEFAULT 1",
   },
+  {
+    name: "005_add_parent_id_to_experiences",
+    sql: "ALTER TABLE experiences ADD COLUMN parent_id TEXT",
+  },
+  {
+    name: "006_add_start_date_to_experiences",
+    sql: "ALTER TABLE experiences ADD COLUMN start_date TEXT",
+  },
+  {
+    name: "007_add_end_date_to_experiences",
+    sql: "ALTER TABLE experiences ADD COLUMN end_date TEXT",
+  },
+  {
+    name: "008_drop_when_from_experiences",
+    sql: 'ALTER TABLE experiences DROP COLUMN "when"',
+  },
 ];
 
 export async function runMigrations(): Promise<void> {
@@ -101,13 +117,15 @@ function rowToPost(row: Record<string, unknown>): Post {
 function rowToExperience(row: Record<string, unknown>): Experience {
   return {
     id: row.id as string,
-    when: row.when as string,
+    startDate: row.start_date as string,
+    endDate: row.end_date == null ? null : (row.end_date as string),
     role: row.role as string,
     where: row.where as string,
     kind: row.kind as Experience["kind"],
     blurb: row.blurb as string,
     stack: JSON.parse(row.stack as string),
     published: row.published == null ? true : Boolean(row.published),
+    ...(row.parent_id != null ? { parentId: row.parent_id as string } : {}),
   };
 }
 
@@ -233,13 +251,13 @@ export async function getExperience(id: string): Promise<Experience | null> {
 export async function upsertExperience(e: Experience): Promise<void> {
   const published = e.published === false ? 0 : 1;
   await db.execute({
-    sql: `INSERT INTO experiences (id, "when", role, "where", kind, blurb, stack, published)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO experiences (id, start_date, end_date, role, "where", kind, blurb, stack, published, parent_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
-            "when"=excluded."when", role=excluded.role, "where"=excluded."where",
+            start_date=excluded.start_date, end_date=excluded.end_date, role=excluded.role, "where"=excluded."where",
             kind=excluded.kind, blurb=excluded.blurb, stack=excluded.stack,
-            published=excluded.published`,
-    args: [e.id, e.when, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack), published],
+            published=excluded.published, parent_id=excluded.parent_id`,
+    args: [e.id, e.startDate, e.endDate, e.role, e.where, e.kind, e.blurb, JSON.stringify(e.stack), published, e.parentId ?? null],
   });
 }
 
