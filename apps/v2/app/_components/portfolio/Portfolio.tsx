@@ -65,7 +65,7 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
                 "tall-desktop:duration-[360ms] tall-desktop:border-r-0 tall-desktop:border-b tall-desktop:last:border-b-0",
                 isFocused
                   ? "flex-1 max-[720px]:min-h-0 tall-desktop:min-h-0"
-                  : "grow-0 shrink-0 basis-[72px] cursor-pointer bg-v3-bg-2 hover:bg-v3-bg-3 max-[1100px]:basis-[60px] max-[920px]:basis-[52px] max-[720px]:hidden tall-desktop:!basis-[52px]",
+                  : "grow-0 shrink-0 basis-[56px] cursor-pointer bg-v3-bg-2 hover:bg-v3-bg-3 max-[1100px]:basis-[48px] max-[920px]:basis-[40px] max-[720px]:hidden tall-desktop:!basis-[52px]",
               ].join(" ")}
               onClick={() => !isFocused && handleFocus(p.id)}
             >
