@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* A desktop-width viewport that's also notably taller than wide (e.g. a
+   portrait monitor) — keeps the desktop pane-focus layout but stacks
+   panes in a column instead of a row. */
+@custom-variant tall-desktop (@media (min-width: 721px) and (max-aspect-ratio: 10/13));
+
 @theme {
   --font-mono: var(--font-jetbrains-mono), "SF Mono", "Menlo", monospace;
   --font-serif: var(--font-fraunces), "Times New Roman", serif;
@@ -68,6 +73,54 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* PaneRail's compact mode (mobile width OR tall-desktop). Hand-written
+   rather than a Tailwind custom variant: a comma-separated OR-condition
+   custom variant combined with any bracket-value utility hits a
+   Tailwind/Lightning CSS dev-mode parser bug (valid production build,
+   broken dev server) — same exception as .scroll-thin below. Unlayered
+   CSS always beats Tailwind's layered utilities, so this safely
+   overrides the base vertical-rail utility classes without needing
+   `!important`. */
+@media (max-width: 720px), (min-width: 721px) and (max-aspect-ratio: 10/13) {
+  .pane-rail {
+    position: static;
+    flex-direction: row;
+    padding: 0 20px;
+    gap: 14px;
+    height: 52px;
+    align-items: center;
+  }
+  .pane-rail-num {
+    font-size: 15px;
+    flex: none;
+  }
+  .pane-rail-label {
+    writing-mode: horizontal-tb;
+    rotate: 0deg;
+    font-size: 15px;
+    margin: 0;
+    flex: 1;
+    justify-content: flex-start;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+  .pane-rail-count {
+    background: var(--color-v3-bg-3);
+    border: 1px solid var(--color-v3-border);
+    border-radius: 3px;
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pane-rail {
+    height: 30px;
+    padding: 0 10px;
+    gap: 8px;
+  }
 }
 
 /* Tailwind has no utility for scrollbar styling; kept as the one

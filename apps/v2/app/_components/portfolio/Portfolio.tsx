@@ -52,7 +52,7 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
       <Header profile={profile} />
       <MobileTabBar panes={panes} focused={focused} onFocus={handleFocus} />
 
-      <div className="flex-1 flex min-w-0 min-h-0 max-[720px]:flex-col max-[720px]:overflow-hidden">
+      <div className="flex-1 flex min-w-0 min-h-0 max-[720px]:flex-col max-[720px]:overflow-hidden tall-desktop:flex-col tall-desktop:overflow-hidden">
         {panes.map((p) => {
           const isFocused = focused === p.id;
           return (
@@ -62,9 +62,10 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
                 "bg-v3-bg overflow-hidden relative min-w-0 transition-[flex] duration-[540ms] ease-v3-pane",
                 "border-r border-v3-border last:border-r-0",
                 "max-[720px]:duration-[360ms] max-[720px]:border-r-0 max-[720px]:border-b max-[720px]:last:border-b-0",
+                "tall-desktop:duration-[360ms] tall-desktop:border-r-0 tall-desktop:border-b tall-desktop:last:border-b-0",
                 isFocused
-                  ? "flex-1 max-[720px]:min-h-0"
-                  : "grow-0 shrink-0 basis-[88px] cursor-pointer bg-v3-bg-2 hover:bg-v3-bg-3 max-[1100px]:basis-[76px] max-[920px]:basis-[64px] max-[720px]:hidden",
+                  ? "flex-1 max-[720px]:min-h-0 tall-desktop:min-h-0"
+                  : "grow-0 shrink-0 basis-[72px] cursor-pointer bg-v3-bg-2 hover:bg-v3-bg-3 max-[1100px]:basis-[60px] max-[920px]:basis-[52px] max-[720px]:hidden tall-desktop:!basis-[52px]",
               ].join(" ")}
               onClick={() => !isFocused && handleFocus(p.id)}
             >
