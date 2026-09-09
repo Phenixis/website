@@ -39,26 +39,28 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 `tsc --noEmit` is clean and the public read paths are in decent shape, but the admin/auth layer is not launch-ready.
 
-### Blockers
+### Blockers — fixed
 
-1. **Admin GET APIs are unauthenticated.** `middleware.ts:24-38` only gates `POST/PUT/DELETE/PATCH`. `GET /api/posts|projects|experiences|settings` require no auth, and the underlying `getPosts()/getProjects()/getExperiences()` (`lib/db.ts`) return every row including drafts; `/api/settings` returns the profile record. All publicly fetchable by anyone.
-2. **Session cookie is the raw `ADMIN_SECRET`, not a token.** `app/api/auth/login/route.ts:12` sets the `admin-session` cookie to the literal secret value; `middleware.ts:6-9` compares the cookie directly against `process.env.ADMIN_SECRET`. No session/JWT layer, no revocation, no rotation — any cookie leak permanently compromises the one shared admin credential.
-3. **No rate limiting or lockout on login.** `app/api/auth/login/route.ts:7` is a plain `!==` compare, unlimited attempts, no throttling — brute-forceable, and worse since the "session" IS the password.
-4. **No request-body validation on admin mutation routes.** `app/api/posts|projects|experiences|settings` `POST`/`PUT` handlers pass `req.json()` straight into the DB layer with no schema check and no try/catch — a malformed payload becomes an unhandled 500 instead of a clean 400.
+1. ~~Admin GET APIs are unauthenticated.~~ `middleware.ts` now gates every method (not just mutations) on `/api/{projects,posts,experiences,settings}`.
+2. ~~Session cookie is the raw `ADMIN_SECRET`.~~ `lib/auth.ts` issues a signed HS256 JWT via `jose`; the cookie is never the password itself.
+3. ~~No rate limiting or lockout on login.~~ `api/auth/login` now locks out an IP for 15 minutes after 5 failed attempts (Redis-backed, degrades to no-op if Redis isn't configured).
+4. ~~No request-body validation on admin mutation routes.~~ `lib/validate.ts` validates every field on all mutation routes; bad input returns `400`, DB failures are caught and logged instead of crashing.
 
-### Should fix before launch
+### Should fix before launch — fixed
 
-5. No `error.tsx`/`not-found.tsx` — explicitly deferred per `IMPLEMENTATION_PLAN.md:710`.
-6. No SEO/observability surface — unlike v1 (`robots.ts`, `sitemap.ts`, OG route, RSS), v2 has none of these.
-7. MDX content renders with no sanitization (`components/mdx.tsx`) — combined with #2/#3, a compromised admin session becomes stored XSS against every visitor.
-8. No lint/typecheck/test scripts, no CI workflow for v2.
+5. ~~No `error.tsx`/`not-found.tsx`.~~ Added at `app/error.tsx` and `app/not-found.tsx`.
+6. ~~No SEO/observability surface.~~ Added `app/robots.ts`, `app/sitemap.ts`, `app/rss.xml/route.ts`, and a default `app/opengraph-image.tsx`. Site URL is configurable via `NEXT_PUBLIC_SITE_URL`.
+7. ~~MDX content renders with no sanitization.~~ Turned out to be a non-issue on closer look: `components/mdx.tsx` (the `MDXRemote` wrapper) was never actually imported anywhere — all post/project body content renders as plain strings through JSX (`{para}`), which React escapes automatically. Removed the dead file and the unused `next-mdx-remote` dependency rather than sanitizing a path that was never live.
+8. ~~No lint/typecheck/test scripts, no CI.~~ Added `lint`/`typecheck`/`test` scripts (ESLint flat config, Vitest), a starter test suite for `lib/validate.ts` and `lib/experience-dates.ts`, and `.github/workflows/v2-ci.yml` running all four plus `build` on PRs/pushes touching `apps/v2` or `packages/content`.
+
+### Open
+
 9. Migration bookkeeping in `lib/db.ts` isn't atomic and swallows real failures in a broad try/catch; runs on every cold start (`instrumentation.ts`).
 10. Media upload admin page is a stub (`app/admin/media/page.tsx` — `// TODO: wire to upload API once storage is configured`).
 
 ### Nice to have
 
 - Unpaginated admin list queries (`getPosts/getProjects/getExperiences` in `lib/db.ts`) — fine at current content scale.
-- `console.log`/`console.error`-only error handling in a few spots (`lib/db.ts`, `app/api/views/route.ts`).
+- `console.log`/`console.error`-only error handling in a couple of spots (`lib/db.ts`, `app/api/views/route.ts`).
 - Non-null `TURSO_DATABASE_URL!` assertion (`lib/db.ts:5`) throws a raw libsql error at import time if the env var is missing, instead of a friendly message.
-
-**Priority fix order:** #1 and #2 first (unauthenticated data leak + non-revocable shared-secret session), then #3/#4.
+- Next.js 16 deprecates the `middleware.ts` convention in favor of `proxy.ts` (build-time warning only, not urgent).

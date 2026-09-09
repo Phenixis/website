@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams, usePathname } from "next/navigation";
 import type { Project } from "../../data";
 import {
-  Badge, Btn, FormBar, FormSection, Field, PageHead,
+  Badge, FormBar, FormSection, Field, PageHead,
   TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, Paragraphs,
   COLOR_OPTIONS, editPageCls,
 } from "./ui";
