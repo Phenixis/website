@@ -1,4 +1,5 @@
 import type { Profile } from "../../data";
+import { LifeElapsed } from "./LifeElapsed";
 
 export function Header({ profile }: { profile: Profile }) {
   return (
@@ -16,6 +17,7 @@ export function Header({ profile }: { profile: Profile }) {
       </div>
       <div className="flex items-center gap-[10px] flex-none max-[480px]:gap-[6px]">
         <span className="text-v3-text-mute tabular-nums max-[720px]:hidden">{profile.location}</span>
+        <LifeElapsed />
       </div>
     </header>
   );
