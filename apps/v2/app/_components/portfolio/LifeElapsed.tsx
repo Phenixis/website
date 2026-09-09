@@ -20,7 +20,7 @@ function generateHourglassData(year: number, birthDate: Date) {
   return { daysSpent, daysLeft };
 }
 
-export function LifeElapsed({ className = "w-4 h-6" }: { className?: string }) {
+export function LifeElapsed({ className = "w-8 h-11" }: { className?: string }) {
   const birthDate = new Date(2005, 3, 18, 10, 1, 0, 0);
   const now = new Date();
   const birthdayThisYear = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
