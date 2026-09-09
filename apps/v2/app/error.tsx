@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { HourglassIcon } from "./_components/HourglassIcon";
 
 export default function Error({
   error,
@@ -16,7 +17,7 @@ export default function Error({
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-v3-bg text-v3-text font-mono text-[13px] px-6 text-center">
-      <span className="font-serif italic text-[15px] text-v3-accent">Error</span>
+      <HourglassIcon className="w-5 h-7" />
       <h1 className="font-serif font-light text-[32px] text-v3-text m-0">Something broke.</h1>
       <p className="text-v3-text-2 max-w-[420px] m-0 leading-[1.6]">
         The page hit an unexpected error. It&apos;s been logged — try reloading, or head back home.
