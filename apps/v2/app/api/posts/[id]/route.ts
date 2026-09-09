@@ -1,5 +1,6 @@
 import { getPost, upsertPost, deletePost } from "@/lib/db";
 import { revalidatePortfolio } from "@/lib/revalidate";
+import { validatePost, ValidationError } from "@/lib/validate";
 
 export async function GET(
   _req: Request,
@@ -16,10 +17,24 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = await req.json();
-  await upsertPost({ ...body, id });
+
+  let post;
+  try {
+    post = validatePost({ ...(await req.json()), id });
+  } catch (err) {
+    const message = err instanceof ValidationError ? err.message : "Invalid JSON body";
+    return Response.json({ error: message }, { status: 400 });
+  }
+
+  try {
+    await upsertPost(post);
+  } catch (err) {
+    console.error("Failed to save post:", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+
   revalidatePortfolio();
-  return Response.json({ ...body, id });
+  return Response.json(post);
 }
 
 export async function DELETE(
@@ -27,7 +42,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  await deletePost(id);
+  try {
+    await deletePost(id);
+  } catch (err) {
+    console.error("Failed to delete post:", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
   revalidatePortfolio();
   return new Response(null, { status: 204 });
 }

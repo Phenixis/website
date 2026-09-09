@@ -1,40 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifySessionToken, SESSION_COOKIE } from "./lib/auth";
 
-const SESSION_COOKIE = "admin-session";
-
-function isAuthenticated(req: NextRequest): boolean {
-  const token = req.cookies.get(SESSION_COOKIE)?.value;
-  const secret = process.env.ADMIN_SECRET;
-  return !!secret && token === secret;
+async function isAuthenticated(req: NextRequest): Promise<boolean> {
+  return verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value);
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Protect admin UI pages
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
-    if (!isAuthenticated(req)) {
+    if (!(await isAuthenticated(req))) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
     return NextResponse.next();
   }
 
-  // Protect mutating API calls
-  const isMutation = ["POST", "PUT", "DELETE", "PATCH"].includes(req.method);
+  // Protect the admin-only content API — nothing under these paths is
+  // consumed by the public site, so every method requires a session.
   const isProtectedApi =
     pathname.startsWith("/api/projects") ||
     pathname.startsWith("/api/posts") ||
     pathname.startsWith("/api/experiences") ||
     pathname.startsWith("/api/settings");
 
-  if (isMutation && isProtectedApi) {
-    if (!isAuthenticated(req)) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+  if (isProtectedApi && !(await isAuthenticated(req))) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   return NextResponse.next();

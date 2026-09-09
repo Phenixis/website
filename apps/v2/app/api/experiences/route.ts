@@ -1,5 +1,6 @@
 import { getExperiences, upsertExperience } from "@/lib/db";
 import { revalidatePortfolio } from "@/lib/revalidate";
+import { validateExperience, ValidationError } from "@/lib/validate";
 
 export async function GET() {
   const experiences = await getExperiences();
@@ -7,8 +8,21 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  await upsertExperience(body);
+  let experience;
+  try {
+    experience = validateExperience(await req.json());
+  } catch (err) {
+    const message = err instanceof ValidationError ? err.message : "Invalid JSON body";
+    return Response.json({ error: message }, { status: 400 });
+  }
+
+  try {
+    await upsertExperience(experience);
+  } catch (err) {
+    console.error("Failed to save experience:", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
+
   revalidatePortfolio();
-  return Response.json(body, { status: 201 });
+  return Response.json(experience, { status: 201 });
 }
