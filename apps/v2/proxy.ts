@@ -5,7 +5,7 @@ async function isAuthenticated(req: NextRequest): Promise<boolean> {
   return verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value);
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Protect admin UI pages
