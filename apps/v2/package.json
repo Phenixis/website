@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "migrate": "tsx scripts/migrate.ts",
     "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "eslint": "^9.39.3",
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "^5.0.0"
   }

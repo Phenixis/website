@@ -53,9 +53,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 7. ~~MDX content renders with no sanitization.~~ Turned out to be a non-issue on closer look: `components/mdx.tsx` (the `MDXRemote` wrapper) was never actually imported anywhere — all post/project body content renders as plain strings through JSX (`{para}`), which React escapes automatically. Removed the dead file and the unused `next-mdx-remote` dependency rather than sanitizing a path that was never live.
 8. ~~No lint/typecheck/test scripts, no CI.~~ Added `lint`/`typecheck`/`test` scripts (ESLint flat config, Vitest), a starter test suite for `lib/validate.ts` and `lib/experience-dates.ts`, and `.github/workflows/v2-ci.yml` running all four plus `build` on PRs/pushes touching `apps/v2` or `packages/content`.
 
+### Fixed
+
+9. ~~Migration bookkeeping isn't atomic and swallows real failures.~~ `runMigrations()` now applies each migration's DDL + bookkeeping insert inside a single transaction, and only tolerates the specific "already exists at schema level" error (e.g. a column added by hand before the `migrations` table existed) — anything else throws for real. It also no longer runs on every serverless cold start via `instrumentation.ts` (deleted); it's a deploy-time step now, run via `pnpm migrate` (`scripts/migrate.ts`), wired into `vercel.json`'s `buildCommand` (`pnpm run migrate && pnpm run build`). This removes the concurrent-cold-start race entirely rather than defending against it.
+
+   **Requires action in Vercel:** `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN` must be available at **build time**, not just runtime, in the Vercel project's environment variable settings, since the build command now runs a migration before `next build`. Locally, run `pnpm migrate` after pulling any commit that adds a new migration — it's no longer automatic on `pnpm dev`.
+
 ### Open
 
-9. Migration bookkeeping in `lib/db.ts` isn't atomic and swallows real failures in a broad try/catch; runs on every cold start (`instrumentation.ts`).
 10. Media upload admin page is a stub (`app/admin/media/page.tsx` — `// TODO: wire to upload API once storage is configured`).
 
 ### Nice to have

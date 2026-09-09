@@ -1,1 +1,4 @@
-{ "ignoreCommand": "! git diff HEAD~1 --name-only | grep -qE '^apps/v2|^packages/content'" }
+{
+  "ignoreCommand": "! git diff HEAD~1 --name-only | grep -qE '^apps/v2|^packages/content'",
+  "buildCommand": "pnpm run migrate && pnpm run build"
+}

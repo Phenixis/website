@@ -55,6 +55,18 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
   },
 ];
 
+/** SQLite's wording for "this DDL is a no-op because the schema already has it". */
+function isAlreadyAppliedError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err);
+  return /duplicate column name|already exists/i.test(message);
+}
+
+/**
+ * Intended to run once per deploy (see scripts/migrate.ts), not on every
+ * server boot — so this assumes it's the only runner touching the
+ * `migrations` table at a time and doesn't need to defend against
+ * concurrent invocations.
+ */
 export async function runMigrations(): Promise<void> {
   await db.execute(
     `CREATE TABLE IF NOT EXISTS migrations (
@@ -70,19 +82,25 @@ export async function runMigrations(): Promise<void> {
     });
     if (row.rows.length > 0) continue;
 
+    const tx = await db.transaction("write");
     try {
-      await db.execute(m.sql);
+      await tx.execute(m.sql);
+      await tx.execute({ sql: "INSERT INTO migrations (name) VALUES (?)", args: [m.name] });
+      await tx.commit();
+      console.log(`[db] migration applied: ${m.name}`);
     } catch (err) {
-      // CREATE TABLE IF NOT EXISTS never throws, but ALTER TABLE will if column
-      // already exists in a DB that predates the migrations table — that's fine.
-      console.warn(`[db] migration ${m.name} skipped (already applied at schema level):`, err);
-    }
+      await tx.rollback();
 
-    await db.execute({
-      sql: "INSERT INTO migrations (name) VALUES (?)",
-      args: [m.name],
-    });
-    console.log(`[db] migration applied: ${m.name}`);
+      if (!isAlreadyAppliedError(err)) {
+        throw new Error(`[db] migration ${m.name} failed: ${(err as Error).message}`, { cause: err });
+      }
+
+      // The DDL is a no-op (e.g. a column added by hand before the
+      // migrations table existed) — record it as applied without retrying
+      // the statement, but don't swallow anything else.
+      await db.execute({ sql: "INSERT INTO migrations (name) VALUES (?)", args: [m.name] });
+      console.warn(`[db] migration ${m.name} already applied at schema level, marking as done`);
+    }
   }
 }
 
