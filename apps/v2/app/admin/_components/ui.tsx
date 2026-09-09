@@ -156,11 +156,13 @@ export function Btn({
   variant,
   size,
   onClick,
+  disabled,
 }: {
   children: React.ReactNode;
   variant?: "primary" | "ghost" | "danger";
   size?: "sm";
   onClick?: () => void;
+  disabled?: boolean;
 }) {
   const cls = [
     "font-mono text-[11.5px] bg-a-bg-3 border border-a-border-strong text-a-text px-[11px] py-[5px] rounded-[5px] cursor-pointer inline-flex items-center gap-[6px] transition-all duration-[140ms] whitespace-nowrap tracking-[0.01em] hover:bg-a-surface hover:border-a-border-focus active:translate-y-[0.5px]",
@@ -168,11 +170,12 @@ export function Btn({
     variant === "ghost" ? "bg-transparent border-transparent text-a-text-mute hover:text-a-text hover:bg-a-bg-3 hover:border-transparent" : "",
     variant === "danger" ? "text-a-red hover:bg-a-red-soft hover:border-a-red hover:text-a-red" : "",
     size === "sm" ? "text-[10.5px] px-2 py-1" : "",
+    disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : "",
   ]
     .filter(Boolean)
     .join(" ");
   return (
-    <button className={cls} data-variant={variant ?? "default"} onClick={onClick}>
+    <button className={cls} data-variant={variant ?? "default"} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );

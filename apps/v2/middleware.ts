@@ -23,7 +23,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/api/projects") ||
     pathname.startsWith("/api/posts") ||
     pathname.startsWith("/api/experiences") ||
-    pathname.startsWith("/api/settings");
+    pathname.startsWith("/api/settings") ||
+    pathname.startsWith("/api/media");
 
   if (isProtectedApi && !(await isAuthenticated(req))) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
@@ -36,5 +37,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin(.*)", "/api/(projects|posts|experiences|settings)(.*)"],
+  matcher: ["/admin(.*)", "/api/(projects|posts|experiences|settings|media)(.*)"],
 };

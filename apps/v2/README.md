@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Production readiness audit (2026-09-09)
 
-`tsc --noEmit` is clean and the public read paths are in decent shape, but the admin/auth layer is not launch-ready.
+All 10 items below are resolved as of this commit; only the "nice to have" list remains open. `tsc --noEmit`, `eslint`, `vitest run`, and `next build` are all clean.
 
 ### Blockers — fixed
 
@@ -59,9 +59,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
    **Requires action in Vercel:** `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN` must be available at **build time**, not just runtime, in the Vercel project's environment variable settings, since the build command now runs a migration before `next build`. Locally, run `pnpm migrate` after pulling any commit that adds a new migration — it's no longer automatic on `pnpm dev`.
 
-### Open
-
-10. Media upload admin page is a stub (`app/admin/media/page.tsx` — `// TODO: wire to upload API once storage is configured`).
+10. ~~Media upload admin page is a stub.~~ Wired up to Vercel Blob: `/admin/media` now lists, uploads, and deletes real files. Uploads go client → Blob directly (not proxied through the Next.js server) via `@vercel/blob/client`'s `upload()`, authorized by a short-lived token from `app/api/media/upload/route.ts` (`handleUpload`, admin-only per `middleware.ts`, capped at 10 MB, image types only). `app/api/media/route.ts` lists (`GET`) and deletes (`DELETE`) via the server SDK. No local media table — Vercel Blob's own storage is the source of truth for the list. Requires `BLOB_READ_WRITE_TOKEN` (already configured in Vercel Production/Preview per the store setup); added to local `.env.local` for `pnpm dev`.
 
 ### Nice to have
 
