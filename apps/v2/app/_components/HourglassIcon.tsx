@@ -21,14 +21,16 @@ export function HourglassIcon({
   className = "w-4 h-5",
   topFraction = 0.5,
   bottomFraction = 0.5,
-  outlineColor = "#b8b8c4", // v3-text-2
+  barColor = "#b8b8c4", // v3-text-2
+  frameColor = "#2c2c38", // v3-border-strong — deliberately subtle, so it doesn't compete with the fill
   topFillColor = "#b8b8c4", // v3-text-2
   bottomFillColor = "#b794f6", // v3-accent
 }: {
   className?: string;
   topFraction?: number;
   bottomFraction?: number;
-  outlineColor?: string;
+  barColor?: string;
+  frameColor?: string;
   topFillColor?: string;
   bottomFillColor?: string;
 }) {
@@ -47,13 +49,18 @@ export function HourglassIcon({
         </clipPath>
       </defs>
 
-      <rect x="20" y="4" width="60" height="6" rx="1.5" fill={outlineColor} />
-      <rect x="20" y="90" width="60" height="6" rx="1.5" fill={outlineColor} />
-      <polygon points="22,14 78,14 50,50" fill="none" stroke={outlineColor} strokeWidth="4" />
-      <polygon points="22,86 78,86 50,50" fill="none" stroke={outlineColor} strokeWidth="4" />
+      {/* Glass outline — subtle on purpose, so an empty bulb reads as "empty" rather
+          than visually merging with the fill below. */}
+      <polygon points="22,14 78,14 50,50" fill="none" stroke={frameColor} strokeWidth="2" />
+      <polygon points="22,86 78,86 50,50" fill="none" stroke={frameColor} strokeWidth="2" />
 
+      {/* Sand fill — clipped to the current fraction, drawn over the outline. */}
       <polygon points="22,14 78,14 50,50" fill={topFillColor} clipPath={`url(#${id}-top)`} />
       <polygon points="22,86 78,86 50,50" fill={bottomFillColor} clipPath={`url(#${id}-bottom)`} />
+
+      {/* Bars — drawn last, on top, so they stay crisp regardless of fill. */}
+      <rect x="20" y="4" width="60" height="6" rx="1.5" fill={barColor} />
+      <rect x="20" y="90" width="60" height="6" rx="1.5" fill={barColor} />
     </svg>
   );
 }
