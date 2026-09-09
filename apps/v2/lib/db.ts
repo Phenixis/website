@@ -49,6 +49,10 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
     name: "008_drop_when_from_experiences",
     sql: 'ALTER TABLE experiences DROP COLUMN "when"',
   },
+  {
+    name: "009_add_category_to_projects",
+    sql: "ALTER TABLE projects ADD COLUMN category TEXT DEFAULT 'main'",
+  },
 ];
 
 export async function runMigrations(): Promise<void> {
@@ -96,6 +100,7 @@ function rowToProject(row: Record<string, unknown>): Project {
     stack: JSON.parse(row.stack as string),
     color: row.color as string,
     published: row.published == null ? true : Boolean(row.published),
+    category: (row.category as Project["category"]) ?? "main",
     ...(row.role != null ? { role: row.role as string } : {}),
     ...(row.links != null ? { links: JSON.parse(row.links as string) } : {}),
   };
@@ -161,19 +166,20 @@ export async function getPublishedProject(id: string): Promise<Project | null> {
 export async function upsertProject(p: Project): Promise<void> {
   const published = p.published === false ? 0 : 1;
   await db.execute({
-    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, published)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, published, category)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             title=excluded.title, year=excluded.year, kind=excluded.kind,
             status=excluded.status, blurb=excluded.blurb, body=excluded.body,
             stack=excluded.stack, color=excluded.color, role=excluded.role, links=excluded.links,
-            published=excluded.published`,
+            published=excluded.published, category=excluded.category`,
     args: [
       p.id, p.title, p.year, p.kind, p.status, p.blurb,
       JSON.stringify(p.body), JSON.stringify(p.stack), p.color,
       p.role ?? null,
       p.links?.length ? JSON.stringify(p.links) : null,
       published,
+      p.category ?? "main",
     ],
   });
 }

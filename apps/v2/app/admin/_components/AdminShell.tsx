@@ -6,7 +6,8 @@ import Link from "next/link";
 import type { Profile } from "../../data";
 
 type Counts = {
-  projects: number;
+  mainProjects: number;
+  sideQuests: number;
   posts: number;
   experiences: number;
   drafts: number;
@@ -35,9 +36,10 @@ export function AdminShell({
       group: "Content",
       items: [
         { id: "dashboard", href: "/admin", label: "Overview", icon: "✦", count: undefined as number | undefined },
-        { id: "projects", href: "/admin/projects", label: "Projects", icon: "I", count: counts.projects },
+        { id: "projects", href: "/admin/projects", label: "Main Projects", icon: "I", count: counts.mainProjects },
         { id: "posts", href: "/admin/posts", label: "Writing", icon: "II", count: counts.posts },
-        { id: "experiences", href: "/admin/experiences", label: "Itinerary", icon: "III", count: counts.experiences },
+        { id: "sidequests", href: "/admin/side-quests", label: "Side Quests", icon: "III", count: counts.sideQuests },
+        { id: "experiences", href: "/admin/experiences", label: "Itinerary", icon: "IV", count: counts.experiences },
       ],
     },
     {

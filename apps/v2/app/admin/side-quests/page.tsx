@@ -7,14 +7,14 @@ import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls } from "..
 
 const updated = ["12m", "2h", "yesterday", "2d", "4d", "1w", "3w", "1mo"];
 
-export default function ProjectsListPage() {
+export default function SideQuestsListPage() {
   const router = useRouter();
   const [items, setItems] = useState<Project[]>([]);
 
   useEffect(() => {
     fetch("/api/projects")
       .then((r) => r.json())
-      .then((data: Project[]) => setItems(data.filter((p) => p.category !== "side")));
+      .then((data: Project[]) => setItems(data.filter((p) => p.category === "side")));
   }, []);
 
   const counts = {
@@ -26,13 +26,13 @@ export default function ProjectsListPage() {
   return (
     <>
       <PageHead
-        title="Main Projects"
-        sub="What I made — apps, tools, libraries, the occasional experiment."
+        title="Side Quests"
+        sub="Smaller, looser projects — icon libraries, homelab tinkering, whatever else didn't need to be a whole thing."
         actions={
           <>
             <Btn variant="ghost" size="sm">Export</Btn>
-            <Btn variant="primary" onClick={() => router.push("/admin/projects/new")}>
-              + New project <span className={kbdCls}>⌘N</span>
+            <Btn variant="primary" onClick={() => router.push("/admin/side-quests/new")}>
+              + New side quest <span className={kbdCls}>⌘N</span>
             </Btn>
           </>
         }
@@ -62,7 +62,7 @@ export default function ProjectsListPage() {
           </thead>
           <tbody>
             {items.map((p, i) => (
-              <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)}>
+              <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/side-quests/${p.id}`)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                   <div className={tableCls.tdTitleInner}>

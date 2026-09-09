@@ -13,7 +13,7 @@ export function BlogList({ posts, onSelect }: { posts: Post[]; onSelect: (id: st
         >
           <div className="flex flex-col gap-[6px] pt-1">
             <div className="font-serif italic text-[32px] text-v3-accent leading-none font-light tabular-nums max-[720px]:text-[26px] max-[480px]:text-[22px]">
-              {String(i + 1).padStart(2, "0")}
+              {String(posts.length - i).padStart(2, "0")}
             </div>
             <div className="text-[10.5px] text-v3-text-dim tracking-[0.08em] uppercase tabular-nums">{p.date}</div>
           </div>
@@ -65,7 +65,7 @@ export function PostDetail({
           <span key={t} className="text-v3-accent font-mono">#{t}</span>
         ))}
         <span className="ml-auto text-v3-text-dim tabular-nums">
-          No. {String(idx + 1).padStart(2, "0")} / {String(posts.length).padStart(2, "0")}
+          No. {String(posts.length - idx).padStart(2, "0")} / {String(posts.length).padStart(2, "0")}
         </span>
       </div>
 

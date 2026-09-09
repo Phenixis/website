@@ -61,7 +61,7 @@ export default function ArchivePage() {
             </thead>
             <tbody>
               {items.map((p, i) => (
-                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)}>
+                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`${p.category === "side" ? "/admin/side-quests" : "/admin/projects"}/${p.id}`)}>
                   <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                   <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                     <div className={tableCls.tdTitleInner}>
@@ -78,6 +78,7 @@ export default function ArchivePage() {
                   <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colMd}`}>{p.kind}</td>
                   <td className={`${tableCls.td} ${tableCls.colLg}`}>
                     <div className={tableCls.tdChipRow}>
+                      {p.category === "side" && <span className={tableCls.tdChip}>side quest</span>}
                       {p.stack.slice(0, 3).map((s) => (
                         <span key={s} className={tableCls.tdChip}>{s}</span>
                       ))}

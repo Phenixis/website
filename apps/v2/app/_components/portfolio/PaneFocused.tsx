@@ -7,7 +7,8 @@ type Pane = { id: string; label: string; num: string; count: number; sub: string
 
 type PaneFocusedProps = {
   pane: Pane;
-  projects: Project[];
+  mainProjects: Project[];
+  sideQuests: Project[];
   posts: Post[];
   experiences: Experience[];
   profile: Profile;
@@ -15,6 +16,8 @@ type PaneFocusedProps = {
   onSelectPost: (id: string | null) => void;
   selectedProjectId: string | null;
   onSelectProject: (id: string | null) => void;
+  selectedSideQuestId: string | null;
+  onSelectSideQuest: (id: string | null) => void;
 };
 
 const HEADER_ROW_CLASS =
@@ -38,7 +41,8 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
 
 export function PaneFocused({
   pane,
-  projects,
+  mainProjects,
+  sideQuests,
   posts,
   experiences,
   profile,
@@ -46,15 +50,26 @@ export function PaneFocused({
   onSelectPost,
   selectedProjectId,
   onSelectProject,
+  selectedSideQuestId,
+  onSelectSideQuest,
 }: PaneFocusedProps) {
   const selectedPost = pane.id === "blog" && selectedPostId
     ? posts.find((p) => p.id === selectedPostId) ?? null
     : null;
   const selectedProject = pane.id === "projects" && selectedProjectId
-    ? projects.find((p) => p.id === selectedProjectId) ?? null
+    ? mainProjects.find((p) => p.id === selectedProjectId) ?? null
+    : null;
+  const selectedSideQuest = pane.id === "sidequests" && selectedSideQuestId
+    ? sideQuests.find((p) => p.id === selectedSideQuestId) ?? null
     : null;
 
-  const centeredHead = pane.id === "blog" || !!selectedProject || (pane.id === "projects" && !selectedProject) || pane.id === "experiences";
+  const centeredHead =
+    pane.id === "blog" ||
+    !!selectedProject ||
+    !!selectedSideQuest ||
+    (pane.id === "projects" && !selectedProject) ||
+    (pane.id === "sidequests" && !selectedSideQuest) ||
+    pane.id === "experiences";
 
   return (
     <div className="scroll-thin absolute inset-0 overflow-y-auto flex flex-col animate-v3-fade">
@@ -86,7 +101,7 @@ export function PaneFocused({
         ) : selectedProject ? (
           <>
             <div className={HEADER_ROW_CLASS}>
-              <BackButton label="Projects" onClick={() => onSelectProject(null)} />
+              <BackButton label="Main Projects" onClick={() => onSelectProject(null)} />
               <HeaderRule />
               <span className="flex items-baseline gap-[14px]">
                 <span style={{ color: selectedProject.color }}>● {selectedProject.kind}</span>
@@ -95,6 +110,20 @@ export function PaneFocused({
             </div>
             <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
               {selectedProject.title}
+            </h1>
+          </>
+        ) : selectedSideQuest ? (
+          <>
+            <div className={HEADER_ROW_CLASS}>
+              <BackButton label="Side Quests" onClick={() => onSelectSideQuest(null)} />
+              <HeaderRule />
+              <span className="flex items-baseline gap-[14px]">
+                <span style={{ color: selectedSideQuest.color }}>● {selectedSideQuest.kind}</span>
+                <span className="text-v3-text-dim tabular-nums">{selectedSideQuest.year}</span>
+              </span>
+            </div>
+            <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
+              {selectedSideQuest.title}
             </h1>
           </>
         ) : (
@@ -117,13 +146,18 @@ export function PaneFocused({
       <div className="px-16 pb-16 max-[1100px]:px-12 max-[1100px]:pb-12 max-[920px]:px-9 max-[920px]:pb-10 max-[720px]:px-[22px] max-[720px]:pb-8 max-[480px]:px-4 max-[480px]:pb-7">
         {pane.id === "projects" && (
           selectedProject
-            ? <ProjectDetail project={selectedProject} projects={projects} onSelect={onSelectProject} />
-            : <ProjectsList projects={projects} onSelect={onSelectProject} />
+            ? <ProjectDetail project={selectedProject} projects={mainProjects} onSelect={onSelectProject} />
+            : <ProjectsList projects={mainProjects} onSelect={onSelectProject} />
         )}
         {pane.id === "blog" && (
           selectedPost
             ? <PostDetail post={selectedPost} posts={posts} profile={profile} onSelect={onSelectPost} />
             : <BlogList posts={posts} onSelect={onSelectPost} />
+        )}
+        {pane.id === "sidequests" && (
+          selectedSideQuest
+            ? <ProjectDetail project={selectedSideQuest} projects={sideQuests} onSelect={onSelectSideQuest} />
+            : <ProjectsList projects={sideQuests} onSelect={onSelectSideQuest} />
         )}
         {pane.id === "experiences" && <ExperiencesList experiences={experiences} />}
       </div>

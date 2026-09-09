@@ -15,18 +15,23 @@ export function formatMonth(ym: string): string {
   });
 }
 
-export function formatRange(e: Pick<Experience, "startDate" | "endDate">): string {
-  return e.endDate ? `${formatMonth(e.startDate)} — ${formatMonth(e.endDate)}` : `${formatMonth(e.startDate)} →`;
-}
-
 function currentYearMonth(): string {
   const d = new Date();
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
+/** True when there's no end date, or the end date hasn't arrived yet (still in progress). */
+export function isOngoing(e: Pick<Experience, "endDate">): boolean {
+  return e.endDate == null || monthIndex(e.endDate) >= monthIndex(currentYearMonth());
+}
+
+export function formatRange(e: Pick<Experience, "startDate" | "endDate">): string {
+  return isOngoing(e) ? `${formatMonth(e.startDate)} →` : `${formatMonth(e.startDate)} — ${formatMonth(e.endDate!)}`;
+}
+
 /** Inclusive month count, formatted as "3 mo", "1 yr", "1 yr 6 mo". Runs to today if ongoing. */
 export function formatDuration(e: Pick<Experience, "startDate" | "endDate">): string {
-  const end = monthIndex(e.endDate ?? currentYearMonth());
+  const end = monthIndex(isOngoing(e) ? currentYearMonth() : e.endDate!);
   const months = Math.max(1, end - monthIndex(e.startDate) + 1);
   const years = Math.floor(months / 12);
   const rem = months % 12;
@@ -51,6 +56,6 @@ export function hasGapAfter(sorted: Experience[], i: number): boolean {
   const newer = sorted[i];
   const older = sorted[i + 1];
   if (!newer || !older) return false;
-  const olderEnd = older.endDate ?? older.startDate;
+  const olderEnd = isOngoing(older) ? currentYearMonth() : older.endDate!;
   return monthIndex(newer.startDate) - monthIndex(olderEnd) >= GAP_THRESHOLD_MONTHS;
 }

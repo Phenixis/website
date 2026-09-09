@@ -1,5 +1,5 @@
 import { ProjectEditForm } from "../../_components/ProjectEditForm";
 
-export default function ProjectEditPage() {
+export default function SideQuestEditPage() {
   return <ProjectEditForm />;
 }

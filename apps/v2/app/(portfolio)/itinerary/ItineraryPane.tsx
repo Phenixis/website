@@ -1,5 +1,5 @@
 import type { Experience } from "../../data";
-import { formatDuration, formatMonth, hasGapAfter, sortByStartDesc } from "@/lib/experience-dates";
+import { formatDuration, formatMonth, hasGapAfter, isOngoing, sortByStartDesc } from "@/lib/experience-dates";
 
 const DOT_CLASS: Record<Experience["kind"], string> = {
   self: "bg-v3-accent shadow-[0_0_0_3px_rgba(183,148,246,0.18)]",
@@ -24,7 +24,7 @@ function DateStack({ e, size }: { e: Experience; size: "outer" | "inner" }) {
       : "text-[8px] text-v3-text-dim tracking-[0.08em] uppercase italic";
   return (
     <div className="h-full flex flex-col justify-between items-end text-right py-[2px]">
-      <div className={labelCls}>{e.endDate ? formatMonth(e.endDate) : "→"}</div>
+      <div className={labelCls}>{isOngoing(e) ? "→" : formatMonth(e.endDate!)}</div>
       <div className={durationCls}>{formatDuration(e)}</div>
       <div className={labelCls}>{formatMonth(e.startDate)}</div>
     </div>

@@ -13,4 +13,6 @@ export function revalidatePortfolio() {
   revalidatePath("/writing/[slug]", "page");
   revalidatePath("/itinerary");
   revalidatePath("/projects/[slug]", "page");
+  revalidatePath("/side-quests");
+  revalidatePath("/side-quests/[slug]", "page");
 }

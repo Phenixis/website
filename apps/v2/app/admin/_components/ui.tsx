@@ -87,6 +87,7 @@ const BADGE_COLORS: Record<string, string> = {
   archived: "text-a-text-mute bg-[rgba(110,110,128,0.1)]",
   role: "text-a-text-mute bg-[rgba(110,110,128,0.1)]",
   accent: "text-a-accent bg-a-accent-soft",
+  side: "text-a-accent bg-a-accent-soft",
 };
 
 export function PageHead({

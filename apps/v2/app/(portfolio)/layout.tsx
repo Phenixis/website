@@ -16,9 +16,18 @@ export default async function PortfolioLayout({
     getProfile(),
   ]);
 
+  const mainProjects = projects.filter((p) => p.category !== "side");
+  const sideQuests = projects.filter((p) => p.category === "side");
+
   return (
     <>
-      <Portfolio profile={profile ?? PROFILE} projects={projects} posts={posts} experiences={experiences} />
+      <Portfolio
+        profile={profile ?? PROFILE}
+        mainProjects={mainProjects}
+        sideQuests={sideQuests}
+        posts={posts}
+        experiences={experiences}
+      />
       {children}
     </>
   );

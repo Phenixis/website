@@ -11,6 +11,8 @@ export type Project = {
   role?: string;
   links?: { label: string; href: string }[];
   published?: boolean;
+  /** "main" for Main Projects, "side" for Side Quests. Defaults to "main". */
+  category?: "main" | "side";
 };
 
 export type Post = {

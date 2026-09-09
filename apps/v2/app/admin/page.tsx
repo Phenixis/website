@@ -9,9 +9,16 @@ export default async function DashboardPage() {
     getExperiences(),
   ]);
 
-  const shipping = projects.filter((p) => p.status === "shipping").length;
-  const paused = projects.filter((p) => p.status === "paused").length;
-  const archived = projects.filter((p) => p.status === "archived").length;
+  const mainProjects = projects.filter((p) => p.category !== "side");
+  const sideQuests = projects.filter((p) => p.category === "side");
+
+  const shipping = mainProjects.filter((p) => p.status === "shipping").length;
+  const paused = mainProjects.filter((p) => p.status === "paused").length;
+  const archived = mainProjects.filter((p) => p.status === "archived").length;
+
+  const sqShipping = sideQuests.filter((p) => p.status === "shipping").length;
+  const sqPaused = sideQuests.filter((p) => p.status === "paused").length;
+  const sqArchived = sideQuests.filter((p) => p.status === "archived").length;
 
   const drafts = posts.filter((p) => p.published === false);
   const published = posts.length - drafts.length;
@@ -34,16 +41,28 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-[14px] max-[720px]:grid-cols-2 max-[560px]:grid-cols-1">
+        <div className="grid grid-cols-4 gap-[14px] max-[1000px]:grid-cols-2 max-[560px]:grid-cols-1">
           <Link className="group p-[22px] pb-[18px] bg-a-bg-2 border border-a-border rounded-md cursor-pointer transition-all duration-200 relative overflow-hidden w-full text-left font-mono text-a-text hover:border-a-border-strong hover:bg-a-bg-3 max-[720px]:p-[18px] max-[720px]:pb-4" href="/admin/projects">
             <div className="font-serif font-light text-[56px] text-a-text tracking-[-0.03em] leading-none max-[720px]:text-[44px]">
-              {String(projects.length).padStart(2, "0")}
+              {String(mainProjects.length).padStart(2, "0")}
             </div>
-            <div className="text-[11px] tracking-[0.12em] uppercase text-a-text-mute mt-2">Projects</div>
+            <div className="text-[11px] tracking-[0.12em] uppercase text-a-text-mute mt-2">Main Projects</div>
             <div className="mt-[14px] flex items-center gap-2 text-[11px] text-a-text-2 border-t border-dashed border-a-border pt-3 max-[720px]:flex-wrap max-[720px]:gap-1">
               <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-green">● {shipping} shipping</span>
               <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-text-mute">{paused} paused</span>
               <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-text-mute">{archived} archived</span>
+            </div>
+            <span className="absolute top-[18px] right-[18px] text-a-text-dim text-[16px] transition-colors duration-[160ms] group-hover:text-a-accent">↗</span>
+          </Link>
+          <Link className="group p-[22px] pb-[18px] bg-a-bg-2 border border-a-border rounded-md cursor-pointer transition-all duration-200 relative overflow-hidden w-full text-left font-mono text-a-text hover:border-a-border-strong hover:bg-a-bg-3 max-[720px]:p-[18px] max-[720px]:pb-4" href="/admin/side-quests">
+            <div className="font-serif font-light text-[56px] text-a-text tracking-[-0.03em] leading-none max-[720px]:text-[44px]">
+              {String(sideQuests.length).padStart(2, "0")}
+            </div>
+            <div className="text-[11px] tracking-[0.12em] uppercase text-a-text-mute mt-2">Side Quests</div>
+            <div className="mt-[14px] flex items-center gap-2 text-[11px] text-a-text-2 border-t border-dashed border-a-border pt-3 max-[720px]:flex-wrap max-[720px]:gap-1">
+              <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-green">● {sqShipping} shipping</span>
+              <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-text-mute">{sqPaused} paused</span>
+              <span className="bg-a-bg border border-a-border rounded-[3px] px-[6px] py-px text-[10px] text-a-text-mute">{sqArchived} archived</span>
             </div>
             <span className="absolute top-[18px] right-[18px] text-a-text-dim text-[16px] transition-colors duration-[160ms] group-hover:text-a-accent">↗</span>
           </Link>

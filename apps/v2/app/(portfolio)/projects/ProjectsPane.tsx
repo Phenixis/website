@@ -18,7 +18,7 @@ export function ProjectsList({ projects, onSelect }: { projects: Project[]; onSe
           onClick={() => onSelect(p.id)}
         >
           <div className="font-serif italic text-[14px] text-v3-text-dim tabular-nums tracking-[0.04em] pt-[6px]">
-            {String(i + 1).padStart(3, "0")}
+            {String(projects.length - i).padStart(3, "0")}
           </div>
           <div className="w-24 h-24 bg-v3-bg-3 border border-v3-border rounded relative overflow-hidden flex items-center justify-center transition-colors duration-200 group-hover:border-[var(--c)] max-[1100px]:w-[88px] max-[1100px]:h-[88px] max-[720px]:w-[72px] max-[720px]:h-[72px] max-[480px]:w-14 max-[480px]:h-14">
             <div className="font-serif font-light text-[56px] leading-none relative z-[1] tracking-[-0.04em] opacity-75 text-[var(--c)] max-[1100px]:text-[52px] max-[720px]:text-[44px] max-[480px]:text-[34px]">
@@ -62,6 +62,7 @@ export function ProjectDetail({
   const idx = projects.findIndex((p) => p.id === project.id);
   const prev = idx > 0 ? projects[idx - 1] : null;
   const next = idx < projects.length - 1 ? projects[idx + 1] : null;
+  const pathPrefix = project.category === "side" ? "/side-quests" : "/projects";
 
   return (
     <article className="max-w-[760px] mx-auto pt-1 max-[920px]:max-w-full" style={{ "--c": project.color } as React.CSSProperties}>
@@ -73,7 +74,7 @@ export function ProjectDetail({
         <div className="absolute inset-0 z-0 [background-image:linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] [background-size:32px_32px]" />
         <div className="absolute bottom-[14px] left-4 right-4 flex items-center justify-between text-[10.5px] tracking-[0.12em] uppercase text-v3-text-mute z-[2] max-[480px]:left-3 max-[480px]:right-3 max-[480px]:bottom-[10px] max-[480px]:text-[9.5px]">
           <span className="tabular-nums">
-            No. {String(idx + 1).padStart(3, "0")} / {String(projects.length).padStart(3, "0")}
+            No. {String(projects.length - idx).padStart(3, "0")} / {String(projects.length).padStart(3, "0")}
           </span>
           <span className={`py-px ${statusColor(project.status)}`}>
             ● {project.status}
@@ -119,7 +120,7 @@ export function ProjectDetail({
         <div className="grid grid-cols-[100px_1fr] items-baseline py-[6px] gap-4 border-t border-dashed border-v3-border max-[720px]:grid-cols-1 max-[720px]:gap-[6px] max-[720px]:py-[10px]">
           <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase text-v3-text-mute max-[720px]:text-[10px]">Views</span>
           <span className="font-mono text-[12.5px] text-v3-text flex items-center flex-wrap gap-[6px]">
-            <ViewCounter slug={`/projects/${project.id}`} />
+            <ViewCounter slug={`${pathPrefix}/${project.id}`} />
           </span>
         </div>
         {project.links && project.links.length > 0 && (

@@ -23,7 +23,8 @@ export default async function AdminLayout({
   ]);
 
   const counts = {
-    projects: projects.length,
+    mainProjects: projects.filter((p) => p.category !== "side").length,
+    sideQuests: projects.filter((p) => p.category === "side").length,
     posts: posts.length,
     experiences: experiences.length,
     drafts: posts.filter((p) => p.published === false).length,
