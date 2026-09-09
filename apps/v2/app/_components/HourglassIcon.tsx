@@ -12,8 +12,8 @@ export function HourglassIcon({
   className = "w-4 h-5",
   topFraction = 0.5,
   bottomFraction = 0.5,
-  outlineClassName = "stroke-v3-text-dim fill-v3-text-dim",
-  topFillClassName = "fill-v3-text-mute",
+  outlineClassName = "stroke-v3-text-2 fill-v3-text-2",
+  topFillClassName = "fill-v3-text-2",
   bottomFillClassName = "fill-v3-accent",
 }: {
   className?: string;
@@ -28,8 +28,8 @@ export function HourglassIcon({
       <svg className={`absolute inset-0 ${outlineClassName}`} viewBox="0 0 100 100" preserveAspectRatio="none">
         <rect x="20" y="4" width="60" height="6" rx="1.5" stroke="none" />
         <rect x="20" y="90" width="60" height="6" rx="1.5" stroke="none" />
-        <polygon points="22,14 78,14 50,50" fill="none" strokeWidth="3" />
-        <polygon points="22,86 78,86 50,50" fill="none" strokeWidth="3" />
+        <polygon points="22,14 78,14 50,50" fill="none" strokeWidth="4" />
+        <polygon points="22,86 78,86 50,50" fill="none" strokeWidth="4" />
       </svg>
       <div
         className="absolute left-0 w-full overflow-hidden"
