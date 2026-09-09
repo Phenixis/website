@@ -1,12 +1,22 @@
 import { createClient } from "@libsql/client";
 import type { Project, Post, Experience } from "@/app/data";
 
+const databaseUrl = process.env.TURSO_DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error(
+    "Missing required environment variable: TURSO_DATABASE_URL. Set it in .env.local for local dev, or in your deployment's environment settings.",
+  );
+}
+
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
+  url: databaseUrl,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
 export default db;
+
+/** Defensive cap on list queries — there's no pagination UI, so this just bounds the worst case. */
+const LIST_LIMIT = 500;
 
 /* ── Migrations ────────────────────────────────────────── */
 
@@ -155,14 +165,18 @@ function rowToExperience(row: Record<string, unknown>): Experience {
 /* ── Projects ──────────────────────────────────────────── */
 
 export async function getProjects(): Promise<Project[]> {
-  const r = await db.execute("SELECT * FROM projects ORDER BY sort_order ASC, rowid ASC");
+  const r = await db.execute({
+    sql: "SELECT * FROM projects ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToProject(row as unknown as Record<string, unknown>));
 }
 
 export async function getPublishedProjects(): Promise<Project[]> {
-  const r = await db.execute(
-    "SELECT * FROM projects WHERE (published IS NULL OR published != 0) AND status != 'archived' ORDER BY sort_order ASC, rowid ASC",
-  );
+  const r = await db.execute({
+    sql: "SELECT * FROM projects WHERE (published IS NULL OR published != 0) AND status != 'archived' ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToProject(row as unknown as Record<string, unknown>));
 }
 
@@ -209,14 +223,18 @@ export async function deleteProject(id: string): Promise<void> {
 /* ── Posts ─────────────────────────────────────────────── */
 
 export async function getPosts(): Promise<Post[]> {
-  const r = await db.execute("SELECT * FROM posts ORDER BY sort_order ASC, rowid ASC");
+  const r = await db.execute({
+    sql: "SELECT * FROM posts ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToPost(row as unknown as Record<string, unknown>));
 }
 
 export async function getPublishedPosts(): Promise<Post[]> {
-  const r = await db.execute(
-    "SELECT * FROM posts WHERE published IS NULL OR published != 0 ORDER BY sort_order ASC, rowid ASC",
-  );
+  const r = await db.execute({
+    sql: "SELECT * FROM posts WHERE published IS NULL OR published != 0 ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToPost(row as unknown as Record<string, unknown>));
 }
 
@@ -255,14 +273,18 @@ export async function deletePost(id: string): Promise<void> {
 /* ── Experiences ───────────────────────────────────────── */
 
 export async function getExperiences(): Promise<Experience[]> {
-  const r = await db.execute("SELECT * FROM experiences ORDER BY sort_order ASC, rowid ASC");
+  const r = await db.execute({
+    sql: "SELECT * FROM experiences ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToExperience(row as unknown as Record<string, unknown>));
 }
 
 export async function getPublishedExperiences(): Promise<Experience[]> {
-  const r = await db.execute(
-    "SELECT * FROM experiences WHERE (published IS NULL OR published != 0) ORDER BY sort_order ASC, rowid ASC",
-  );
+  const r = await db.execute({
+    sql: "SELECT * FROM experiences WHERE (published IS NULL OR published != 0) ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    args: [LIST_LIMIT],
+  });
   return r.rows.map((row) => rowToExperience(row as unknown as Record<string, unknown>));
 }
 

@@ -63,7 +63,7 @@ All 10 items below are resolved as of this commit; only the "nice to have" list 
 
 ### Nice to have
 
-- Unpaginated admin list queries (`getPosts/getProjects/getExperiences` in `lib/db.ts`) — fine at current content scale.
-- `console.log`/`console.error`-only error handling in a couple of spots (`lib/db.ts`, `app/api/views/route.ts`).
-- Non-null `TURSO_DATABASE_URL!` assertion (`lib/db.ts:5`) throws a raw libsql error at import time if the env var is missing, instead of a friendly message.
+- ~~Unpaginated admin list queries.~~ `getProjects/getPublishedProjects/getPosts/getPublishedPosts/getExperiences/getPublishedExperiences` in `lib/db.ts` now cap at `LIST_LIMIT = 500`. Not real pagination (no UI for it, and content is nowhere near that scale) — just a bound on the worst case.
+- `console.log`/`console.error`-only error handling in `app/api/views/route.ts` — left as-is. It already has proper try/catch and status codes; `console.error` lands in Vercel's Runtime Logs, which is proportionate for a low-traffic single-admin site. Revisit if real alerting (Sentry, a failure webhook, etc.) is ever wanted.
+- ~~Non-null `TURSO_DATABASE_URL!` assertion.~~ `lib/db.ts` now throws a clear "Missing required environment variable" error instead of a bare non-null assertion, so a missing env var fails with an actionable message instead of a cryptic libsql `URL_INVALID` error.
 - Next.js 16 deprecates the `middleware.ts` convention in favor of `proxy.ts` (build-time warning only, not urgent).
