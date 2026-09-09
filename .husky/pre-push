@@ -1,20 +1,49 @@
 #!/usr/bin/env sh
 
-date '+%Y-%m-%d %H:%M:%S' >> .husky/pre-push.log
-echo "🚀 Running pre-push checks..." >> .husky/pre-push.log
+LOG=".husky/pre-push.log"
+
+date '+%Y-%m-%d %H:%M:%S' >> "$LOG"
+echo "🚀 Running pre-push checks..." >> "$LOG"
+
+# Build against exactly what's committed — not whatever's sitting in the
+# working tree — so this catches the same thing Vercel/CI would build.
+# (A dirty tree can make a broken commit look fine locally: an uncommitted
+# fix on top of a bad commit builds successfully here but ships broken.)
+STASHED=0
+if ! git diff --quiet HEAD --; then
+    if git stash push --quiet --message "pre-push autostash"; then
+        STASHED=1
+        echo "📦 Stashed working tree changes to build against HEAD..." >> "$LOG"
+    else
+        echo "❌ Could not stash working tree changes — aborting push." >> "$LOG"
+        exit 1
+    fi
+fi
+
+restore_stash() {
+    if [ "$STASHED" = "1" ]; then
+        if git stash pop --quiet; then
+            echo "📦 Restored working tree changes." >> "$LOG"
+        else
+            echo "⚠️  Could not restore stashed changes automatically!" >> "$LOG"
+            echo "⚠️  Your changes are NOT lost — run 'git stash list' and 'git stash pop' manually." >> "$LOG"
+        fi
+    fi
+}
+trap restore_stash EXIT INT TERM
 
 BASE_REF="origin/main"
 if ! git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
     BASE_REF=$(git merge-base HEAD @{u} 2>/dev/null || echo "HEAD^")
 fi
 
-echo "📦 Building packages changed since $BASE_REF..." >> .husky/pre-push.log
+echo "📦 Building packages changed since $BASE_REF..." >> "$LOG"
 
-if pnpm turbo build --filter="...[$BASE_REF...HEAD]" >> .husky/pre-push.log 2>&1; then
-    echo "✅ Build succeeded! Push is allowed to continue." >> .husky/pre-push.log
+if pnpm turbo build --filter="...[$BASE_REF...HEAD]" >> "$LOG" 2>&1; then
+    echo "✅ Build succeeded! Push is allowed to continue." >> "$LOG"
     exit 0
 else
-    echo "❌ Build failed! Push has been blocked." >> .husky/pre-push.log
-    echo "💡 Please fix the build errors before pushing." >> .husky/pre-push.log
+    echo "❌ Build failed! Push has been blocked." >> "$LOG"
+    echo "💡 Please fix the build errors before pushing." >> "$LOG"
     exit 1
 fi
