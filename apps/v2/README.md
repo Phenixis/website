@@ -35,6 +35,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## Analytics
+
+Migrated from v1: `@vercel/analytics`'s `<Analytics />` is mounted in `app/layout.tsx`, tracking every page under the root layout (public site + `/admin`). It needs to be turned on for this project in the Vercel dashboard (Project → Analytics) before data starts showing up there — that's a one-time toggle, not something set from code.
+
+To trace visits back to a specific link (e.g. one left on a client's site), just append `?utm_source=<name>` (and optionally `utm_medium`/`utm_campaign`) to the URL you give them — Vercel Analytics picks up query params and referrers automatically, no extra code needed. "Top Referrers" in the dashboard also shows the referring domain even without any query param, as long as the link is a plain `<a href>` (not a redirect that drops the `Referer` header).
+
 ## Production readiness audit (2026-09-09)
 
 All 10 items below are resolved as of this commit; only the "nice to have" list remains open. `tsc --noEmit`, `eslint`, `vitest run`, and `next build` are all clean.
