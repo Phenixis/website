@@ -1,6 +1,11 @@
-export function PaneRail({ pane }: { pane: { num: string; label: string; count: number } }) {
+import Link from "next/link";
+
+export function PaneRail({ pane, href }: { pane: { num: string; label: string; count: number }; href: string }) {
   return (
-    <div className="pane-rail absolute inset-0 flex flex-col items-center py-8 pb-6 [transition:color_200ms] group">
+    <Link
+      href={href}
+      className="pane-rail absolute inset-0 flex flex-col items-center py-8 pb-6 [transition:color_200ms] group"
+    >
       <span className="pane-rail-num font-serif italic text-[14px] font-light text-v3-text-mute tracking-[0.02em] transition-colors duration-200 group-hover:text-v3-accent">
         {pane.num}
       </span>
@@ -10,6 +15,6 @@ export function PaneRail({ pane }: { pane: { num: string; label: string; count: 
       <span className="pane-rail-count text-[10.5px] text-v3-text-dim tabular-nums tracking-[0.15em]">
         {String(pane.count).padStart(2, "0")}
       </span>
-    </div>
+    </Link>
   );
 }

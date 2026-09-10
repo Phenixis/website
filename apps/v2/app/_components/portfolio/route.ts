@@ -41,3 +41,11 @@ export function parsePortfolioRoute(pathname: string): PortfolioRoute {
   }
   return { focused: "projects", selectedPostId: null, selectedProjectId: null, selectedSideQuestId: null };
 }
+
+/** Inverse of parsePortfolioRoute's `focused` field — the URL a pane's own link points to. */
+export function paneHref(id: string): string {
+  if (id === "blog") return "/writing";
+  if (id === "sidequests") return "/side-quests";
+  if (id === "experiences") return "/itinerary";
+  return "/";
+}

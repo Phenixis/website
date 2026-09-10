@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type NavItem = { id: string; title: string };
 
 const navBtnBase =
@@ -8,12 +10,12 @@ export function DetailFooter({
   sign,
   prev,
   next,
-  onSelect,
+  hrefFor,
 }: {
   sign: React.ReactNode;
   prev: NavItem | null;
   next: NavItem | null;
-  onSelect: (id: string | null) => void;
+  hrefFor: (id: string) => string;
 }) {
   return (
     <footer className="mt-14 pt-7 border-t border-v3-border max-[480px]:mt-9 max-[480px]:pt-5">
@@ -22,16 +24,16 @@ export function DetailFooter({
       </div>
       <nav className="grid grid-cols-2 gap-4 max-[720px]:grid-cols-1">
         {prev && (
-          <button className={`${navBtnBase} text-left`} onClick={() => onSelect(prev.id)}>
+          <Link href={hrefFor(prev.id)} className={`${navBtnBase} text-left`}>
             <span className="text-[10px] tracking-[0.18em] uppercase text-v3-text-mute">← previous</span>
             <span className="font-serif not-italic font-normal text-[15px] tracking-[-0.005em] text-v3-text leading-[1.3] text-pretty">{prev.title}</span>
-          </button>
+          </Link>
         )}
         {next && (
-          <button className={`${navBtnBase} text-right`} onClick={() => onSelect(next.id)}>
+          <Link href={hrefFor(next.id)} className={`${navBtnBase} text-right`}>
             <span className="text-[10px] tracking-[0.18em] uppercase text-v3-text-mute">next →</span>
             <span className="font-serif not-italic font-normal text-[15px] tracking-[-0.005em] text-v3-text leading-[1.3] text-pretty">{next.title}</span>
-          </button>
+          </Link>
         )}
       </nav>
     </footer>

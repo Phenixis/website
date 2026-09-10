@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { Project, Post, Experience, Profile } from "../../data";
-import { parsePortfolioRoute } from "./route";
+import { parsePortfolioRoute, paneHref } from "./route";
 import { Header } from "./Header";
 import { PaneRail } from "./PaneRail";
 import { PaneFocused } from "./PaneFocused";
@@ -17,7 +17,6 @@ type PortfolioProps = {
 };
 
 export function Portfolio({ profile, mainProjects, sideQuests, posts, experiences }: PortfolioProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const { focused, selectedPostId, selectedProjectId, selectedSideQuestId } = parsePortfolioRoute(pathname);
 
@@ -28,29 +27,10 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
     { id: "experiences", label: "Itinerary", num: "IV", count: experiences.length, sub: "Where I went" },
   ];
 
-  const handleFocus = (id: string) => {
-    if (id === "projects") router.push("/");
-    else if (id === "blog") router.push("/writing");
-    else if (id === "sidequests") router.push("/side-quests");
-    else if (id === "experiences") router.push("/itinerary");
-  };
-
-  const handleSelectPost = (id: string | null) => {
-    router.push(id ? `/writing/${id}` : "/writing");
-  };
-
-  const handleSelectProject = (id: string | null) => {
-    router.push(id ? `/projects/${id}` : "/");
-  };
-
-  const handleSelectSideQuest = (id: string | null) => {
-    router.push(id ? `/side-quests/${id}` : "/side-quests");
-  };
-
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-v3-bg text-v3-text font-mono text-[12.5px] leading-[1.55] [background-image:radial-gradient(ellipse_60%_40%_at_75%_90%,rgba(183,148,246,0.05),transparent_70%),radial-gradient(ellipse_40%_30%_at_20%_10%,rgba(183,148,246,0.04),transparent_60%)]">
       <Header profile={profile} />
-      <MobileTabBar panes={panes} focused={focused} onFocus={handleFocus} />
+      <MobileTabBar panes={panes} focused={focused} />
 
       <div className="flex-1 flex min-w-0 min-h-0 max-[720px]:flex-col max-[720px]:overflow-hidden tall-desktop:flex-col tall-desktop:overflow-hidden">
         {panes.map((p) => {
@@ -67,7 +47,6 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
                   ? "flex-1 max-[720px]:min-h-0 tall-desktop:min-h-0"
                   : "grow-0 shrink-0 basis-[56px] cursor-pointer bg-v3-bg-2 hover:bg-v3-bg-3 max-[1100px]:basis-[48px] max-[920px]:basis-[40px] max-[720px]:hidden tall-desktop:!basis-[52px]",
               ].join(" ")}
-              onClick={() => !isFocused && handleFocus(p.id)}
             >
               {isFocused ? (
                 <PaneFocused
@@ -79,14 +58,11 @@ export function Portfolio({ profile, mainProjects, sideQuests, posts, experience
                   experiences={experiences}
                   profile={profile}
                   selectedPostId={selectedPostId}
-                  onSelectPost={handleSelectPost}
                   selectedProjectId={selectedProjectId}
-                  onSelectProject={handleSelectProject}
                   selectedSideQuestId={selectedSideQuestId}
-                  onSelectSideQuest={handleSelectSideQuest}
                 />
               ) : (
-                <PaneRail pane={p} />
+                <PaneRail pane={p} href={paneHref(p.id)} />
               )}
             </section>
           );
