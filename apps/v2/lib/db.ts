@@ -1,4 +1,5 @@
 import { createClient } from "@libsql/client";
+import { cache } from "react";
 import type { Project, Post, Experience } from "@/app/data";
 
 const databaseUrl = process.env.TURSO_DATABASE_URL;
@@ -62,6 +63,14 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
   {
     name: "009_add_category_to_projects",
     sql: "ALTER TABLE projects ADD COLUMN category TEXT DEFAULT 'main'",
+  },
+  {
+    name: "010_add_social_links_to_profile",
+    sql: "ALTER TABLE profile ADD COLUMN github TEXT DEFAULT 'https://github.com/Phenixis/'",
+  },
+  {
+    name: "011_add_linkedin_to_profile",
+    sql: "ALTER TABLE profile ADD COLUMN linkedin TEXT DEFAULT 'https://www.linkedin.com/in/maxime-duhamel-b07a71251/'",
   },
 ];
 
@@ -318,9 +327,12 @@ export type SettingsProfile = {
   handle: string;
   tagline: string;
   location: string;
+  github?: string;
+  linkedin?: string;
 };
 
-export async function getProfile(): Promise<SettingsProfile | null> {
+/** Cached per-request: both the root layout and the portfolio layout read the profile. */
+export const getProfile = cache(async (): Promise<SettingsProfile | null> => {
   const r = await db.execute("SELECT * FROM profile LIMIT 1");
   if (!r.rows.length) return null;
   const row = r.rows[0] as unknown as Record<string, unknown>;
@@ -329,16 +341,19 @@ export async function getProfile(): Promise<SettingsProfile | null> {
     handle: row.handle as string,
     tagline: row.tagline as string,
     location: row.location as string,
+    github: (row.github as string) ?? undefined,
+    linkedin: (row.linkedin as string) ?? undefined,
   };
-}
+});
 
 export async function upsertProfile(p: SettingsProfile): Promise<void> {
   await db.execute({
-    sql: `INSERT INTO profile (id, name, handle, tagline, location)
-          VALUES (1, ?, ?, ?, ?)
+    sql: `INSERT INTO profile (id, name, handle, tagline, location, github, linkedin)
+          VALUES (1, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             name=excluded.name, handle=excluded.handle,
-            tagline=excluded.tagline, location=excluded.location`,
-    args: [p.name, p.handle, p.tagline, p.location],
+            tagline=excluded.tagline, location=excluded.location,
+            github=excluded.github, linkedin=excluded.linkedin`,
+    args: [p.name, p.handle, p.tagline, p.location, p.github ?? null, p.linkedin ?? null],
   });
 }

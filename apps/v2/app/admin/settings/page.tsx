@@ -81,6 +81,20 @@ export default function SettingsPage() {
                   placeholder="Saint-Brieuc · 48.51, -2.77"
                 />
               </Field>
+              <Field label="GitHub" hint="Used in the site's structured data (SEO)">
+                <TextInput
+                  value={profile.github ?? ""}
+                  onChange={(v) => update("github", v)}
+                  placeholder="https://github.com/..."
+                />
+              </Field>
+              <Field label="LinkedIn" hint="Used in the site's structured data (SEO)">
+                <TextInput
+                  value={profile.linkedin ?? ""}
+                  onChange={(v) => update("linkedin", v)}
+                  placeholder="https://www.linkedin.com/in/..."
+                />
+              </Field>
             </FormSection>
 
             <div className={formBarCls}>

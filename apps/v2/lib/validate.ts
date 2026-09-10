@@ -112,5 +112,7 @@ export function validateProfile(body: unknown): Profile {
     handle: str(b.handle, "handle"),
     tagline: strAllowEmpty(b.tagline, "tagline"),
     location: strAllowEmpty(b.location, "location"),
+    ...(b.github != null ? { github: str(b.github, "github") } : {}),
+    ...(b.linkedin != null ? { linkedin: str(b.linkedin, "linkedin") } : {}),
   };
 }
