@@ -18,18 +18,31 @@ type Counts = {
 const SEARCH_ICON =
   "bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2014%2014%22%3E%3Ccircle%20cx%3D%226%22%20cy%3D%226%22%20r%3D%224.5%22%20fill%3D%22none%22%20stroke%3D%22%236e6e80%22%20stroke-width%3D%221.4%22%2F%3E%3Cpath%20d%3D%22M9.5%209.5L13%2013%22%20stroke%3D%22%236e6e80%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E')]";
 
+export type SearchItem = { kind: string; label: string; href: string };
+
 export function AdminShell({
   children,
   profile,
   counts,
+  searchItems,
 }: {
   children: React.ReactNode;
   profile: Profile;
   counts: Counts;
+  searchItems: SearchItem[];
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  const needle = query.trim().toLowerCase();
+  const results = needle ? searchItems.filter((i) => i.label.toLowerCase().includes(needle)).slice(0, 8) : [];
+  const openResult = (href: string) => {
+    setQuery("");
+    router.push(href);
+  };
 
   const nav = [
     {
@@ -91,11 +104,40 @@ export function AdminShell({
           </div>
         </div>
         <div className="flex-1 flex justify-center max-[900px]:hidden">
-          <input
-            className={`bg-a-bg border border-a-border rounded-[5px] pl-7 pr-[10px] py-[5px] w-80 text-a-text font-mono text-[11.5px] outline-none transition-colors duration-[160ms] bg-no-repeat bg-[position:8px_center] focus:border-a-border-focus placeholder:text-a-text-dim max-[980px]:w-[220px] max-[980px]:text-[11px] ${SEARCH_ICON}`}
-            placeholder="Search projects, posts, experiences…"
-            readOnly
-          />
+          <div className="relative">
+            <input
+              className={`bg-a-bg border border-a-border rounded-[5px] pl-7 pr-[10px] py-[5px] w-80 text-a-text font-mono text-[11.5px] outline-none transition-colors duration-[160ms] bg-no-repeat bg-[position:8px_center] focus:border-a-border-focus placeholder:text-a-text-dim max-[980px]:w-[220px] max-[980px]:text-[11px] ${SEARCH_ICON}`}
+              placeholder="Search projects, posts, experiences…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && results[0]) openResult(results[0].href);
+                if (e.key === "Escape") { setQuery(""); e.currentTarget.blur(); }
+              }}
+            />
+            {searchFocused && needle && (
+              <ul className="absolute left-0 right-0 top-full mt-1 p-1 list-none bg-a-bg-2 border border-a-border-strong rounded-[5px] shadow-[0_8px_24px_rgba(0,0,0,0.5)] z-20">
+                {results.length === 0 ? (
+                  <li className="px-[10px] py-[7px] text-[11.5px] text-a-text-mute italic">No matches</li>
+                ) : (
+                  results.map((r) => (
+                    <li key={r.href}>
+                      <button
+                        className="w-full flex items-center gap-[10px] px-[10px] py-[6px] bg-transparent border-0 rounded-[4px] cursor-pointer text-left font-mono text-[11.5px] text-a-text hover:bg-a-bg-3"
+                        // mousedown fires before the input's blur would unmount the list
+                        onMouseDown={(e) => { e.preventDefault(); openResult(r.href); }}
+                      >
+                        <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{r.label}</span>
+                        <span className="text-[9.5px] tracking-[0.12em] uppercase text-a-text-dim">{r.kind}</span>
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-[6px] text-a-text-mute text-[11px] max-[560px]:hidden">

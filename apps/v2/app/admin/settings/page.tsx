@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PROFILE } from "../../data";
 import type { Profile } from "../../data";
-import { Btn, FormSection, Field, PageHead, TextInput, pageBodyCls, editPageCls, formBarCls, kbdCls } from "../_components/ui";
+import { Btn, FormSection, Field, PageHead, TextInput, pageBodyCls, editPageCls, formBarCls, kbdCls, useSaveShortcut } from "../_components/ui";
 
 function timeAgo(d: Date): string {
   const s = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -36,6 +36,8 @@ export default function SettingsPage() {
     setSaving(false);
     setSavedAt(new Date());
   };
+
+  useSaveShortcut(save);
 
   const statusLabel = saving
     ? "Saving…"

@@ -32,8 +32,18 @@ export default async function AdminLayout({
     tags: new Set(posts.flatMap((p) => p.tags)).size,
   };
 
+  const searchItems = [
+    ...projects.map((p) => ({
+      kind: p.category === "side" ? "Side quest" : "Project",
+      label: p.title,
+      href: `/admin/${p.category === "side" ? "side-quests" : "projects"}/${p.id}`,
+    })),
+    ...posts.map((p) => ({ kind: "Post", label: p.title, href: `/admin/posts/${p.id}` })),
+    ...experiences.map((e) => ({ kind: "Itinerary", label: `${e.role} — ${e.where}`, href: `/admin/experiences/${e.id}` })),
+  ];
+
   return (
-    <AdminShell profile={profile ?? PROFILE} counts={counts}>
+    <AdminShell profile={profile ?? PROFILE} counts={counts} searchItems={searchItems}>
       {children}
     </AdminShell>
   );

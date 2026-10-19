@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
-import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls } from "../_components/ui";
+import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 
 export default function PostsListPage() {
   const router = useRouter();
   const [items, setItems] = useState<Post[]>([]);
+  const [filter, setFilter] = useState<"all" | "published" | "drafts">("all");
+
+  useKeyShortcut("n", () => router.push("/admin/posts/new"));
 
   useEffect(() => {
     fetch("/api/posts").then((r) => r.json()).then(setItems);
@@ -16,6 +19,10 @@ export default function PostsListPage() {
   const published = items.filter((p) => p.published !== false).length;
   const drafts = items.filter((p) => p.published === false).length;
 
+  const visible = items.filter((p) =>
+    filter === "all" ? true : filter === "drafts" ? p.published === false : p.published !== false,
+  );
+
   return (
     <>
       <PageHead
@@ -23,16 +30,20 @@ export default function PostsListPage() {
         sub="Essays, notes, observations — things that needed to be written."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/posts/new")}>
-            + New post <span className={kbdCls}>⌘N</span>
+            + New post <span className={kbdCls}>N</span>
           </Btn>
         }
       />
       <Toolbar>
-        <Btn size="sm">All <span className={kbdCls}>{items.length}</span></Btn>
-        <Btn size="sm" variant="ghost">Published <span className={kbdCls}>{published}</span></Btn>
-        <Btn size="sm" variant="ghost">Drafts <span className={kbdCls}>{drafts}</span></Btn>
-        <span className="flex-1" />
-        <Btn size="sm" variant="ghost">Sort: Recent ↓</Btn>
+        <FilterChips
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: "all", label: "All", count: items.length },
+            { value: "published", label: "Published", count: published },
+            { value: "drafts", label: "Drafts", count: drafts },
+          ]}
+        />
       </Toolbar>
       <div className={pageBodyCls}>
         <table className={tableCls.table}>
@@ -47,7 +58,7 @@ export default function PostsListPage() {
             </tr>
           </thead>
           <tbody>
-            {items.map((p, i) => (
+            {visible.map((p, i) => (
               <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>

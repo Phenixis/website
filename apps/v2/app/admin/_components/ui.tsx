@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const COLOR_OPTIONS = [
   "#a78bfa", "#7dd3fc", "#fcd34d", "#f472b6",
@@ -181,6 +181,27 @@ export function Btn({
   );
 }
 
+/** Toolbar filter buttons with counts; the selected one is drawn as a solid button. */
+export function FilterChips<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string; count: number }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <>
+      {options.map((o) => (
+        <Btn key={o.value} size="sm" variant={o.value === value ? undefined : "ghost"} onClick={() => onChange(o.value)}>
+          {o.label} <span className={kbdCls}>{o.count}</span>
+        </Btn>
+      ))}
+    </>
+  );
+}
+
 export function Badge({ kind, children }: { kind: string; children: React.ReactNode }) {
   return (
     <span className={`inline-flex items-center gap-1 text-[10px] tracking-[0.08em] uppercase px-[7px] py-[2px] rounded-[3px] font-medium whitespace-nowrap ${BADGE_COLORS[kind] ?? ""}`}>
@@ -209,6 +230,39 @@ function timeAgo(d: Date): string {
   return `${Math.floor(s / 3600)}h ago`;
 }
 
+/** Runs `onSave` on Ctrl/⌘+S, suppressing the browser's own "save page" dialog. */
+export function useSaveShortcut(onSave: () => void) {
+  const latest = useRef(onSave);
+  useEffect(() => { latest.current = onSave; });
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        latest.current();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+}
+
+/** Runs `handler` when `key` is pressed on its own, ignoring keystrokes made while typing in a field. */
+export function useKeyShortcut(key: string, handler: () => void) {
+  const latest = useRef(handler);
+  useEffect(() => { latest.current = handler; });
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== key) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      latest.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [key]);
+}
+
 export function FormBar({
   onSave,
   onDiscard,
@@ -224,6 +278,7 @@ export function FormBar({
   savedAt?: Date | null;
   error?: string | null;
 }) {
+  useSaveShortcut(onSave);
   const status = saving
     ? "Saving…"
     : savedAt
