@@ -38,7 +38,7 @@ export function ProjectsList({ projects }: { projects: Project[] }) {
                 </h3>
                 <span className="text-[10.5px] text-v3-text-mute tabular-nums tracking-[0.1em]">{p.year}</span>
               </div>
-              <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.65] max-w-[420px] text-pretty max-[720px]:text-[11.5px] max-[720px]:max-w-full">
+              <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.65] max-w-[420px] text-pretty whitespace-pre-line max-[720px]:text-[11.5px] max-[720px]:max-w-full">
                 {p.blurb}
               </p>
               <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase mt-[2px] max-[480px]:flex-wrap max-[480px]:gap-y-1">
@@ -86,7 +86,7 @@ export function ProjectDetail({
         </div>
       </div>
 
-      <p className="font-serif italic font-light text-[22px] leading-[1.5] tracking-[-0.005em] text-v3-text-2 mt-0 mb-7 text-pretty max-[720px]:text-[18px]">
+      <p className="font-serif italic font-light text-[22px] leading-[1.5] tracking-[-0.005em] text-v3-text-2 mt-0 mb-7 text-pretty whitespace-pre-line max-[720px]:text-[18px]">
         {project.blurb}
       </p>
 
@@ -150,7 +150,7 @@ export function ProjectDetail({
 
       <div className="flex flex-col gap-[22px] max-[720px]:gap-[18px]">
         {project.body.map((para, i) => (
-          <p key={i} className="font-mono text-[13.5px] leading-[1.85] text-v3-text m-0 text-pretty max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]">
+          <p key={i} className="font-mono text-[13.5px] leading-[1.85] text-v3-text m-0 text-pretty whitespace-pre-line max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]">
             {para}
           </p>
         ))}

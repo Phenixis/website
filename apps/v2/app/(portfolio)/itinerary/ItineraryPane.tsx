@@ -60,7 +60,7 @@ function EntryContent({ e }: { e: Experience }) {
           {e.where}
         </span>
       </div>
-      <p className="font-mono text-[12.5px] text-v3-text-2 m-0 leading-[1.7] max-w-[600px] text-pretty max-[720px]:text-[12px] max-[720px]:max-w-full">
+      <p className="font-mono text-[12.5px] text-v3-text-2 m-0 leading-[1.7] max-w-[600px] text-pretty whitespace-pre-line max-[720px]:text-[12px] max-[720px]:max-w-full">
         {e.blurb}
       </p>
       <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase mt-[2px] flex-wrap">
@@ -130,7 +130,7 @@ function InnerEntryRow({ e }: { e: Experience }) {
             {e.where}
           </span>
         </div>
-        <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.6] max-w-[480px] text-pretty">
+        <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.6] max-w-[480px] text-pretty whitespace-pre-line">
           {e.blurb}
         </p>
         <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase flex-wrap">
