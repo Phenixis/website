@@ -13,6 +13,8 @@ export type Project = {
   published?: boolean;
   /** "main" for Main Projects, "side" for Side Quests. Defaults to "main". */
   category?: "main" | "side";
+  /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
+  hasDraftPassword?: boolean;
 };
 
 export type Post = {
@@ -24,6 +26,8 @@ export type Post = {
   excerpt: string;
   body: string[];
   published?: boolean;
+  /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
+  hasDraftPassword?: boolean;
 };
 
 export type Experience = {

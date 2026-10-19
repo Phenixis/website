@@ -37,7 +37,7 @@ export const tableCls = {
 export const pageBodyCls = "scroll-thin-a-wide flex-1 overflow-y-auto p-0";
 
 export const formBarCls =
-  "sticky bottom-0 [background:linear-gradient(180deg,transparent,var(--color-a-bg-2)_30%)] pt-6 px-9 pb-[18px] -mx-9 -mb-20 mt-6 border-t border-a-border flex items-center gap-[10px] max-[980px]:-mx-6 max-[980px]:px-6 max-[980px]:-mb-9 max-[560px]:-mx-4 max-[560px]:px-4 max-[560px]:-mb-8 max-[560px]:flex-wrap max-[560px]:gap-2";
+  "sticky bottom-0 z-10 bg-a-bg-2 pt-4 px-9 pb-[18px] -mx-9 -mb-20 mt-6 border-t border-a-border flex items-center gap-[10px] max-[980px]:-mx-6 max-[980px]:px-6 max-[980px]:-mb-9 max-[560px]:-mx-4 max-[560px]:px-4 max-[560px]:-mb-8 max-[560px]:flex-wrap max-[560px]:gap-2";
 
 export const mediaCls = {
   grid: "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 px-7 py-5",
@@ -65,9 +65,9 @@ export const editPageCls = {
   loading: "flex items-center justify-center h-full text-a-text-mute",
   inputTitle:
     "font-serif font-normal text-[22px] tracking-[-0.01em] px-[14px] py-3 bg-transparent border border-transparent rounded-[5px] w-full outline-none transition-all duration-[140ms] text-a-text hover:bg-a-bg-2 hover:border-a-border focus:bg-a-bg-2 focus:border-a-accent placeholder:text-a-text-dim placeholder:italic",
-  form: "grid grid-cols-[1fr_320px] h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
+  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
   formMain:
-    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-20 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-9 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
+    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
   formSide:
     "scroll-thin-a-wide overflow-y-auto pt-6 px-[22px] pb-15 bg-a-bg-2 max-[1100px]:pt-5 max-[1100px]:px-4 max-[980px]:overflow-visible max-[980px]:pt-5 max-[980px]:px-6 max-[980px]:pb-12 max-[560px]:pt-4 max-[560px]:px-4 max-[560px]:pb-10",
   sideCard: "p-[14px] bg-a-bg-3 border border-a-border rounded-md mb-[14px]",
@@ -533,5 +533,58 @@ export function PlaceholderPage({ title }: { title: string }) {
       <span className="text-[36px] font-serif italic font-light text-a-text-dim">{title}</span>
       <span className="text-[11px] tracking-[0.12em] uppercase">Not yet designed</span>
     </div>
+  );
+}
+
+/**
+ * Sidebar section for choosing the password that guards a draft's private link.
+ * `password` is undefined until edited ("" means remove); the parent only sends
+ * it on a manual save, never on autosave, so a half-typed value is never stored.
+ */
+export function DraftAccessSection({
+  hasPassword,
+  password,
+  onPasswordChange,
+  linkPath,
+}: {
+  hasPassword?: boolean;
+  password: string | undefined;
+  onPasswordChange: (v: string | undefined) => void;
+  /** The private link, once the draft has been saved. */
+  linkPath: string | null;
+}) {
+  const untouched = password === undefined;
+  return (
+    <FormSection title="Draft access">
+      <Field
+        label="Password"
+        hint={
+          linkPath
+            ? "Shares this draft at its private link, behind this password. Applied when you click Save changes."
+            : "Applied when you click Save changes. The private link appears once the draft is saved."
+        }
+      >
+        <TextInput
+          value={password ?? ""}
+          onChange={onPasswordChange}
+          placeholder={hasPassword && untouched ? "Password set — type to replace" : "Choose a password"}
+        />
+        {hasPassword && untouched && (
+          <div>
+            <Btn size="sm" variant="ghost" onClick={() => onPasswordChange("")}>Remove password</Btn>
+          </div>
+        )}
+        {password === "" && (
+          <span className="text-[11px] italic text-a-text-mute">Password will be removed on save.</span>
+        )}
+      </Field>
+      {linkPath && hasPassword && (
+        <Field label="Private link">
+          <a className="text-[12px] text-a-accent break-all hover:underline" href={linkPath} target="_blank" rel="noreferrer">
+            {linkPath}
+          </a>
+        </Field>
+      )}
+    </FormSection>
   );
 }
