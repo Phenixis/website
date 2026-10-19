@@ -59,7 +59,7 @@ export type Profile = {
 export const PROFILE: Profile = {
   name: "Maxime Duhamel",
   handle: "@maxime",
-  tagline: "Designer & builder. Lives in Saint-Brieuc, thinks in margins.",
+  tagline: "Designer & builder. Lives in Saint-Brieuc & Montpellier.",
   location: "Saint-Brieuc · 48.51, -2.77",
   github: "https://github.com/Phenixis/",
   linkedin: "https://www.linkedin.com/in/maxime-duhamel-b07a71251/",
