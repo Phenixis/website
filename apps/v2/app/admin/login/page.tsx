@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,8 +18,10 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (res.ok) {
-      router.push("/admin");
-      router.refresh();
+      // Hard navigation: the shared admin layout prefetches /admin while
+      // logged out, so the client router cache can hold the redirect back to
+      // /admin/login and bounce us straight back here after a soft push.
+      window.location.assign("/admin");
     } else {
       setError("Wrong password.");
       setPassword("");

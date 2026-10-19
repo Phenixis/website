@@ -2,7 +2,8 @@
   "private": true,
   "packageManager": "pnpm@11.1.1",
   "scripts": {
-    "dev": "turbo dev",
+    "dev-v1": "turbo dev --filter v1",
+    "dev": "turbo dev --filter v2",
     "build": "turbo build",
     "lint": "turbo lint",
     "prepare": "node -e \"if (!process.env.CI) process.exit(require('child_process').spawnSync('npx', ['husky'], {stdio:'inherit',shell:true}).status)\""
