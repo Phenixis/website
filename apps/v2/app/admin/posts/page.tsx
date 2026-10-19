@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
+import { byDateDesc } from "@/lib/admin-sort";
 import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 
 export default function PostsListPage() {
@@ -13,7 +14,7 @@ export default function PostsListPage() {
   useKeyShortcut("n", () => router.push("/admin/posts/new"));
 
   useEffect(() => {
-    fetch("/api/posts").then((r) => r.json()).then(setItems);
+    fetch("/api/posts").then((r) => r.json()).then((data: Post[]) => setItems(byDateDesc(data)));
   }, []);
 
   const published = items.filter((p) => p.published !== false).length;

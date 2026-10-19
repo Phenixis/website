@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
+import { byDateDesc } from "@/lib/admin-sort";
 import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function DraftsPage() {
@@ -13,7 +14,7 @@ export default function DraftsPage() {
   useEffect(() => {
     fetch("/api/posts")
       .then((r) => r.json())
-      .then((data: Post[]) => setItems(data.filter((p) => p.published === false)));
+      .then((data: Post[]) => setItems(byDateDesc(data.filter((p) => p.published === false))));
   }, []);
 
   const publish = async (p: Post) => {

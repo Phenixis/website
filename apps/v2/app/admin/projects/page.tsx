@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
+import { byYearDesc, timeAgo } from "@/lib/admin-sort";
 import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
-
-const updated = ["12m", "2h", "yesterday", "2d", "4d", "1w", "3w", "1mo"];
 
 export default function ProjectsListPage() {
   const router = useRouter();
@@ -17,7 +16,7 @@ export default function ProjectsListPage() {
   useEffect(() => {
     fetch("/api/projects")
       .then((r) => r.json())
-      .then((data: Project[]) => setItems(data.filter((p) => p.category !== "side")));
+      .then((data: Project[]) => setItems(byYearDesc(data.filter((p) => p.category !== "side"))));
   }, []);
 
   const counts = {
@@ -100,7 +99,7 @@ export default function ProjectsListPage() {
                     )}
                   </div>
                 </td>
-                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colLg}`}>{updated[i] ?? "—"} ago</td>
+                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colLg}`}>{timeAgo(p.updatedAt)}</td>
                 <td className={`${tableCls.td} ${tableCls.tdActions}`}><span className={tableCls.rowArrow}>→</span></td>
               </tr>
             ))}

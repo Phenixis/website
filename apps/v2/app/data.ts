@@ -15,6 +15,8 @@ export type Project = {
   category?: "main" | "side";
   /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
   hasDraftPassword?: boolean;
+  /** Read-only: ISO timestamp of the last save; absent for projects not edited since tracking began. */
+  updatedAt?: string;
 };
 
 export type Post = {
