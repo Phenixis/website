@@ -17,7 +17,13 @@ export default function ExperiencesListPage() {
     fetch("/api/experiences").then((r) => r.json()).then(setItems);
   }, []);
 
-  const visible = filter === "all" ? items : items.filter((e) => e.kind === filter);
+  // Most recent first: by start date, then ongoing / latest end date.
+  const sorted = [...items].sort(
+    (a, b) =>
+      b.startDate.localeCompare(a.startDate) ||
+      (b.endDate ?? "9999-99").localeCompare(a.endDate ?? "9999-99"),
+  );
+  const visible = filter === "all" ? sorted : sorted.filter((e) => e.kind === filter);
   const countOf = (kind: Experience["kind"]) => items.filter((e) => e.kind === kind).length;
 
   return (
