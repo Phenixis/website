@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export const COLOR_OPTIONS = [
   "#a78bfa", "#7dd3fc", "#fcd34d", "#f472b6",
@@ -342,6 +342,23 @@ export function TextInput({
   );
 }
 
+/** Grows/shrinks a textarea to fit its content, re-fitting when the width changes. */
+function useAutoResize(value: string) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const fit = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight + 2}px`;
+  };
+  useLayoutEffect(fit, [value]);
+  useEffect(() => {
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+  return ref;
+}
+
 export function Textarea({
   value,
   onChange,
@@ -353,6 +370,7 @@ export function Textarea({
   placeholder?: string;
   variant?: "lede" | "body";
 }) {
+  const ref = useAutoResize(value);
   const variantCls =
     variant === "lede"
       ? "font-serif italic text-[16px] leading-[1.5] font-light text-a-text-2 min-h-[80px]"
@@ -361,7 +379,9 @@ export function Textarea({
         : "";
   return (
     <textarea
-      className={`${inputBase} ${variantCls}`}
+      ref={ref}
+      rows={1}
+      className={`${inputBase} ${variantCls} resize-none overflow-hidden`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
@@ -545,6 +565,19 @@ export function LinkList({
   );
 }
 
+function ParagraphField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = useAutoResize(value);
+  return (
+    <textarea
+      ref={ref}
+      rows={1}
+      className="font-mono text-[12.5px] bg-a-bg border border-a-border text-a-text px-3 py-2 rounded-[5px] outline-none resize-none overflow-hidden min-h-16 leading-[1.65] w-full focus:border-a-accent focus:bg-a-bg-2"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
 export function Paragraphs({
   value,
   onChange,
@@ -552,17 +585,33 @@ export function Paragraphs({
   value: string[];
   onChange: (v: string[]) => void;
 }) {
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= value.length) return;
+    const next = [...value];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  };
+  const arrowCls =
+    "bg-transparent border-0 text-a-text-dim text-[11px] leading-none cursor-pointer p-0 hover:text-a-accent disabled:opacity-30 disabled:cursor-default disabled:hover:text-a-text-dim";
   return (
     <div className="flex flex-col gap-[10px]">
       {value.map((p, i) => (
         <div key={i} className="grid grid-cols-[40px_1fr_24px] gap-2 items-start">
-          <div className="font-serif italic text-[14px] text-a-accent pt-[14px] text-center tabular-nums">
-            {String(i + 1).padStart(2, "0")}
+          <div className="flex flex-col items-center gap-[2px] pt-[6px]">
+            <button className={arrowCls} disabled={i === 0} onClick={() => move(i, i - 1)} title="Move up">
+              ▲
+            </button>
+            <span className="font-serif italic text-[14px] text-a-accent tabular-nums">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <button className={arrowCls} disabled={i === value.length - 1} onClick={() => move(i, i + 1)} title="Move down">
+              ▼
+            </button>
           </div>
-          <textarea
-            className="font-mono text-[12.5px] bg-a-bg border border-a-border text-a-text px-3 py-2 rounded-[5px] outline-none resize-y min-h-16 leading-[1.65] w-full focus:border-a-accent focus:bg-a-bg-2"
+          <ParagraphField
             value={p}
-            onChange={(e) => onChange(value.map((x, j) => j === i ? e.target.value : x))}
+            onChange={(v) => onChange(value.map((x, j) => j === i ? v : x))}
           />
           <button
             className="bg-transparent border-0 text-a-text-dim text-[14px] cursor-pointer pt-[10px] hover:text-a-red"
