@@ -72,6 +72,14 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
     name: "011_add_linkedin_to_profile",
     sql: "ALTER TABLE profile ADD COLUMN linkedin TEXT DEFAULT 'https://www.linkedin.com/in/maxime-duhamel-b07a71251/'",
   },
+  {
+    name: "012_add_draft_password_hash_to_posts",
+    sql: "ALTER TABLE posts ADD COLUMN draft_password_hash TEXT",
+  },
+  {
+    name: "013_add_draft_password_hash_to_projects",
+    sql: "ALTER TABLE projects ADD COLUMN draft_password_hash TEXT",
+  },
 ];
 
 /** SQLite's wording for "this DDL is a no-op because the schema already has it". */
@@ -138,6 +146,7 @@ function rowToProject(row: Record<string, unknown>): Project {
     color: row.color as string,
     published: row.published == null ? true : Boolean(row.published),
     category: (row.category as Project["category"]) ?? "main",
+    hasDraftPassword: row.draft_password_hash != null,
     ...(row.role != null ? { role: row.role as string } : {}),
     ...(row.links != null ? { links: JSON.parse(row.links as string) } : {}),
   };
@@ -153,6 +162,7 @@ function rowToPost(row: Record<string, unknown>): Post {
     excerpt: row.excerpt as string,
     body: JSON.parse(row.body as string),
     published: row.published == null ? true : Boolean(row.published),
+    hasDraftPassword: row.draft_password_hash != null,
   };
 }
 
@@ -225,6 +235,16 @@ export async function upsertProject(p: Project): Promise<void> {
   });
 }
 
+/** Scrypt hash guarding a draft project's private link; null when none is set. */
+export async function getProjectDraftPasswordHash(id: string): Promise<string | null> {
+  const r = await db.execute({ sql: "SELECT draft_password_hash FROM projects WHERE id = ?", args: [id] });
+  return (r.rows[0]?.draft_password_hash as string | null | undefined) ?? null;
+}
+
+export async function setProjectDraftPasswordHash(id: string, hash: string | null): Promise<void> {
+  await db.execute({ sql: "UPDATE projects SET draft_password_hash = ? WHERE id = ?", args: [hash, id] });
+}
+
 export async function deleteProject(id: string): Promise<void> {
   await db.execute({ sql: "DELETE FROM projects WHERE id = ?", args: [id] });
 }
@@ -273,6 +293,16 @@ export async function upsertPost(p: Post): Promise<void> {
             published=excluded.published`,
     args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, JSON.stringify(p.body), published],
   });
+}
+
+/** Scrypt hash guarding a draft's private /drafts/<id> link; null when none is set. */
+export async function getPostDraftPasswordHash(id: string): Promise<string | null> {
+  const r = await db.execute({ sql: "SELECT draft_password_hash FROM posts WHERE id = ?", args: [id] });
+  return (r.rows[0]?.draft_password_hash as string | null | undefined) ?? null;
+}
+
+export async function setPostDraftPasswordHash(id: string, hash: string | null): Promise<void> {
+  await db.execute({ sql: "UPDATE posts SET draft_password_hash = ? WHERE id = ?", args: [hash, id] });
 }
 
 export async function deletePost(id: string): Promise<void> {

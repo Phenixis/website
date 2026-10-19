@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams, usePathname } from "next/navigation";
 import type { Project } from "../../data";
 import {
-  Badge, FormBar, FormSection, Field, PageHead,
+  Badge, DraftAccessSection, FormBar, FormSection, Field, PageHead,
   TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, Paragraphs,
   COLOR_OPTIONS, editPageCls,
 } from "./ui";
@@ -40,6 +40,10 @@ export function ProjectEditForm() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // Password typed in the "Draft access" section: undefined = untouched, "" = remove.
+  // Only sent on a manual save, never by autosave, so a half-typed password is never stored.
+  const [draftPassword, setDraftPassword] = useState<string | undefined>(undefined);
 
   const update = (key: keyof Project, val: unknown) =>
     setP((prev) => ({ ...prev, [key]: val }));
@@ -58,17 +62,32 @@ export function ProjectEditForm() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isNew, router]);
 
-  const save = async () => {
+  const save = async ({ auto = false } = {}) => {
     setSaving(true);
-    const payload = isNew ? { ...p, id: slugify(p.title) } : p;
-    await fetch(isNew ? "/api/projects" : `/api/projects/${p.id}`, {
-      method: isNew ? "POST" : "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setSaving(false);
-    setSavedAt(new Date());
-    if (isNew) router.push(payload.category === "side" ? "/admin/side-quests" : "/admin/projects");
+    setError(null);
+    try {
+      const payload = isNew ? { ...p, id: slugify(p.title) } : p;
+      const sendPassword = !auto && draftPassword !== undefined;
+      const res = await fetch(isNew ? "/api/projects" : `/api/projects/${p.id}`, {
+        method: isNew ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sendPassword ? { ...payload, draftPassword } : payload),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Save failed (${res.status})`);
+      }
+      if (sendPassword) {
+        setP((prev) => ({ ...prev, hasDraftPassword: draftPassword !== "" }));
+        setDraftPassword(undefined);
+      }
+      setSavedAt(new Date());
+      if (isNew) router.push(payload.category === "side" ? "/admin/side-quests" : "/admin/projects");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const remove = async () => {
@@ -80,7 +99,7 @@ export function ProjectEditForm() {
   // 30s autosave
   useEffect(() => {
     if (isNew || loading) return;
-    const timer = setTimeout(() => { save(); }, 30_000);
+    const timer = setTimeout(() => { save({ auto: true }); }, 30_000);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p]);
@@ -126,11 +145,12 @@ export function ProjectEditForm() {
             </Field>
           </FormSection>
           <FormBar
-            onSave={save}
+            onSave={() => save()}
             onDiscard={back}
             onDelete={remove}
             saving={saving}
             savedAt={savedAt}
+            error={error}
           />
         </div>
         <div className={editPageCls.formSide}>
@@ -169,6 +189,14 @@ export function ProjectEditForm() {
               />
             </Field>
           </FormSection>
+          {p.published === false && (
+            <DraftAccessSection
+              hasPassword={p.hasDraftPassword}
+              password={draftPassword}
+              onPasswordChange={setDraftPassword}
+              linkPath={isNew ? null : `/drafts/projects/${encodeURIComponent(p.id)}`}
+            />
+          )}
           <FormSection title="Panel">
             <Field label="Panel" hint="Which public panel this shows up under">
               <Segmented

@@ -1,6 +1,7 @@
-import { getPost, upsertPost, deletePost } from "@/lib/db";
+import { getPost, upsertPost, deletePost, setPostDraftPasswordHash } from "@/lib/db";
+import { hashDraftPassword } from "@/lib/draft-access";
 import { revalidatePortfolio } from "@/lib/revalidate";
-import { validatePost, ValidationError } from "@/lib/validate";
+import { validatePost, validateDraftPassword, ValidationError } from "@/lib/validate";
 
 export async function GET(
   _req: Request,
@@ -19,8 +20,11 @@ export async function PUT(
   const { id } = await params;
 
   let post;
+  let draftPassword;
   try {
-    post = validatePost({ ...(await req.json()), id });
+    const body = await req.json();
+    post = validatePost({ ...body, id });
+    draftPassword = validateDraftPassword(body);
   } catch (err) {
     const message = err instanceof ValidationError ? err.message : "Invalid JSON body";
     return Response.json({ error: message }, { status: 400 });
@@ -28,6 +32,9 @@ export async function PUT(
 
   try {
     await upsertPost(post);
+    if (draftPassword !== undefined) {
+      await setPostDraftPasswordHash(post.id, draftPassword && hashDraftPassword(draftPassword));
+    }
   } catch (err) {
     console.error("Failed to save post:", err);
     return Response.json({ error: "Internal server error" }, { status: 500 });

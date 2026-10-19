@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import type { Post } from "../../../data";
 import {
-  Badge, FormBar, FormSection, Field, PageHead,
+  Badge, DraftAccessSection, FormBar, FormSection, Field, PageHead,
   TextInput, Textarea, Chips, Paragraphs, Segmented, editPageCls,
 } from "../../_components/ui";
 
@@ -35,6 +35,9 @@ export default function PostEditPage() {
   const [error, setError] = useState<string | null>(null);
   // Set once a new post has been created (by autosave), so later saves PUT instead of POST.
   const [createdId, setCreatedId] = useState<string | null>(null);
+  // Password typed in the "Draft access" section: undefined = untouched, "" = remove.
+  // Only sent on a manual save, never by autosave, so a half-typed password is never stored.
+  const [draftPassword, setDraftPassword] = useState<string | undefined>(undefined);
 
   // `rev` counts edits, `savedRev` is the edit count last persisted; they differ while dirty.
   const rev = useRef(0);
@@ -80,10 +83,11 @@ export default function PostEditPage() {
     try {
       const creating = postId === null;
       const payload = creating ? { ...p, id: await newId() } : p;
+      const sendPassword = !auto && draftPassword !== undefined;
       const res = await fetch(creating ? "/api/posts" : `/api/posts/${postId}`, {
         method: creating ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(sendPassword ? { ...payload, draftPassword } : payload),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -91,6 +95,10 @@ export default function PostEditPage() {
       }
       savedRev.current = sentRev;
       persistedAsDraft.current = payload.published === false;
+      if (sendPassword) {
+        setP((prev) => ({ ...prev, hasDraftPassword: draftPassword !== "" }));
+        setDraftPassword(undefined);
+      }
       setSavedAt(new Date());
       if (creating) {
         setCreatedId(payload.id);
@@ -192,6 +200,14 @@ export default function PostEditPage() {
               />
             </Field>
           </FormSection>
+          {p.published === false && (
+            <DraftAccessSection
+              hasPassword={p.hasDraftPassword}
+              password={draftPassword}
+              onPasswordChange={setDraftPassword}
+              linkPath={postId ? `/drafts/${encodeURIComponent(postId)}` : null}
+            />
+          )}
           <FormSection title="Meta">
             <Field label="Date">
               <TextInput value={p.date} onChange={(v) => update("date", v)} placeholder="Apr 02, 2026" />
