@@ -1,6 +1,7 @@
 import { createClient } from "@libsql/client";
 import { cache } from "react";
 import type { Project, Post, Experience } from "@/app/data";
+import { parseBody } from "./body";
 
 const databaseUrl = process.env.TURSO_DATABASE_URL;
 if (!databaseUrl) {
@@ -72,6 +73,21 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
     name: "011_add_linkedin_to_profile",
     sql: "ALTER TABLE profile ADD COLUMN linkedin TEXT DEFAULT 'https://www.linkedin.com/in/maxime-duhamel-b07a71251/'",
   },
+  // Bodies used to be a JSON array of paragraphs; they're Markdown now.
+  // Joining paragraphs with a blank line is a lossless conversion. Rows that
+  // aren't a JSON array (already Markdown) are left untouched.
+  {
+    name: "012_projects_body_to_markdown",
+    sql: `UPDATE projects SET body = COALESCE((
+            SELECT group_concat(value, char(10) || char(10)) FROM json_each(projects.body)
+          ), '') WHERE json_valid(body) AND json_type(body) = 'array'`,
+  },
+  {
+    name: "013_posts_body_to_markdown",
+    sql: `UPDATE posts SET body = COALESCE((
+            SELECT group_concat(value, char(10) || char(10)) FROM json_each(posts.body)
+          ), '') WHERE json_valid(body) AND json_type(body) = 'array'`,
+  },
 ];
 
 /** SQLite's wording for "this DDL is a no-op because the schema already has it". */
@@ -133,7 +149,7 @@ function rowToProject(row: Record<string, unknown>): Project {
     kind: row.kind as string,
     status: row.status as Project["status"],
     blurb: row.blurb as string,
-    body: JSON.parse(row.body as string),
+    body: parseBody(row.body),
     stack: JSON.parse(row.stack as string),
     color: row.color as string,
     published: row.published == null ? true : Boolean(row.published),
@@ -151,7 +167,7 @@ function rowToPost(row: Record<string, unknown>): Post {
     readTime: row.read_time as string,
     tags: JSON.parse(row.tags as string),
     excerpt: row.excerpt as string,
-    body: JSON.parse(row.body as string),
+    body: parseBody(row.body),
     published: row.published == null ? true : Boolean(row.published),
   };
 }
@@ -216,7 +232,7 @@ export async function upsertProject(p: Project): Promise<void> {
             published=excluded.published, category=excluded.category`,
     args: [
       p.id, p.title, p.year, p.kind, p.status, p.blurb,
-      JSON.stringify(p.body), JSON.stringify(p.stack), p.color,
+      p.body, JSON.stringify(p.stack), p.color,
       p.role ?? null,
       p.links?.length ? JSON.stringify(p.links) : null,
       published,
@@ -271,7 +287,7 @@ export async function upsertPost(p: Post): Promise<void> {
             title=excluded.title, date=excluded.date, read_time=excluded.read_time,
             tags=excluded.tags, excerpt=excluded.excerpt, body=excluded.body,
             published=excluded.published`,
-    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, JSON.stringify(p.body), published],
+    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, p.body, published],
   });
 }
 

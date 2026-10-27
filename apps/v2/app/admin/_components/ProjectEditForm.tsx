@@ -5,7 +5,7 @@ import { useRouter, useParams, usePathname } from "next/navigation";
 import type { Project } from "../../data";
 import {
   Badge, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, Paragraphs,
+  TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, MarkdownEditor,
   COLOR_OPTIONS, editPageCls,
 } from "./ui";
 
@@ -16,7 +16,7 @@ const BLANK: Project = {
   kind: "App",
   status: "paused",
   blurb: "",
-  body: [""],
+  body: "",
   stack: [],
   color: "#a78bfa",
   published: false,
@@ -116,8 +116,8 @@ export function ProjectEditForm() {
                 placeholder="Short description…"
               />
             </Field>
-            <Field label="Body" hint="Full write-up · one paragraph per block">
-              <Paragraphs value={p.body} onChange={(v) => update("body", v)} />
+            <Field label="Body" hint="Markdown · blank line between paragraphs · images from the media page">
+              <MarkdownEditor value={p.body} onChange={(v) => update("body", v)} />
             </Field>
           </FormSection>
           <FormSection title="Links">

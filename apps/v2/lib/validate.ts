@@ -65,7 +65,7 @@ export function validateProject(body: unknown): Project {
     kind: str(b.kind, "kind"),
     status: oneOf(b.status, ["shipping", "paused", "archived"] as const, "status"),
     blurb: strAllowEmpty(b.blurb, "blurb"),
-    body: strArray(b.body, "body"),
+    body: strAllowEmpty(b.body, "body"),
     stack: strArray(b.stack, "stack"),
     color: str(b.color, "color"),
     ...(b.role != null ? { role: str(b.role, "role") } : {}),
@@ -84,7 +84,7 @@ export function validatePost(body: unknown): Post {
     readTime: strAllowEmpty(b.readTime, "readTime"),
     tags: strArray(b.tags, "tags"),
     excerpt: strAllowEmpty(b.excerpt, "excerpt"),
-    body: strArray(b.body, "body"),
+    body: strAllowEmpty(b.body, "body"),
     ...(b.published != null ? { published: bool(b.published, "published") } : {}),
   };
 }

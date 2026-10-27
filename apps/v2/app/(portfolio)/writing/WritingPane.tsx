@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Post, Profile } from "../../data";
+import { Markdown } from "../../_components/Markdown";
 import { DetailFooter } from "../../_components/portfolio/DetailFooter";
 
 export function BlogList({ posts }: { posts: Post[] }) {
@@ -74,18 +75,7 @@ export function PostDetail({
       </p>
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />
 
-      <div className="flex flex-col gap-[22px] max-[720px]:gap-[18px]">
-        {post.body.map((para, i) => (
-          <p key={i} className="font-mono text-[13.5px] leading-[1.85] text-v3-text m-0 text-pretty max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]">
-            {i === 0 && (
-              <span className="font-serif italic font-light text-[56px] leading-[0.85] float-left mr-2 -mb-[2px] mt-[6px] text-v3-accent max-[720px]:text-[44px] max-[480px]:text-[36px] max-[480px]:mr-[6px] max-[480px]:mt-1">
-                {para.charAt(0)}
-              </span>
-            )}
-            {i === 0 ? para.slice(1) : para}
-          </p>
-        ))}
-      </div>
+      <Markdown source={post.body} dropCap />
 
       <DetailFooter
         sign={

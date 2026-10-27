@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Markdown } from "../../_components/Markdown";
 
 export const COLOR_OPTIONS = [
   "#a78bfa", "#7dd3fc", "#fcd34d", "#f472b6",
@@ -490,39 +491,47 @@ export function LinkList({
   );
 }
 
-export function Paragraphs({
+export function MarkdownEditor({
   value,
   onChange,
+  placeholder,
 }: {
-  value: string[];
-  onChange: (v: string[]) => void;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
 }) {
+  const [mode, setMode] = useState<"write" | "preview">("write");
   return (
-    <div className="flex flex-col gap-[10px]">
-      {value.map((p, i) => (
-        <div key={i} className="grid grid-cols-[40px_1fr_24px] gap-2 items-start">
-          <div className="font-serif italic text-[14px] text-a-accent pt-[14px] text-center tabular-nums">
-            {String(i + 1).padStart(2, "0")}
-          </div>
-          <textarea
-            className="font-mono text-[12.5px] bg-a-bg border border-a-border text-a-text px-3 py-2 rounded-[5px] outline-none resize-y min-h-16 leading-[1.65] w-full focus:border-a-accent focus:bg-a-bg-2"
-            value={p}
-            onChange={(e) => onChange(value.map((x, j) => j === i ? e.target.value : x))}
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3 max-[480px]:flex-col max-[480px]:items-start">
+        <div className="w-[180px]">
+          <Segmented
+            value={mode}
+            onChange={(v) => setMode(v as "write" | "preview")}
+            options={[{ value: "write", label: "Write" }, { value: "preview", label: "Preview" }]}
           />
-          <button
-            className="bg-transparent border-0 text-a-text-dim text-[14px] cursor-pointer pt-[10px] hover:text-a-red"
-            onClick={() => onChange(value.filter((_, j) => j !== i))}
-          >
-            ×
-          </button>
         </div>
-      ))}
-      <button
-        className="self-start text-[10.5px] text-a-accent bg-transparent border border-dashed border-a-border-strong px-3 py-1 rounded-[4px] cursor-pointer font-mono tracking-[0.05em] hover:border-a-accent"
-        onClick={() => onChange([...value, ""])}
-      >
-        + Add paragraph
-      </button>
+        <span className="text-[10.5px] text-a-text-dim font-mono">
+          **bold** · *italic* · [link](url) · ![alt](image-url) · - list · ## heading · `code`
+        </span>
+      </div>
+      {mode === "write" ? (
+        <textarea
+          className={`${inputBase} field-sizing-content min-h-[320px] leading-[1.7]`}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          spellCheck
+        />
+      ) : (
+        <div className="bg-v3-bg border border-a-border rounded-[5px] px-5 py-4 min-h-[320px]">
+          {value.trim() ? (
+            <Markdown source={value} />
+          ) : (
+            <span className="text-a-text-dim italic text-[12px] font-mono">Nothing to preview yet.</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
