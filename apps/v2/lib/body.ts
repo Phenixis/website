@@ -1,5 +1,5 @@
 /**
- * Bodies are stored as Markdown. Rows written before migrations 012/013 hold
+ * Bodies are stored as Markdown. Rows written before migrations 015/016 hold
  * a JSON array of paragraphs instead — join those so reads keep working
  * until the migration has run.
  */

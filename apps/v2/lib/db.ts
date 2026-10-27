@@ -73,17 +73,30 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
     name: "011_add_linkedin_to_profile",
     sql: "ALTER TABLE profile ADD COLUMN linkedin TEXT DEFAULT 'https://www.linkedin.com/in/maxime-duhamel-b07a71251/'",
   },
+  {
+    name: "012_add_draft_password_hash_to_posts",
+    sql: "ALTER TABLE posts ADD COLUMN draft_password_hash TEXT",
+  },
+  {
+    name: "013_add_draft_password_hash_to_projects",
+    sql: "ALTER TABLE projects ADD COLUMN draft_password_hash TEXT",
+  },
+  {
+    name: "014_add_updated_at_to_projects",
+    // Nullable, no default: SQLite cannot add a non-constant default, and existing rows have no known edit time.
+    sql: "ALTER TABLE projects ADD COLUMN updated_at TEXT",
+  },
   // Bodies used to be a JSON array of paragraphs; they're Markdown now.
   // Joining paragraphs with a blank line is a lossless conversion. Rows that
   // aren't a JSON array (already Markdown) are left untouched.
   {
-    name: "012_projects_body_to_markdown",
+    name: "015_projects_body_to_markdown",
     sql: `UPDATE projects SET body = COALESCE((
             SELECT group_concat(value, char(10) || char(10)) FROM json_each(projects.body)
           ), '') WHERE json_valid(body) AND json_type(body) = 'array'`,
   },
   {
-    name: "013_posts_body_to_markdown",
+    name: "016_posts_body_to_markdown",
     sql: `UPDATE posts SET body = COALESCE((
             SELECT group_concat(value, char(10) || char(10)) FROM json_each(posts.body)
           ), '') WHERE json_valid(body) AND json_type(body) = 'array'`,
@@ -154,6 +167,8 @@ function rowToProject(row: Record<string, unknown>): Project {
     color: row.color as string,
     published: row.published == null ? true : Boolean(row.published),
     category: (row.category as Project["category"]) ?? "main",
+    hasDraftPassword: row.draft_password_hash != null,
+    ...(row.updated_at != null ? { updatedAt: row.updated_at as string } : {}),
     ...(row.role != null ? { role: row.role as string } : {}),
     ...(row.links != null ? { links: JSON.parse(row.links as string) } : {}),
   };
@@ -169,6 +184,7 @@ function rowToPost(row: Record<string, unknown>): Post {
     excerpt: row.excerpt as string,
     body: parseBody(row.body),
     published: row.published == null ? true : Boolean(row.published),
+    hasDraftPassword: row.draft_password_hash != null,
   };
 }
 
@@ -223,13 +239,13 @@ export async function getPublishedProject(id: string): Promise<Project | null> {
 export async function upsertProject(p: Project): Promise<void> {
   const published = p.published === false ? 0 : 1;
   await db.execute({
-    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, published, category)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, published, category, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             title=excluded.title, year=excluded.year, kind=excluded.kind,
             status=excluded.status, blurb=excluded.blurb, body=excluded.body,
             stack=excluded.stack, color=excluded.color, role=excluded.role, links=excluded.links,
-            published=excluded.published, category=excluded.category`,
+            published=excluded.published, category=excluded.category, updated_at=excluded.updated_at`,
     args: [
       p.id, p.title, p.year, p.kind, p.status, p.blurb,
       p.body, JSON.stringify(p.stack), p.color,
@@ -237,8 +253,19 @@ export async function upsertProject(p: Project): Promise<void> {
       p.links?.length ? JSON.stringify(p.links) : null,
       published,
       p.category ?? "main",
+      new Date().toISOString(),
     ],
   });
+}
+
+/** Scrypt hash guarding a draft project's private link; null when none is set. */
+export async function getProjectDraftPasswordHash(id: string): Promise<string | null> {
+  const r = await db.execute({ sql: "SELECT draft_password_hash FROM projects WHERE id = ?", args: [id] });
+  return (r.rows[0]?.draft_password_hash as string | null | undefined) ?? null;
+}
+
+export async function setProjectDraftPasswordHash(id: string, hash: string | null): Promise<void> {
+  await db.execute({ sql: "UPDATE projects SET draft_password_hash = ? WHERE id = ?", args: [hash, id] });
 }
 
 export async function deleteProject(id: string): Promise<void> {
@@ -289,6 +316,16 @@ export async function upsertPost(p: Post): Promise<void> {
             published=excluded.published`,
     args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, p.body, published],
   });
+}
+
+/** Scrypt hash guarding a draft's private /drafts/<id> link; null when none is set. */
+export async function getPostDraftPasswordHash(id: string): Promise<string | null> {
+  const r = await db.execute({ sql: "SELECT draft_password_hash FROM posts WHERE id = ?", args: [id] });
+  return (r.rows[0]?.draft_password_hash as string | null | undefined) ?? null;
+}
+
+export async function setPostDraftPasswordHash(id: string, hash: string | null): Promise<void> {
+  await db.execute({ sql: "UPDATE posts SET draft_password_hash = ? WHERE id = ?", args: [hash, id] });
 }
 
 export async function deletePost(id: string): Promise<void> {

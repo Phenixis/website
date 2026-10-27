@@ -23,7 +23,7 @@ export function BlogList({ posts }: { posts: Post[] }) {
               <h3 className="font-serif font-normal text-[30px] m-0 tracking-[-0.015em] leading-[1.15] text-v3-text text-pretty max-[720px]:text-[24px] max-[480px]:text-[20px]">
                 {p.title}
               </h3>
-              <p className="font-mono text-[12.5px] leading-[1.7] text-v3-text-2 m-0 max-w-[640px] text-pretty max-[720px]:text-[12px] max-[720px]:max-w-full">
+              <p className="font-mono text-[12.5px] leading-[1.7] text-v3-text-2 m-0 max-w-[640px] text-pretty whitespace-pre-line max-[720px]:text-[12px] max-[720px]:max-w-full">
                 {p.excerpt}
               </p>
               <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.1em] uppercase mt-1 max-[480px]:flex-wrap max-[480px]:gap-[6px]">
@@ -70,7 +70,7 @@ export function PostDetail({
         </span>
       </div>
 
-      <p className="font-serif italic font-light text-[22px] leading-[1.5] tracking-[-0.005em] text-v3-text-2 mt-0 mb-7 text-pretty max-[720px]:text-[18px] max-[480px]:text-[16px]">
+      <p className="font-serif italic font-light text-[22px] leading-[1.5] tracking-[-0.005em] text-v3-text-2 mt-0 mb-7 text-pretty whitespace-pre-line max-[720px]:text-[18px] max-[480px]:text-[16px]">
         {post.excerpt}
       </p>
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />

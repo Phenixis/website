@@ -3,7 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 export const SESSION_COOKIE = "admin-session";
 const SESSION_DURATION = "30d";
 
-function getSecretKey(): Uint8Array {
+export function getSecretKey(): Uint8Array {
   const secret = process.env.ADMIN_SECRET;
   if (!secret) throw new Error("ADMIN_SECRET is not set");
   return new TextEncoder().encode(secret);

@@ -14,6 +14,10 @@ export type Project = {
   published?: boolean;
   /** "main" for Main Projects, "side" for Side Quests. Defaults to "main". */
   category?: "main" | "side";
+  /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
+  hasDraftPassword?: boolean;
+  /** Read-only: ISO timestamp of the last save; absent for projects not edited since tracking began. */
+  updatedAt?: string;
 };
 
 export type Post = {
@@ -26,6 +30,8 @@ export type Post = {
   /** Markdown. */
   body: string;
   published?: boolean;
+  /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
+  hasDraftPassword?: boolean;
 };
 
 export type Experience = {
@@ -57,7 +63,7 @@ export type Profile = {
 export const PROFILE: Profile = {
   name: "Maxime Duhamel",
   handle: "@maxime",
-  tagline: "Designer & builder. Lives in Saint-Brieuc, thinks in margins.",
+  tagline: "Designer & builder. Lives in Saint-Brieuc & Montpellier.",
   location: "Saint-Brieuc · 48.51, -2.77",
   github: "https://github.com/Phenixis/",
   linkedin: "https://www.linkedin.com/in/maxime-duhamel-b07a71251/",

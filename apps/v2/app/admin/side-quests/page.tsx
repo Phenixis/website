@@ -3,18 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
-import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls } from "../_components/ui";
-
-const updated = ["12m", "2h", "yesterday", "2d", "4d", "1w", "3w", "1mo"];
+import { byYearDesc, timeAgo } from "@/lib/admin-sort";
+import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 
 export default function SideQuestsListPage() {
   const router = useRouter();
   const [items, setItems] = useState<Project[]>([]);
+  const [filter, setFilter] = useState<"all" | Project["status"]>("all");
+
+  useKeyShortcut("n", () => router.push("/admin/side-quests/new"));
 
   useEffect(() => {
     fetch("/api/projects")
       .then((r) => r.json())
-      .then((data: Project[]) => setItems(data.filter((p) => p.category === "side")));
+      .then((data: Project[]) => setItems(byYearDesc(data.filter((p) => p.category === "side"))));
   }, []);
 
   const counts = {
@@ -23,28 +25,30 @@ export default function SideQuestsListPage() {
     archived: items.filter((p) => p.status === "archived").length,
   };
 
+  const visible = filter === "all" ? items : items.filter((p) => p.status === filter);
+
   return (
     <>
       <PageHead
         title="Side Quests"
         sub="Smaller, looser projects — icon libraries, homelab tinkering, whatever else didn't need to be a whole thing."
         actions={
-          <>
-            <Btn variant="ghost" size="sm">Export</Btn>
-            <Btn variant="primary" onClick={() => router.push("/admin/side-quests/new")}>
-              + New side quest <span className={kbdCls}>⌘N</span>
-            </Btn>
-          </>
+          <Btn variant="primary" onClick={() => router.push("/admin/side-quests/new")}>
+            + New side quest <span className={kbdCls}>N</span>
+          </Btn>
         }
       />
       <Toolbar>
-        <Btn size="sm">All <span className={kbdCls}>{items.length}</span></Btn>
-        <Btn size="sm" variant="ghost">Shipping <span className={kbdCls}>{counts.shipping}</span></Btn>
-        <Btn size="sm" variant="ghost">Paused <span className={kbdCls}>{counts.paused}</span></Btn>
-        <Btn size="sm" variant="ghost">Archived <span className={kbdCls}>{counts.archived}</span></Btn>
-        <span className="flex-1" />
-        <Btn size="sm" variant="ghost">Sort: Recent ↓</Btn>
-        <Btn size="sm" variant="ghost">Columns ⌃</Btn>
+        <FilterChips
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: "all", label: "All", count: items.length },
+            { value: "shipping", label: "Shipping", count: counts.shipping },
+            { value: "paused", label: "Paused", count: counts.paused },
+            { value: "archived", label: "Archived", count: counts.archived },
+          ]}
+        />
       </Toolbar>
       <div className={pageBodyCls}>
         <table className={tableCls.table}>
@@ -61,7 +65,7 @@ export default function SideQuestsListPage() {
             </tr>
           </thead>
           <tbody>
-            {items.map((p, i) => (
+            {visible.map((p, i) => (
               <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/side-quests/${p.id}`)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
@@ -95,7 +99,7 @@ export default function SideQuestsListPage() {
                     )}
                   </div>
                 </td>
-                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colLg}`}>{updated[i] ?? "—"} ago</td>
+                <td className={`${tableCls.td} ${tableCls.tdMuted} ${tableCls.colLg}`}>{timeAgo(p.updatedAt)}</td>
                 <td className={`${tableCls.td} ${tableCls.tdActions}`}><span className={tableCls.rowArrow}>→</span></td>
               </tr>
             ))}

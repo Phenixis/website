@@ -1,5 +1,6 @@
 import React from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
+import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 const text = "font-mono text-[13.5px] leading-[1.85] text-v3-text text-pretty max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]";
@@ -78,10 +79,15 @@ const dropCapCls = [
   "max-[480px]:[&>p:first-child]:first-letter:mt-1",
 ].join(" ");
 
+// remark-breaks keeps a single newline inside a paragraph as a line break
+// (as the plain-text bodies did), rather than Markdown's default of folding
+// it into a space.
+const remarkPlugins = [remarkGfm, remarkBreaks];
+
 export function Markdown({ source, dropCap = false }: { source: string; dropCap?: boolean }) {
   return (
     <div className={`flex flex-col gap-[22px] max-[720px]:gap-[18px] ${dropCap ? dropCapCls : ""}`}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
         {source}
       </ReactMarkdown>
     </div>

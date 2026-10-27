@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Markdown } from "../../_components/Markdown";
 
 export const COLOR_OPTIONS = [
@@ -38,7 +38,7 @@ export const tableCls = {
 export const pageBodyCls = "scroll-thin-a-wide flex-1 overflow-y-auto p-0";
 
 export const formBarCls =
-  "sticky bottom-0 [background:linear-gradient(180deg,transparent,var(--color-a-bg-2)_30%)] pt-6 px-9 pb-[18px] -mx-9 -mb-20 mt-6 border-t border-a-border flex items-center gap-[10px] max-[980px]:-mx-6 max-[980px]:px-6 max-[980px]:-mb-9 max-[560px]:-mx-4 max-[560px]:px-4 max-[560px]:-mb-8 max-[560px]:flex-wrap max-[560px]:gap-2";
+  "sticky bottom-0 z-10 bg-a-bg-2 pt-4 px-9 pb-[18px] -mx-9 -mb-20 mt-6 border-t border-a-border flex items-center gap-[10px] max-[980px]:-mx-6 max-[980px]:px-6 max-[980px]:-mb-9 max-[560px]:-mx-4 max-[560px]:px-4 max-[560px]:-mb-8 max-[560px]:flex-wrap max-[560px]:gap-2";
 
 export const mediaCls = {
   grid: "grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3 px-7 py-5",
@@ -66,9 +66,9 @@ export const editPageCls = {
   loading: "flex items-center justify-center h-full text-a-text-mute",
   inputTitle:
     "font-serif font-normal text-[22px] tracking-[-0.01em] px-[14px] py-3 bg-transparent border border-transparent rounded-[5px] w-full outline-none transition-all duration-[140ms] text-a-text hover:bg-a-bg-2 hover:border-a-border focus:bg-a-bg-2 focus:border-a-accent placeholder:text-a-text-dim placeholder:italic",
-  form: "grid grid-cols-[1fr_320px] h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
+  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
   formMain:
-    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-20 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-9 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
+    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
   formSide:
     "scroll-thin-a-wide overflow-y-auto pt-6 px-[22px] pb-15 bg-a-bg-2 max-[1100px]:pt-5 max-[1100px]:px-4 max-[980px]:overflow-visible max-[980px]:pt-5 max-[980px]:px-6 max-[980px]:pb-12 max-[560px]:pt-4 max-[560px]:px-4 max-[560px]:pb-10",
   sideCard: "p-[14px] bg-a-bg-3 border border-a-border rounded-md mb-[14px]",
@@ -182,6 +182,27 @@ export function Btn({
   );
 }
 
+/** Toolbar filter buttons with counts; the selected one is drawn as a solid button. */
+export function FilterChips<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string; count: number }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <>
+      {options.map((o) => (
+        <Btn key={o.value} size="sm" variant={o.value === value ? undefined : "ghost"} onClick={() => onChange(o.value)}>
+          {o.label} <span className={kbdCls}>{o.count}</span>
+        </Btn>
+      ))}
+    </>
+  );
+}
+
 export function Badge({ kind, children }: { kind: string; children: React.ReactNode }) {
   return (
     <span className={`inline-flex items-center gap-1 text-[10px] tracking-[0.08em] uppercase px-[7px] py-[2px] rounded-[3px] font-medium whitespace-nowrap ${BADGE_COLORS[kind] ?? ""}`}>
@@ -210,6 +231,39 @@ function timeAgo(d: Date): string {
   return `${Math.floor(s / 3600)}h ago`;
 }
 
+/** Runs `onSave` on Ctrl/⌘+S, suppressing the browser's own "save page" dialog. */
+export function useSaveShortcut(onSave: () => void) {
+  const latest = useRef(onSave);
+  useEffect(() => { latest.current = onSave; });
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        latest.current();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+}
+
+/** Runs `handler` when `key` is pressed on its own, ignoring keystrokes made while typing in a field. */
+export function useKeyShortcut(key: string, handler: () => void) {
+  const latest = useRef(handler);
+  useEffect(() => { latest.current = handler; });
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== key) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      latest.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [key]);
+}
+
 export function FormBar({
   onSave,
   onDiscard,
@@ -225,6 +279,7 @@ export function FormBar({
   savedAt?: Date | null;
   error?: string | null;
 }) {
+  useSaveShortcut(onSave);
   const status = saving
     ? "Saving…"
     : savedAt
@@ -288,6 +343,23 @@ export function TextInput({
   );
 }
 
+/** Grows/shrinks a textarea to fit its content, re-fitting when the width changes. */
+function useAutoResize(value: string) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const fit = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight + 2}px`;
+  };
+  useLayoutEffect(fit, [value]);
+  useEffect(() => {
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+  return ref;
+}
+
 export function Textarea({
   value,
   onChange,
@@ -299,6 +371,7 @@ export function Textarea({
   placeholder?: string;
   variant?: "lede" | "body";
 }) {
+  const ref = useAutoResize(value);
   const variantCls =
     variant === "lede"
       ? "font-serif italic text-[16px] leading-[1.5] font-light text-a-text-2 min-h-[80px]"
@@ -307,7 +380,9 @@ export function Textarea({
         : "";
   return (
     <textarea
-      className={`${inputBase} ${variantCls}`}
+      ref={ref}
+      rows={1}
+      className={`${inputBase} ${variantCls} resize-none overflow-hidden`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
@@ -491,6 +566,29 @@ export function LinkList({
   );
 }
 
+function MarkdownTextarea({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  const ref = useAutoResize(value);
+  return (
+    <textarea
+      ref={ref}
+      rows={1}
+      className={`${inputBase} resize-none overflow-hidden min-h-[320px] leading-[1.7]`}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      spellCheck
+    />
+  );
+}
+
 export function MarkdownEditor({
   value,
   onChange,
@@ -516,13 +614,7 @@ export function MarkdownEditor({
         </span>
       </div>
       {mode === "write" ? (
-        <textarea
-          className={`${inputBase} field-sizing-content min-h-[320px] leading-[1.7]`}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          spellCheck
-        />
+        <MarkdownTextarea value={value} onChange={onChange} placeholder={placeholder} />
       ) : (
         <div className="bg-v3-bg border border-a-border rounded-[5px] px-5 py-4 min-h-[320px]">
           {value.trim() ? (
@@ -542,5 +634,58 @@ export function PlaceholderPage({ title }: { title: string }) {
       <span className="text-[36px] font-serif italic font-light text-a-text-dim">{title}</span>
       <span className="text-[11px] tracking-[0.12em] uppercase">Not yet designed</span>
     </div>
+  );
+}
+
+/**
+ * Sidebar section for choosing the password that guards a draft's private link.
+ * `password` is undefined until edited ("" means remove); the parent only sends
+ * it on a manual save, never on autosave, so a half-typed value is never stored.
+ */
+export function DraftAccessSection({
+  hasPassword,
+  password,
+  onPasswordChange,
+  linkPath,
+}: {
+  hasPassword?: boolean;
+  password: string | undefined;
+  onPasswordChange: (v: string | undefined) => void;
+  /** The private link, once the draft has been saved. */
+  linkPath: string | null;
+}) {
+  const untouched = password === undefined;
+  return (
+    <FormSection title="Draft access">
+      <Field
+        label="Password"
+        hint={
+          linkPath
+            ? "Shares this draft at its private link, behind this password. Applied when you click Save changes."
+            : "Applied when you click Save changes. The private link appears once the draft is saved."
+        }
+      >
+        <TextInput
+          value={password ?? ""}
+          onChange={onPasswordChange}
+          placeholder={hasPassword && untouched ? "Password set — type to replace" : "Choose a password"}
+        />
+        {hasPassword && untouched && (
+          <div>
+            <Btn size="sm" variant="ghost" onClick={() => onPasswordChange("")}>Remove password</Btn>
+          </div>
+        )}
+        {password === "" && (
+          <span className="text-[11px] italic text-a-text-mute">Password will be removed on save.</span>
+        )}
+      </Field>
+      {linkPath && hasPassword && (
+        <Field label="Private link">
+          <a className="text-[12px] text-a-accent break-all hover:underline" href={linkPath} target="_blank" rel="noreferrer">
+            {linkPath}
+          </a>
+        </Field>
+      )}
+    </FormSection>
   );
 }

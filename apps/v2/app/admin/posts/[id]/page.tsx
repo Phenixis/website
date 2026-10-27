@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import type { Post } from "../../../data";
 import {
-  Badge, FormBar, FormSection, Field, PageHead,
+  Badge, DraftAccessSection, FormBar, FormSection, Field, PageHead,
   TextInput, Textarea, Chips, MarkdownEditor, Segmented, editPageCls,
 } from "../../_components/ui";
 
@@ -32,9 +32,26 @@ export default function PostEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // Set once a new post has been created (by autosave), so later saves PUT instead of POST.
+  const [createdId, setCreatedId] = useState<string | null>(null);
+  // Password typed in the "Draft access" section: undefined = untouched, "" = remove.
+  // Only sent on a manual save, never by autosave, so a half-typed password is never stored.
+  const [draftPassword, setDraftPassword] = useState<string | undefined>(undefined);
 
-  const update = (key: keyof Post, val: unknown) =>
+  // `rev` counts edits, `savedRev` is the edit count last persisted; they differ while dirty.
+  const rev = useRef(0);
+  const savedRev = useRef(0);
+  const saveInFlight = useRef(false);
+  // Autosave only while the persisted copy is a draft, so it never edits or unpublishes a live post.
+  const persistedAsDraft = useRef(true);
+
+  const postId = isNew ? createdId : id;
+
+  const update = (key: keyof Post, val: unknown) => {
+    rev.current += 1;
     setP((prev) => ({ ...prev, [key]: val }));
+  };
 
   const back = () => router.push("/admin/posts");
 
@@ -44,34 +61,74 @@ export default function PostEditPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!data) { router.replace("/admin/posts"); return; }
+        persistedAsDraft.current = data.published === false;
         setP(data);
         setLoading(false);
       });
   }, [id, isNew, router]);
 
-  const save = async () => {
+  // Slug from the title, made unique so a new post never overwrites an existing one.
+  const newId = async () => {
+    const slug = slugify(p.title);
+    const taken = await fetch(`/api/posts/${slug}`).then((r) => r.ok);
+    return taken ? `${slug}-${Date.now()}` : slug;
+  };
+
+  const save = async ({ auto = false } = {}) => {
+    if (saveInFlight.current) return;
+    saveInFlight.current = true;
     setSaving(true);
-    const payload = isNew ? { ...p, id: slugify(p.title) } : p;
-    await fetch(isNew ? "/api/posts" : `/api/posts/${p.id}`, {
-      method: isNew ? "POST" : "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setSaving(false);
-    setSavedAt(new Date());
-    if (isNew) router.push("/admin/posts");
+    setError(null);
+    const sentRev = rev.current;
+    try {
+      const creating = postId === null;
+      const payload = creating ? { ...p, id: await newId() } : p;
+      const sendPassword = !auto && draftPassword !== undefined;
+      const res = await fetch(creating ? "/api/posts" : `/api/posts/${postId}`, {
+        method: creating ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sendPassword ? { ...payload, draftPassword } : payload),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Save failed (${res.status})`);
+      }
+      savedRev.current = sentRev;
+      persistedAsDraft.current = payload.published === false;
+      if (sendPassword) {
+        setP((prev) => ({ ...prev, hasDraftPassword: draftPassword !== "" }));
+        setDraftPassword(undefined);
+      }
+      setSavedAt(new Date());
+      if (creating) {
+        setCreatedId(payload.id);
+        setP((prev) => ({ ...prev, id: payload.id }));
+        if (!auto) router.push("/admin/posts");
+      } else if (isNew && !auto) {
+        router.push("/admin/posts");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      saveInFlight.current = false;
+      setSaving(false);
+    }
   };
 
   const remove = async () => {
+    if (!postId) { back(); return; }
     if (!window.confirm("Delete this post?")) return;
-    await fetch(`/api/posts/${p.id}`, { method: "DELETE" });
+    await fetch(`/api/posts/${postId}`, { method: "DELETE" });
     back();
   };
 
-  // 30s autosave
+  // Debounced autosave of drafts: 3s after the last edit, only if something changed.
   useEffect(() => {
-    if (isNew || loading) return;
-    const timer = setTimeout(() => { save(); }, 30_000);
+    if (loading || rev.current === savedRev.current) return;
+    if (p.published !== false || !persistedAsDraft.current) return;
+    // Don't create an empty "Untitled post" before anything meaningful is typed.
+    if (postId === null && p.title === BLANK.title && !p.excerpt && !p.body.trim()) return;
+    const timer = setTimeout(() => { save({ auto: true }); }, 3_000);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p]);
@@ -107,11 +164,12 @@ export default function PostEditPage() {
             </Field>
           </FormSection>
           <FormBar
-            onSave={save}
+            onSave={() => save()}
             onDiscard={back}
             onDelete={remove}
             saving={saving}
             savedAt={savedAt}
+            error={error}
           />
         </div>
         <div className={editPageCls.formSide}>
@@ -119,7 +177,7 @@ export default function PostEditPage() {
             <div className={editPageCls.sideCardTitle}>At a glance</div>
             <div className={editPageCls.sideCardRow}>
               <span className={editPageCls.sideCardKey}>ID</span>
-              <span className={editPageCls.sideCardVal}>{isNew ? "new" : p.id}</span>
+              <span className={editPageCls.sideCardVal}>{postId ?? "new"}</span>
             </div>
             <div className={editPageCls.sideCardRow}>
               <span className={editPageCls.sideCardKey}>Status</span>
@@ -142,6 +200,14 @@ export default function PostEditPage() {
               />
             </Field>
           </FormSection>
+          {p.published === false && (
+            <DraftAccessSection
+              hasPassword={p.hasDraftPassword}
+              password={draftPassword}
+              onPasswordChange={setDraftPassword}
+              linkPath={postId ? `/drafts/${encodeURIComponent(postId)}` : null}
+            />
+          )}
           <FormSection title="Meta">
             <Field label="Date">
               <TextInput value={p.date} onChange={(v) => update("date", v)} placeholder="Apr 02, 2026" />

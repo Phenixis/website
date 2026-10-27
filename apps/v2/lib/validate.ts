@@ -89,6 +89,20 @@ export function validatePost(body: unknown): Post {
   };
 }
 
+/**
+ * The optional `draftPassword` sent alongside a post: `undefined` leaves the
+ * stored password untouched (autosaves never send it), `null` or "" removes it.
+ */
+export function validateDraftPassword(body: unknown): string | null | undefined {
+  const v = record(body).draftPassword;
+  if (v === undefined) return undefined;
+  if (v === null || v === "") return null;
+  if (typeof v !== "string" || v.length > 200) {
+    throw new ValidationError('"draftPassword" must be a string of at most 200 characters');
+  }
+  return v;
+}
+
 export function validateExperience(body: unknown): Experience {
   const b = record(body);
   return {

@@ -120,7 +120,7 @@ console.log(`✓ Seeded ${EXPERIENCES.length} experiences`);
 await db.execute({
   sql: `INSERT OR REPLACE INTO profile (id, name, handle, tagline, location)
         VALUES (1, ?, ?, ?, ?)`,
-  args: ["Maxime Duhamel", "@maxime", "Designer & builder. Lives in Saint-Brieuc, thinks in margins.", "Saint-Brieuc · 48.51, -2.77"],
+  args: ["Maxime Duhamel", "@maxime", "Designer & builder. Lives in Saint-Brieuc & Montpellier.", "Saint-Brieuc · 48.51, -2.77"],
 });
 console.log("✓ Seeded profile");
 

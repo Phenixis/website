@@ -3,16 +3,28 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Experience } from "../../data";
-import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls } from "../_components/ui";
+import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 import { formatRange } from "@/lib/experience-dates";
 
 export default function ExperiencesListPage() {
   const router = useRouter();
   const [items, setItems] = useState<Experience[]>([]);
+  const [filter, setFilter] = useState<"all" | Experience["kind"]>("all");
+
+  useKeyShortcut("n", () => router.push("/admin/experiences/new"));
 
   useEffect(() => {
     fetch("/api/experiences").then((r) => r.json()).then(setItems);
   }, []);
+
+  // Most recent first: by start date, then ongoing / latest end date.
+  const sorted = [...items].sort(
+    (a, b) =>
+      b.startDate.localeCompare(a.startDate) ||
+      (b.endDate ?? "9999-99").localeCompare(a.endDate ?? "9999-99"),
+  );
+  const visible = filter === "all" ? sorted : sorted.filter((e) => e.kind === filter);
+  const countOf = (kind: Experience["kind"]) => items.filter((e) => e.kind === kind).length;
 
   return (
     <>
@@ -21,17 +33,21 @@ export default function ExperiencesListPage() {
         sub="Where I went, what I did, who I worked with."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/experiences/new")}>
-            + New entry <span className={kbdCls}>⌘N</span>
+            + New entry <span className={kbdCls}>N</span>
           </Btn>
         }
       />
       <Toolbar>
-        <Btn size="sm">All <span className={kbdCls}>{items.length}</span></Btn>
-        <Btn size="sm" variant="ghost">Self <span className={kbdCls}>{items.filter((e) => e.kind === "self").length}</span></Btn>
-        <Btn size="sm" variant="ghost">Role <span className={kbdCls}>{items.filter((e) => e.kind === "role").length}</span></Btn>
-        <Btn size="sm" variant="ghost">Edu <span className={kbdCls}>{items.filter((e) => e.kind === "edu").length}</span></Btn>
-        <span className="flex-1" />
-        <Btn size="sm" variant="ghost">Sort: Recent ↓</Btn>
+        <FilterChips
+          value={filter}
+          onChange={setFilter}
+          options={[
+            { value: "all", label: "All", count: items.length },
+            { value: "self", label: "Self", count: countOf("self") },
+            { value: "role", label: "Role", count: countOf("role") },
+            { value: "edu", label: "Edu", count: countOf("edu") },
+          ]}
+        />
       </Toolbar>
       <div className={pageBodyCls}>
         <table className={tableCls.table}>
@@ -46,7 +62,7 @@ export default function ExperiencesListPage() {
             </tr>
           </thead>
           <tbody>
-            {items.map((e, i) => (
+            {visible.map((e, i) => (
               <tr className={tableCls.tr} key={e.id} onClick={() => router.push(`/admin/experiences/${e.id}`)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>

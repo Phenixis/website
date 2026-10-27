@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
+import { byYearDesc } from "@/lib/admin-sort";
 import { Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function ArchivePage() {
@@ -13,7 +14,7 @@ export default function ArchivePage() {
   useEffect(() => {
     fetch("/api/projects")
       .then((r) => r.json())
-      .then((data: Project[]) => setItems(data.filter((p) => p.status === "archived")));
+      .then((data: Project[]) => setItems(byYearDesc(data.filter((p) => p.status === "archived"))));
   }, []);
 
   const restore = async (p: Project) => {
