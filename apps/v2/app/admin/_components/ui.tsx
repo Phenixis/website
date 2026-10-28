@@ -70,9 +70,11 @@ export const editPageCls = {
   loading: "flex items-center justify-center h-full text-a-text-mute",
   inputTitle:
     "font-serif font-normal text-[22px] tracking-[-0.01em] px-[14px] py-3 bg-transparent border border-transparent rounded-[5px] w-full outline-none transition-all duration-[140ms] text-a-text hover:bg-a-bg-2 hover:border-a-border focus:bg-a-bg-2 focus:border-a-accent placeholder:text-a-text-dim placeholder:italic",
-  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
+  // scroll-pb keeps the caret clear of the sticky FormBar when the browser
+  // scrolls it into view while typing (form scrolls ≤980px, formMain above).
+  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden scroll-pb-[120px] max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
   formMain:
-    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
+    "scroll-thin-a-wide overflow-y-auto scroll-pb-[120px] pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
   formSide:
     "scroll-thin-a-wide overflow-y-auto pt-6 px-[22px] pb-15 bg-a-bg-2 max-[1100px]:pt-5 max-[1100px]:px-4 max-[980px]:overflow-visible max-[980px]:pt-5 max-[980px]:px-6 max-[980px]:pb-12 max-[560px]:pt-4 max-[560px]:px-4 max-[560px]:pb-10",
   sideCard: "p-[14px] bg-a-bg-3 border border-a-border rounded-md mb-[14px]",
@@ -353,8 +355,16 @@ function useAutoResize(value: string) {
   const fit = () => {
     const el = ref.current;
     if (!el) return;
+    // Collapsing to "auto" to measure briefly shrinks the page, which clamps
+    // the scroll position of every scrolling ancestor — on a long text the
+    // view would jump away from the caret on each keystroke. Restore them.
+    const scrolled: Array<[Element, number]> = [];
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      if (p.scrollTop > 0) scrolled.push([p, p.scrollTop]);
+    }
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight + 2}px`;
+    for (const [p, top] of scrolled) p.scrollTop = top;
   };
   useLayoutEffect(fit, [value]);
   useEffect(() => {
