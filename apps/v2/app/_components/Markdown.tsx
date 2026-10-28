@@ -14,23 +14,53 @@ function isExternal(href: string | undefined): boolean {
 const components: Components = {
   p: ({ children }) => <p className={`${text} m-0`}>{children}</p>,
   h1: ({ children }) => <h2 className="font-serif font-light text-[28px] leading-[1.2] tracking-[-0.01em] text-v3-text mt-4 mb-0 max-[480px]:text-[22px]">{children}</h2>,
-  h2: ({ children }) => <h2 className="font-serif font-light text-[24px] leading-[1.25] tracking-[-0.01em] text-v3-text mt-4 mb-0 max-[480px]:text-[20px]">{children}</h2>,
+  h2: ({ id, className, children }) =>
+    // remark-gfm's visually hidden "Footnotes" label above the notes list.
+    className?.includes("sr-only") ? (
+      <h2 id={id} className="sr-only">{children}</h2>
+    ) : (
+      <h2 className="font-serif font-light text-[24px] leading-[1.25] tracking-[-0.01em] text-v3-text mt-4 mb-0 max-[480px]:text-[20px]">{children}</h2>
+    ),
   h3: ({ children }) => <h3 className="font-serif italic font-light text-[20px] leading-[1.3] text-v3-text mt-2 mb-0 max-[480px]:text-[17px]">{children}</h3>,
   h4: ({ children }) => <h4 className="font-mono text-[11px] tracking-[0.14em] uppercase text-v3-text-mute mt-2 mb-0">{children}</h4>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      className="text-v3-accent underline decoration-v3-accent/40 underline-offset-[3px] transition-colors duration-150 hover:text-v3-accent-2 hover:decoration-v3-accent-2"
-      {...(isExternal(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-    >
-      {children}
-    </a>
-  ),
-  strong: ({ children }) => <strong className="font-semibold text-v3-text">{children}</strong>,
+  a: ({ href, id, children, ...rest }) => {
+    // Footnote reference (the superscript number) and its back-link (↩).
+    if (href?.startsWith("#user-content-fn")) {
+      return (
+        <a
+          href={href}
+          id={id}
+          aria-describedby={rest["aria-describedby"]}
+          aria-label={rest["aria-label"]}
+          className="text-v3-accent no-underline px-[1px] transition-colors duration-150 hover:text-v3-accent-2"
+        >
+          {children}
+        </a>
+      );
+    }
+    return (
+      <a
+        href={href}
+        className="text-v3-accent underline decoration-v3-accent/40 underline-offset-[3px] transition-colors duration-150 hover:text-v3-accent-2 hover:decoration-v3-accent-2"
+        {...(isExternal(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
+        {children}
+      </a>
+    );
+  },
+  sup: ({ children }) => <sup className="text-[0.7em] leading-none align-super scroll-mt-24">{children}</sup>,
+  section: ({ className, children }) =>
+    className?.includes("footnotes") ? (
+      <section className="mt-2 pt-5 border-t border-v3-rule [&_ol]:text-[12px] [&_ol]:leading-[1.7] [&_ol]:text-v3-text-2 [&_p]:text-[12px] [&_p]:leading-[1.7] [&_p]:text-v3-text-2">
+        {children}
+      </section>
+    ) : (
+      <section>{children}</section>
+    ),  strong: ({ children }) => <strong className="font-semibold text-v3-text">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
   ul: ({ children }) => <ul className={`${text} m-0 pl-5 list-disc marker:text-v3-accent flex flex-col gap-2`}>{children}</ul>,
   ol: ({ children }) => <ol className={`${text} m-0 pl-6 list-decimal marker:text-v3-accent marker:tabular-nums flex flex-col gap-2`}>{children}</ol>,
-  li: ({ children }) => <li className="pl-1 [&>ul]:mt-2 [&>ol]:mt-2">{children}</li>,
+  li: ({ id, children }) => <li id={id} className="pl-1 scroll-mt-24 [&>ul]:mt-2 [&>ol]:mt-2">{children}</li>,
   blockquote: ({ children }) => (
     <blockquote className="m-0 border-l-2 border-v3-accent/55 pl-5 font-serif italic font-light text-[17px] leading-[1.6] text-v3-text-2 [&_p]:font-serif [&_p]:text-[17px] [&_p]:leading-[1.6] [&_p]:text-v3-text-2 max-[480px]:text-[15px] max-[480px]:[&_p]:text-[15px]">
       {children}

@@ -2,6 +2,10 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Markdown } from "../../_components/Markdown";
+import {
+  insertCodeBlock, insertFootnote, insertLink, toggleLinePrefix, wrapInline,
+  type Edit, type Selection,
+} from "@/lib/markdown-format";
 
 export const COLOR_OPTIONS = [
   "#a78bfa", "#7dd3fc", "#fcd34d", "#f472b6",
@@ -566,6 +570,42 @@ export function LinkList({
   );
 }
 
+type FormatAction = (sel: Selection) => Edit;
+
+/** Toolbar buttons, in order; `key` is the Ctrl/⌘ shortcut (matched on `KeyboardEvent.code`). */
+const FORMAT_ACTIONS: Array<{ label: React.ReactNode; title: string; key?: { code: string; shift?: boolean; alt?: boolean }; run: FormatAction; gap?: boolean }> = [
+  { label: <b>B</b>, title: "Bold", key: { code: "KeyB" }, run: (s) => wrapInline(s, "**", "bold") },
+  { label: <i>I</i>, title: "Italic", key: { code: "KeyI" }, run: (s) => wrapInline(s, "_", "italic") },
+  { label: <s>S</s>, title: "Strikethrough", key: { code: "KeyX", shift: true }, run: (s) => wrapInline(s, "~~", "text") },
+  { label: "H", title: "Heading", key: { code: "Digit2", alt: true }, run: (s) => toggleLinePrefix(s, "## "), gap: true },
+  { label: "“", title: "Quote", key: { code: "Digit9", shift: true }, run: (s) => toggleLinePrefix(s, "> ") },
+  { label: "•", title: "Bulleted list", key: { code: "Digit8", shift: true }, run: (s) => toggleLinePrefix(s, "- ") },
+  { label: "1.", title: "Numbered list", key: { code: "Digit7", shift: true }, run: (s) => toggleLinePrefix(s, "1. ") },
+  { label: "</>", title: "Inline code", key: { code: "KeyE" }, run: (s) => wrapInline(s, "`", "code"), gap: true },
+  { label: "{ }", title: "Code block", key: { code: "KeyE", shift: true }, run: insertCodeBlock },
+  { label: "Link", title: "Link", key: { code: "KeyK" }, run: (s) => insertLink(s), gap: true },
+  { label: "Img", title: "Image (paste a URL from the media page)", run: (s) => insertLink(s, true) },
+  { label: "¹", title: "Footnote", key: { code: "KeyF", alt: true }, run: insertFootnote },
+];
+
+/**
+ * Apply an edit through the browser's editing commands so it lands in the
+ * textarea's native undo history (Ctrl/⌘+Z works); falls back to a direct
+ * value change where execCommand isn't supported.
+ */
+function applyEdit(el: HTMLTextAreaElement, edit: Edit, onChange: (v: string) => void) {
+  el.focus();
+  el.setSelectionRange(edit.from, edit.to);
+  const ok = edit.text
+    ? document.execCommand("insertText", false, edit.text)
+    : edit.from === edit.to || document.execCommand("delete");
+  if (!ok) {
+    el.setRangeText(edit.text, edit.from, edit.to);
+    onChange(el.value);
+  }
+  el.setSelectionRange(edit.selStart, edit.selEnd);
+}
+
 function MarkdownTextarea({
   value,
   onChange,
@@ -576,16 +616,65 @@ function MarkdownTextarea({
   placeholder?: string;
 }) {
   const ref = useAutoResize(value);
+  // "Ctrl" during SSR and first paint; swapped after mount to avoid a hydration mismatch.
+  const [mod, setMod] = useState("Ctrl");
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.userAgent)) setMod("⌘");
+  }, []);
+
+  const run = (action: FormatAction) => {
+    const el = ref.current;
+    if (!el) return;
+    applyEdit(el, action({ value: el.value, start: el.selectionStart, end: el.selectionEnd }), onChange);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // AltGr reports as Ctrl+Alt on Windows; it types characters (AZERTY's ~, #, [ …), never a shortcut.
+    if (!(e.ctrlKey || e.metaKey) || e.getModifierState("AltGraph")) return;
+    const action = FORMAT_ACTIONS.find(
+      (a) => a.key && a.key.code === e.code && !!a.key.shift === e.shiftKey && !!a.key.alt === e.altKey,
+    );
+    if (!action) return;
+    e.preventDefault();
+    run(action.run);
+  };
+
+  const shortcut = (k: NonNullable<(typeof FORMAT_ACTIONS)[number]["key"]>) =>
+    [mod, k.shift && "Shift", k.alt && (mod === "⌘" ? "⌥" : "Alt"), k.code.replace(/^(Key|Digit)/, "")]
+      .filter(Boolean)
+      .join(mod === "⌘" ? "" : "+");
+
   return (
-    <textarea
-      ref={ref}
-      rows={1}
-      className={`${inputBase} resize-none overflow-hidden min-h-[320px] leading-[1.7]`}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      spellCheck
-    />
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-[2px]" role="toolbar" aria-label="Formatting">
+        {FORMAT_ACTIONS.map((a) => (
+          <button
+            key={a.title}
+            type="button"
+            title={a.key ? `${a.title} (${shortcut(a.key)})` : a.title}
+            aria-label={a.title}
+            // mousedown, not click: keeps focus (and the selection) in the textarea.
+            onMouseDown={(e) => {
+              e.preventDefault();
+              run(a.run);
+            }}
+            className={`min-w-[28px] h-[26px] px-[7px] font-mono text-[11.5px] text-a-text-2 bg-transparent border border-transparent rounded-[4px] cursor-pointer transition-colors duration-[140ms] hover:text-a-text hover:bg-a-bg-3 hover:border-a-border ${a.gap ? "ml-2" : ""}`}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+      <textarea
+        ref={ref}
+        rows={1}
+        className={`${inputBase} resize-none overflow-hidden min-h-[320px] leading-[1.7]`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        spellCheck
+      />
+    </div>
   );
 }
 
@@ -610,7 +699,7 @@ export function MarkdownEditor({
           />
         </div>
         <span className="text-[10.5px] text-a-text-dim font-mono">
-          **bold** · *italic* · [link](url) · ![alt](image-url) · - list · ## heading · `code`
+          Markdown · footnotes: text[^1] then [^1]: note
         </span>
       </div>
       {mode === "write" ? (
