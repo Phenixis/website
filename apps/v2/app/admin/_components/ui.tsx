@@ -3,7 +3,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Markdown } from "../../_components/Markdown";
 import {
-  insertCodeBlock, insertFootnote, insertLink, toggleLinePrefix, wrapInline,
+  Bold, Code, Heading2, Image as ImageIcon, Italic, Link, List, ListOrdered, ListTodo, Quote,
+  SquareCode, Strikethrough, Superscript, type LucideIcon,
+} from "lucide-react";
+import {
+  insertCodeBlock, insertFootnote, insertLink, moveLines, toggleChecklist, toggleLinePrefix, wrapInline,
   type Edit, type Selection,
 } from "@/lib/markdown-format";
 
@@ -581,22 +585,40 @@ export function LinkList({
 }
 
 type FormatAction = (sel: Selection) => Edit;
+/** A shortcut, matched on `KeyboardEvent.code` (physical key, so it works on AZERTY too). `mod` = Ctrl/⌘, on by default. */
+type Shortcut = { code: string; mod?: boolean; shift?: boolean; alt?: boolean };
 
-/** Toolbar buttons, in order; `key` is the Ctrl/⌘ shortcut (matched on `KeyboardEvent.code`). */
-const FORMAT_ACTIONS: Array<{ label: React.ReactNode; title: string; key?: { code: string; shift?: boolean; alt?: boolean }; run: FormatAction; gap?: boolean }> = [
-  { label: <b>B</b>, title: "Bold", key: { code: "KeyB" }, run: (s) => wrapInline(s, "**", "bold") },
-  { label: <i>I</i>, title: "Italic", key: { code: "KeyI" }, run: (s) => wrapInline(s, "_", "italic") },
-  { label: <s>S</s>, title: "Strikethrough", key: { code: "KeyX", shift: true }, run: (s) => wrapInline(s, "~~", "text") },
-  { label: "H", title: "Heading", key: { code: "Digit2", alt: true }, run: (s) => toggleLinePrefix(s, "## "), gap: true },
-  { label: "“", title: "Quote", key: { code: "Digit9", shift: true }, run: (s) => toggleLinePrefix(s, "> ") },
-  { label: "•", title: "Bulleted list", key: { code: "Digit8", shift: true }, run: (s) => toggleLinePrefix(s, "- ") },
-  { label: "1.", title: "Numbered list", key: { code: "Digit7", shift: true }, run: (s) => toggleLinePrefix(s, "1. ") },
-  { label: "</>", title: "Inline code", key: { code: "KeyE" }, run: (s) => wrapInline(s, "`", "code"), gap: true },
-  { label: "{ }", title: "Code block", key: { code: "KeyE", shift: true }, run: insertCodeBlock },
-  { label: "Link", title: "Link", key: { code: "KeyK" }, run: (s) => insertLink(s), gap: true },
-  { label: "Img", title: "Image (paste a URL from the media page)", run: (s) => insertLink(s, true) },
-  { label: "¹", title: "Footnote", key: { code: "KeyF", alt: true }, run: insertFootnote },
+// Shortcuts follow Maxime's Obsidian hotkeys (Obsidian defaults for bold,
+// italic and link). Actions with no Obsidian binding are button-only.
+const FORMAT_ACTIONS: Array<{ icon: LucideIcon; title: string; key?: Shortcut; run: FormatAction; gap?: boolean }> = [
+  { icon: Bold, title: "Bold", key: { code: "KeyB" }, run: (s) => wrapInline(s, "**", "bold") },
+  { icon: Italic, title: "Italic", key: { code: "KeyI" }, run: (s) => wrapInline(s, "_", "italic") },
+  { icon: Strikethrough, title: "Strikethrough", key: { code: "Space" }, run: (s) => wrapInline(s, "~~", "text") },
+  { icon: Code, title: "Inline code", key: { code: "Digit5" }, run: (s) => wrapInline(s, "`", "code") },
+  { icon: Heading2, title: "Heading", run: (s) => toggleLinePrefix(s, "## "), gap: true },
+  { icon: Quote, title: "Quote", key: { code: "Digit6" }, run: (s) => toggleLinePrefix(s, "> ") },
+  { icon: List, title: "Bulleted list", key: { code: "Digit4" }, run: (s) => toggleLinePrefix(s, "- ") },
+  { icon: ListOrdered, title: "Numbered list", key: { code: "Digit3" }, run: (s) => toggleLinePrefix(s, "1. ") },
+  { icon: ListTodo, title: "Checklist", key: { code: "Digit2" }, run: toggleChecklist },
+  { icon: SquareCode, title: "Code block", run: insertCodeBlock },
+  { icon: Link, title: "Link", key: { code: "KeyK" }, run: (s) => insertLink(s), gap: true },
+  { icon: ImageIcon, title: "Image (paste a URL from the media page)", run: (s) => insertLink(s, true) },
+  { icon: Superscript, title: "Footnote", run: insertFootnote },
 ];
+
+const SHORTCUT_ONLY: Array<{ key: Shortcut; run: FormatAction }> = [
+  { key: { code: "ArrowUp", mod: false, alt: true }, run: (s) => moveLines(s, "up") },
+  { key: { code: "ArrowDown", mod: false, alt: true }, run: (s) => moveLines(s, "down") },
+];
+
+function matches(k: Shortcut, e: React.KeyboardEvent): boolean {
+  return (
+    k.code === e.code &&
+    (k.mod ?? true) === (e.ctrlKey || e.metaKey) &&
+    !!k.shift === e.shiftKey &&
+    !!k.alt === e.altKey
+  );
+}
 
 /**
  * Apply an edit through the browser's editing commands so it lands in the
@@ -640,19 +662,20 @@ function MarkdownTextarea({
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // AltGr reports as Ctrl+Alt on Windows; it types characters (AZERTY's ~, #, [ …), never a shortcut.
-    if (!(e.ctrlKey || e.metaKey) || e.getModifierState("AltGraph")) return;
-    const action = FORMAT_ACTIONS.find(
-      (a) => a.key && a.key.code === e.code && !!a.key.shift === e.shiftKey && !!a.key.alt === e.altKey,
-    );
+    if (e.getModifierState("AltGraph")) return;
+    const action = [...FORMAT_ACTIONS, ...SHORTCUT_ONLY].find((a) => a.key && matches(a.key, e));
     if (!action) return;
     e.preventDefault();
     run(action.run);
   };
 
-  const shortcut = (k: NonNullable<(typeof FORMAT_ACTIONS)[number]["key"]>) =>
-    [mod, k.shift && "Shift", k.alt && (mod === "⌘" ? "⌥" : "Alt"), k.code.replace(/^(Key|Digit)/, "")]
+  const shortcut = (k: Shortcut) => {
+    const mac = mod === "⌘";
+    const key = { Space: "Space", ArrowUp: "↑", ArrowDown: "↓" }[k.code] ?? k.code.replace(/^(Key|Digit)/, "");
+    return [(k.mod ?? true) && mod, k.shift && (mac ? "⇧" : "Shift"), k.alt && (mac ? "⌥" : "Alt"), key]
       .filter(Boolean)
-      .join(mod === "⌘" ? "" : "+");
+      .join(mac ? "" : "+");
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -668,9 +691,9 @@ function MarkdownTextarea({
               e.preventDefault();
               run(a.run);
             }}
-            className={`min-w-[28px] h-[26px] px-[7px] font-mono text-[11.5px] text-a-text-2 bg-transparent border border-transparent rounded-[4px] cursor-pointer transition-colors duration-[140ms] hover:text-a-text hover:bg-a-bg-3 hover:border-a-border ${a.gap ? "ml-2" : ""}`}
+            className={`w-[28px] h-[28px] inline-flex items-center justify-center text-a-text-mute bg-transparent border border-transparent rounded-[4px] cursor-pointer transition-colors duration-[140ms] hover:text-a-text hover:bg-a-bg-3 hover:border-a-border ${a.gap ? "ml-[10px]" : ""}`}
           >
-            {a.label}
+            <a.icon size={15} strokeWidth={1.75} aria-hidden />
           </button>
         ))}
       </div>
@@ -708,9 +731,6 @@ export function MarkdownEditor({
             options={[{ value: "write", label: "Write" }, { value: "preview", label: "Preview" }]}
           />
         </div>
-        <span className="text-[10.5px] text-a-text-dim font-mono">
-          Markdown · footnotes: text[^1] then [^1]: note
-        </span>
       </div>
       {mode === "write" ? (
         <MarkdownTextarea value={value} onChange={onChange} placeholder={placeholder} />

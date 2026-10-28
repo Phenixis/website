@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { insertCodeBlock, insertFootnote, insertLink, toggleLinePrefix, wrapInline, type Edit, type Selection } from "./markdown-format";
+import { insertCodeBlock, insertFootnote, insertLink, moveLines, toggleChecklist, toggleLinePrefix, wrapInline, type Edit, type Selection } from "./markdown-format";
 
 /** Apply an edit and return the new value with the selection marked as [ ]. */
 function apply(sel: Selection, edit: Edit): string {
@@ -78,5 +78,44 @@ describe("insertCodeBlock", () => {
   });
   it("starts the fence on its own line", () => {
     expect(apply(sel("text []"), insertCodeBlock(sel("text []")))).toBe("text \n```\n[code]\n```");
+  });
+});
+
+describe("toggleChecklist", () => {
+  it("adds an unchecked box, converting a bullet", () => {
+    expect(apply(sel("[buy milk\n- eggs]"), toggleChecklist(sel("[buy milk\n- eggs]")))).toBe("[- [ ] buy milk\n- [ ] eggs]");
+  });
+  it("checks, then unchecks", () => {
+    const once = "- [ ] milk";
+    const checked = toggleChecklist({ value: once, start: 8, end: 8 });
+    expect(checked.text).toBe("- [x] milk");
+    expect(toggleChecklist({ value: checked.text, start: 8, end: 8 }).text).toBe("- [ ] milk");
+  });
+});
+
+describe("moveLines", () => {
+  const value = "one\ntwo\nthree";
+  const at = (w: string) => ({ value, start: value.indexOf(w) + 1, end: value.indexOf(w) + 1 });
+  const run = (s: Selection, d: "up" | "down") => {
+    const e = moveLines(s, d);
+    return { v: s.value.slice(0, e.from) + e.text + s.value.slice(e.to), caret: e.selStart };
+  };
+  it("moves a line up and keeps the caret on it", () => {
+    const r = run(at("two"), "up");
+    expect(r.v).toBe("two\none\nthree");
+    expect(r.v.slice(r.caret - 1, r.caret + 2)).toBe("two");
+  });
+  it("moves a line down", () => {
+    const r = run(at("two"), "down");
+    expect(r.v).toBe("one\nthree\ntwo");
+    expect(r.v.slice(r.caret - 1, r.caret + 2)).toBe("two");
+  });
+  it("does nothing at the edges", () => {
+    expect(run(at("one"), "up").v).toBe(value);
+    expect(run(at("three"), "down").v).toBe(value);
+  });
+  it("moves several selected lines together", () => {
+    const e = moveLines({ value, start: 0, end: 7 }, "down");
+    expect(value.slice(0, e.from) + e.text + value.slice(e.to)).toBe("three\none\ntwo");
   });
 });

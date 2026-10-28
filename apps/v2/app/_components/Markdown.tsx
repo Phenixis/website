@@ -60,7 +60,17 @@ const components: Components = {
   em: ({ children }) => <em className="italic">{children}</em>,
   ul: ({ children }) => <ul className={`${text} m-0 pl-5 list-disc marker:text-v3-accent flex flex-col gap-2`}>{children}</ul>,
   ol: ({ children }) => <ol className={`${text} m-0 pl-6 list-decimal marker:text-v3-accent marker:tabular-nums flex flex-col gap-2`}>{children}</ol>,
-  li: ({ id, children }) => <li id={id} className="pl-1 scroll-mt-24 [&>ul]:mt-2 [&>ol]:mt-2">{children}</li>,
+  li: ({ id, className, children }) =>
+    // GFM task list item ("- [ ] …"): the checkbox replaces the bullet.
+    className?.includes("task-list-item") ? (
+      <li className="list-none -ml-5 flex items-baseline gap-[10px] [&>ul]:mt-2 [&>ol]:mt-2">{children}</li>
+    ) : (
+      <li id={id} className="pl-1 scroll-mt-24 [&>ul]:mt-2 [&>ol]:mt-2">{children}</li>
+    ),
+  input: ({ type, checked }) =>
+    type === "checkbox" ? (
+      <input type="checkbox" checked={!!checked} disabled className="accent-v3-accent translate-y-[1px] shrink-0" />
+    ) : null,
   blockquote: ({ children }) => (
     <blockquote className="m-0 border-l-2 border-v3-accent/55 pl-5 font-serif italic font-light text-[17px] leading-[1.6] text-v3-text-2 [&_p]:font-serif [&_p]:text-[17px] [&_p]:leading-[1.6] [&_p]:text-v3-text-2 max-[480px]:text-[15px] max-[480px]:[&_p]:text-[15px]">
       {children}

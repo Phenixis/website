@@ -114,3 +114,45 @@ export function insertCodeBlock({ value, start, end }: Selection): Edit {
   const bodyStart = from + before.length + 4;
   return { from, to, text, selStart: bodyStart, selEnd: bodyStart + body.length };
 }
+
+const TASK = /^(\s*)[-*+] \[([ xX])\] /;
+
+/**
+ * Cycle a checklist on every selected line, like Obsidian's "Toggle checkbox
+ * status": plain or list line → `- [ ] `, `- [ ] ` → `- [x] `, `- [x] ` → `- [ ] `.
+ */
+export function toggleChecklist({ value, start, end }: Selection): Edit {
+  const [from, to] = lineBounds(value, start, end);
+  const lines = value.slice(from, to).split("\n");
+  const next = lines.map((line) => {
+    if (!line.trim()) return line;
+    const task = line.match(TASK);
+    if (task) return line.replace(TASK, `$1- [${task[2] === " " ? "x" : " "}] `);
+    return LIST_PREFIX.test(line) ? line.replace(LIST_PREFIX, "$1- [ ] ") : `- [ ] ${line}`;
+  });
+  const text = next.join("\n");
+  if (start === end) {
+    const caret = Math.max(from, start + (next[0].length - lines[0].length));
+    return { from, to, text, selStart: caret, selEnd: caret };
+  }
+  return { from, to, text, selStart: from, selEnd: from + text.length };
+}
+
+/** Swap the selected lines with the line above or below (Obsidian's Alt+↑/↓), keeping the selection on them. */
+export function moveLines({ value, start, end }: Selection, direction: "up" | "down"): Edit {
+  const [from, to] = lineBounds(value, start, end);
+  const block = value.slice(from, to);
+  if (direction === "up") {
+    if (from === 0) return { from, to, text: block, selStart: start, selEnd: end };
+    const prevStart = value.lastIndexOf("\n", from - 2) + 1;
+    const prev = value.slice(prevStart, from - 1);
+    const shift = prev.length + 1;
+    return { from: prevStart, to, text: `${block}\n${prev}`, selStart: start - shift, selEnd: end - shift };
+  }
+  if (to === value.length) return { from, to, text: block, selStart: start, selEnd: end };
+  const nextEnd = value.indexOf("\n", to + 1);
+  const nextLineEnd = nextEnd === -1 ? value.length : nextEnd;
+  const nextLine = value.slice(to + 1, nextLineEnd);
+  const shift = nextLine.length + 1;
+  return { from, to: nextLineEnd, text: `${nextLine}\n${block}`, selStart: start + shift, selEnd: end + shift };
+}
