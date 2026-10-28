@@ -1,0 +1,44 @@
+name: v2 sync preview DB
+
+# After each successful production deploy of website-v2 (whose build has
+# already applied main's migrations to the main database), overwrite the
+# Turso "preview" branch with a copy of main, so preview deployments start
+# from production's schema and data. Can also be run by hand from Actions.
+on:
+  deployment_status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-sync-preview-db
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production – website-v2')
+    runs-on: ubuntu-latest
+    env:
+      TURSO_MAIN_DATABASE_URL: ${{ secrets.TURSO_MAIN_DATABASE_URL }}
+      TURSO_MAIN_AUTH_TOKEN: ${{ secrets.TURSO_MAIN_AUTH_TOKEN }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Copy main database into preview
+        run: pnpm --filter v2 sync-preview-db
