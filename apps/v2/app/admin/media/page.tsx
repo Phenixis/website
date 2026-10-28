@@ -24,6 +24,32 @@ function isImage(pathname: string): boolean {
   return /\.(png|jpe?g|webp|gif|svg)$/i.test(pathname);
 }
 
+/**
+ * The Clipboard API only exists in secure contexts (HTTPS, localhost), so over
+ * plain HTTP — the dev server reached from another machine — fall back to a
+ * selected textarea, then to a prompt the text can be copied from by hand.
+ */
+async function copyText(text: string): Promise<boolean> {
+  if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Permission denied: try the fallbacks below.
+    }
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) window.prompt("Copy the Markdown:", text);
+  return copied;
+}
+
 export default function MediaPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<MediaItem[]>([]);
@@ -34,7 +60,7 @@ export default function MediaPage() {
 
   const copyMarkdown = async (item: MediaItem) => {
     const alt = item.pathname.replace(/\.[^.]+$/, "").replace(/[[\]]/g, "");
-    await navigator.clipboard.writeText(`![${alt}](${item.src})`);
+    if (!(await copyText(`![${alt}](${item.src})`))) return;
     setCopied(item.url);
     setTimeout(() => setCopied((c) => (c === item.url ? null : c)), 1500);
   };
