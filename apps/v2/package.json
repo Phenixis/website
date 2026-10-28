@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "migrate": "tsx scripts/migrate.ts",
+    "sync-preview-db": "tsx scripts/sync-preview-db.ts",
     "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
