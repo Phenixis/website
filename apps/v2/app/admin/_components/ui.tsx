@@ -77,8 +77,10 @@ export const editPageCls = {
   // scroll-pb keeps the caret clear of the sticky FormBar when the browser
   // scrolls it into view while typing (form scrolls ≤980px, formMain above).
   form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden scroll-pb-[120px] max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
+  // Top spacing is a margin on the first child, not padding: a scroller's
+  // padding-top would leave a gap above the sticky Markdown toolbar.
   formMain:
-    "scroll-thin-a-wide overflow-y-auto scroll-pb-[120px] pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
+    "scroll-thin-a-wide overflow-y-auto scroll-pb-[120px] [&>:first-child]:mt-7 px-9 pb-0 border-r border-a-border max-[1100px]:[&>:first-child]:mt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:[&>:first-child]:mt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
   formSide:
     "scroll-thin-a-wide overflow-y-auto pt-6 px-[22px] pb-15 bg-a-bg-2 max-[1100px]:pt-5 max-[1100px]:px-4 max-[980px]:overflow-visible max-[980px]:pt-5 max-[980px]:px-6 max-[980px]:pb-12 max-[560px]:pt-4 max-[560px]:px-4 max-[560px]:pb-10",
   sideCard: "p-[14px] bg-a-bg-3 border border-a-border rounded-md mb-[14px]",
@@ -679,7 +681,7 @@ function MarkdownTextarea({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-[2px]" role="toolbar" aria-label="Formatting">
+      <div className="sticky top-0 z-10 bg-a-bg py-2 flex flex-wrap items-center gap-[2px]" role="toolbar" aria-label="Formatting">
         {FORMAT_ACTIONS.map((a) => (
           <button
             key={a.title}
