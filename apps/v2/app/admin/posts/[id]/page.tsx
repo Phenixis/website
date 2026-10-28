@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import type { Post } from "../../../data";
 import {
   Badge, DraftAccessSection, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Chips, Paragraphs, Segmented, editPageCls,
+  TextInput, Textarea, Chips, MarkdownEditor, Segmented, editPageCls,
 } from "../../_components/ui";
 
 const BLANK: Post = {
@@ -15,7 +15,7 @@ const BLANK: Post = {
   readTime: "",
   tags: [],
   excerpt: "",
-  body: [""],
+  body: "",
   published: false,
 };
 
@@ -127,7 +127,7 @@ export default function PostEditPage() {
     if (loading || rev.current === savedRev.current) return;
     if (p.published !== false || !persistedAsDraft.current) return;
     // Don't create an empty "Untitled post" before anything meaningful is typed.
-    if (postId === null && p.title === BLANK.title && !p.excerpt && !p.body.some((b) => b.trim())) return;
+    if (postId === null && p.title === BLANK.title && !p.excerpt && !p.body.trim()) return;
     const timer = setTimeout(() => { save({ auto: true }); }, 3_000);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,8 +159,8 @@ export default function PostEditPage() {
             <Field label="Excerpt" hint="Lede shown in the list and as the article intro">
               <Textarea value={p.excerpt} onChange={(v) => update("excerpt", v)} variant="lede" placeholder="Opening line…" />
             </Field>
-            <Field label="Body" hint="One paragraph per block">
-              <Paragraphs value={p.body} onChange={(v) => update("body", v)} />
+            <Field label="Body" hint="Markdown · blank line between paragraphs · images from the media page">
+              <MarkdownEditor value={p.body} onChange={(v) => update("body", v)} />
             </Field>
           </FormSection>
           <FormBar

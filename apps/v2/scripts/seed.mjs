@@ -68,6 +68,7 @@ const PROJECTS = [
   { id: "wisecart", title: "Wisecart", year: "2024", kind: "App", status: "archived", blurb: "A shopping-list app: pick the meals you'll cook this week and it builds the list for you. My first shipped app.", stack: ["Next.js", "Tailwind CSS", "React"], color: "#34d399", role: "Solo", body: ["I worked on Wisecart between September and December 2024, right after discovering indie hacking. I had no idea what to build, so I looked at my own problem: I kept forgetting items at the shop and never knew what to cook for dinner.", "I learned Next.js, Tailwind CSS and React to build it, working on it every day before and after class. In mid-October I found Vercel's 'SaaS Starter' boilerplate, forked it, rebuilt the app on top of it, and shipped a working version at wisecart.app in early December.", "Looking back, the app itself is rough — too wide, a loading flash before the landing page, a flat design. But it solved my actual problem and it was my first real shipped product, which mattered more than the polish.", "Wisecart is discontinued: I'm folding a better version of it into Life OS instead of maintaining it separately."], links: [{ label: "wisecart.app", href: "https://wisecart.app" }] },
 ];
 
+// Bodies are written as Markdown: paragraphs joined by a blank line.
 await db.execute("DELETE FROM projects");
 
 for (let i = 0; i < PROJECTS.length; i++) {
@@ -75,7 +76,7 @@ for (let i = 0; i < PROJECTS.length; i++) {
   await db.execute({
     sql: `INSERT OR REPLACE INTO projects (id, title, year, kind, status, blurb, body, stack, color, role, links, sort_order)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [p.id, p.title, p.year, p.kind, p.status, p.blurb, JSON.stringify(p.body), JSON.stringify(p.stack), p.color, p.role ?? null, p.links?.length ? JSON.stringify(p.links) : null, i],
+    args: [p.id, p.title, p.year, p.kind, p.status, p.blurb, p.body.join("\n\n"), JSON.stringify(p.stack), p.color, p.role ?? null, p.links?.length ? JSON.stringify(p.links) : null, i],
   });
 }
 console.log(`✓ Seeded ${PROJECTS.length} projects`);
@@ -93,7 +94,7 @@ for (let i = 0; i < POSTS.length; i++) {
   await db.execute({
     sql: `INSERT OR REPLACE INTO posts (id, title, date, read_time, tags, excerpt, body, sort_order)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, JSON.stringify(p.body), i],
+    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, p.body.join("\n\n"), i],
   });
 }
 console.log(`✓ Seeded ${POSTS.length} posts`);

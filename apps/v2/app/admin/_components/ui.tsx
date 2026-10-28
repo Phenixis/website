@@ -1,6 +1,15 @@
 "use client";
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Markdown } from "../../_components/Markdown";
+import {
+  Bold, Code, Heading2, Image as ImageIcon, Italic, Link, List, ListOrdered, ListTodo, Quote,
+  SquareCode, Strikethrough, Superscript, type LucideIcon,
+} from "lucide-react";
+import {
+  insertCodeBlock, insertFootnote, insertLink, moveLines, toggleChecklist, toggleLinePrefix, wrapInline,
+  type Edit, type Selection,
+} from "@/lib/markdown-format";
 
 export const COLOR_OPTIONS = [
   "#a78bfa", "#7dd3fc", "#fcd34d", "#f472b6",
@@ -65,9 +74,11 @@ export const editPageCls = {
   loading: "flex items-center justify-center h-full text-a-text-mute",
   inputTitle:
     "font-serif font-normal text-[22px] tracking-[-0.01em] px-[14px] py-3 bg-transparent border border-transparent rounded-[5px] w-full outline-none transition-all duration-[140ms] text-a-text hover:bg-a-bg-2 hover:border-a-border focus:bg-a-bg-2 focus:border-a-accent placeholder:text-a-text-dim placeholder:italic",
-  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
+  // scroll-pb keeps the caret clear of the sticky FormBar when the browser
+  // scrolls it into view while typing (form scrolls ≤980px, formMain above).
+  form: "grid grid-cols-[1fr_320px] flex-1 min-h-0 h-full overflow-hidden scroll-pb-[120px] max-[1100px]:grid-cols-[1fr_280px] max-[980px]:grid-cols-1 max-[980px]:overflow-y-auto",
   formMain:
-    "scroll-thin-a-wide overflow-y-auto pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
+    "scroll-thin-a-wide overflow-y-auto scroll-pb-[120px] pt-7 px-9 pb-0 border-r border-a-border max-[1100px]:pt-[22px] max-[1100px]:px-[26px] max-[980px]:border-r-0 max-[980px]:border-b max-[980px]:border-a-border max-[980px]:pt-[22px] max-[980px]:px-6 max-[980px]:pb-0 max-[980px]:overflow-visible max-[560px]:pt-[18px] max-[560px]:px-4 max-[560px]:pb-8",
   formSide:
     "scroll-thin-a-wide overflow-y-auto pt-6 px-[22px] pb-15 bg-a-bg-2 max-[1100px]:pt-5 max-[1100px]:px-4 max-[980px]:overflow-visible max-[980px]:pt-5 max-[980px]:px-6 max-[980px]:pb-12 max-[560px]:pt-4 max-[560px]:px-4 max-[560px]:pb-10",
   sideCard: "p-[14px] bg-a-bg-3 border border-a-border rounded-md mb-[14px]",
@@ -348,8 +359,16 @@ function useAutoResize(value: string) {
   const fit = () => {
     const el = ref.current;
     if (!el) return;
+    // Collapsing to "auto" to measure briefly shrinks the page, which clamps
+    // the scroll position of every scrolling ancestor — on a long text the
+    // view would jump away from the caret on each keystroke. Restore them.
+    const scrolled: Array<[Element, number]> = [];
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      if (p.scrollTop > 0) scrolled.push([p, p.scrollTop]);
+    }
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight + 2}px`;
+    for (const [p, top] of scrolled) p.scrollTop = top;
   };
   useLayoutEffect(fit, [value]);
   useEffect(() => {
@@ -565,68 +584,165 @@ export function LinkList({
   );
 }
 
-function ParagraphField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const ref = useAutoResize(value);
+type FormatAction = (sel: Selection) => Edit;
+/** A shortcut, matched on `KeyboardEvent.code` (physical key, so it works on AZERTY too). `mod` = Ctrl/⌘, on by default. */
+type Shortcut = { code: string; mod?: boolean; shift?: boolean; alt?: boolean };
+
+// Shortcuts follow Maxime's Obsidian hotkeys (Obsidian defaults for bold,
+// italic and link). Actions with no Obsidian binding are button-only.
+const FORMAT_ACTIONS: Array<{ icon: LucideIcon; title: string; key?: Shortcut; run: FormatAction; gap?: boolean }> = [
+  { icon: Bold, title: "Bold", key: { code: "KeyB" }, run: (s) => wrapInline(s, "**", "bold") },
+  { icon: Italic, title: "Italic", key: { code: "KeyI" }, run: (s) => wrapInline(s, "_", "italic") },
+  { icon: Strikethrough, title: "Strikethrough", key: { code: "Space" }, run: (s) => wrapInline(s, "~~", "text") },
+  { icon: Code, title: "Inline code", key: { code: "Digit5" }, run: (s) => wrapInline(s, "`", "code") },
+  { icon: Heading2, title: "Heading", run: (s) => toggleLinePrefix(s, "## "), gap: true },
+  { icon: Quote, title: "Quote", key: { code: "Digit6" }, run: (s) => toggleLinePrefix(s, "> ") },
+  { icon: List, title: "Bulleted list", key: { code: "Digit4" }, run: (s) => toggleLinePrefix(s, "- ") },
+  { icon: ListOrdered, title: "Numbered list", key: { code: "Digit3" }, run: (s) => toggleLinePrefix(s, "1. ") },
+  { icon: ListTodo, title: "Checklist", key: { code: "Digit2" }, run: toggleChecklist },
+  { icon: SquareCode, title: "Code block", run: insertCodeBlock },
+  { icon: Link, title: "Link", key: { code: "KeyK" }, run: (s) => insertLink(s), gap: true },
+  { icon: ImageIcon, title: "Image (paste a URL from the media page)", run: (s) => insertLink(s, true) },
+  { icon: Superscript, title: "Footnote", run: insertFootnote },
+];
+
+const SHORTCUT_ONLY: Array<{ key: Shortcut; run: FormatAction }> = [
+  { key: { code: "ArrowUp", mod: false, alt: true }, run: (s) => moveLines(s, "up") },
+  { key: { code: "ArrowDown", mod: false, alt: true }, run: (s) => moveLines(s, "down") },
+];
+
+function matches(k: Shortcut, e: React.KeyboardEvent): boolean {
   return (
-    <textarea
-      ref={ref}
-      rows={1}
-      className="font-mono text-[12.5px] bg-a-bg border border-a-border text-a-text px-3 py-2 rounded-[5px] outline-none resize-none overflow-hidden min-h-16 leading-[1.65] w-full focus:border-a-accent focus:bg-a-bg-2"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
+    k.code === e.code &&
+    (k.mod ?? true) === (e.ctrlKey || e.metaKey) &&
+    !!k.shift === e.shiftKey &&
+    !!k.alt === e.altKey
   );
 }
 
-export function Paragraphs({
+/**
+ * Apply an edit through the browser's editing commands so it lands in the
+ * textarea's native undo history (Ctrl/⌘+Z works); falls back to a direct
+ * value change where execCommand isn't supported.
+ */
+function applyEdit(el: HTMLTextAreaElement, edit: Edit, onChange: (v: string) => void) {
+  el.focus();
+  el.setSelectionRange(edit.from, edit.to);
+  const ok = edit.text
+    ? document.execCommand("insertText", false, edit.text)
+    : edit.from === edit.to || document.execCommand("delete");
+  if (!ok) {
+    el.setRangeText(edit.text, edit.from, edit.to);
+    onChange(el.value);
+  }
+  el.setSelectionRange(edit.selStart, edit.selEnd);
+}
+
+function MarkdownTextarea({
   value,
   onChange,
+  placeholder,
 }: {
-  value: string[];
-  onChange: (v: string[]) => void;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
 }) {
-  const move = (from: number, to: number) => {
-    if (to < 0 || to >= value.length) return;
-    const next = [...value];
-    const [item] = next.splice(from, 1);
-    next.splice(to, 0, item);
-    onChange(next);
+  const ref = useAutoResize(value);
+  // "Ctrl" during SSR and first paint; swapped after mount to avoid a hydration mismatch.
+  const [mod, setMod] = useState("Ctrl");
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.userAgent)) setMod("⌘");
+  }, []);
+
+  const run = (action: FormatAction) => {
+    const el = ref.current;
+    if (!el) return;
+    applyEdit(el, action({ value: el.value, start: el.selectionStart, end: el.selectionEnd }), onChange);
   };
-  const arrowCls =
-    "bg-transparent border-0 text-a-text-dim text-[11px] leading-none cursor-pointer p-0 hover:text-a-accent disabled:opacity-30 disabled:cursor-default disabled:hover:text-a-text-dim";
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // AltGr reports as Ctrl+Alt on Windows; it types characters (AZERTY's ~, #, [ …), never a shortcut.
+    if (e.getModifierState("AltGraph")) return;
+    const action = [...FORMAT_ACTIONS, ...SHORTCUT_ONLY].find((a) => a.key && matches(a.key, e));
+    if (!action) return;
+    e.preventDefault();
+    run(action.run);
+  };
+
+  const shortcut = (k: Shortcut) => {
+    const mac = mod === "⌘";
+    const key = { Space: "Space", ArrowUp: "↑", ArrowDown: "↓" }[k.code] ?? k.code.replace(/^(Key|Digit)/, "");
+    return [(k.mod ?? true) && mod, k.shift && (mac ? "⇧" : "Shift"), k.alt && (mac ? "⌥" : "Alt"), key]
+      .filter(Boolean)
+      .join(mac ? "" : "+");
+  };
+
   return (
-    <div className="flex flex-col gap-[10px]">
-      {value.map((p, i) => (
-        <div key={i} className="grid grid-cols-[40px_1fr_24px] gap-2 items-start">
-          <div className="flex flex-col items-center gap-[2px] pt-[6px]">
-            <button className={arrowCls} disabled={i === 0} onClick={() => move(i, i - 1)} title="Move up">
-              ▲
-            </button>
-            <span className="font-serif italic text-[14px] text-a-accent tabular-nums">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <button className={arrowCls} disabled={i === value.length - 1} onClick={() => move(i, i + 1)} title="Move down">
-              ▼
-            </button>
-          </div>
-          <ParagraphField
-            value={p}
-            onChange={(v) => onChange(value.map((x, j) => j === i ? v : x))}
-          />
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-[2px]" role="toolbar" aria-label="Formatting">
+        {FORMAT_ACTIONS.map((a) => (
           <button
-            className="bg-transparent border-0 text-a-text-dim text-[14px] cursor-pointer pt-[10px] hover:text-a-red"
-            onClick={() => onChange(value.filter((_, j) => j !== i))}
+            key={a.title}
+            type="button"
+            title={a.key ? `${a.title} (${shortcut(a.key)})` : a.title}
+            aria-label={a.title}
+            // mousedown, not click: keeps focus (and the selection) in the textarea.
+            onMouseDown={(e) => {
+              e.preventDefault();
+              run(a.run);
+            }}
+            className={`w-[28px] h-[28px] inline-flex items-center justify-center text-a-text-mute bg-transparent border border-transparent rounded-[4px] cursor-pointer transition-colors duration-[140ms] hover:text-a-text hover:bg-a-bg-3 hover:border-a-border ${a.gap ? "ml-[10px]" : ""}`}
           >
-            ×
+            <a.icon size={15} strokeWidth={1.75} aria-hidden />
           </button>
+        ))}
+      </div>
+      <textarea
+        ref={ref}
+        rows={1}
+        className={`${inputBase} resize-none overflow-hidden min-h-[320px] leading-[1.7]`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+        spellCheck
+      />
+    </div>
+  );
+}
+
+export function MarkdownEditor({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  const [mode, setMode] = useState<"write" | "preview">("write");
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3 max-[480px]:flex-col max-[480px]:items-start">
+        <div className="w-[180px]">
+          <Segmented
+            value={mode}
+            onChange={(v) => setMode(v as "write" | "preview")}
+            options={[{ value: "write", label: "Write" }, { value: "preview", label: "Preview" }]}
+          />
         </div>
-      ))}
-      <button
-        className="self-start text-[10.5px] text-a-accent bg-transparent border border-dashed border-a-border-strong px-3 py-1 rounded-[4px] cursor-pointer font-mono tracking-[0.05em] hover:border-a-accent"
-        onClick={() => onChange([...value, ""])}
-      >
-        + Add paragraph
-      </button>
+      </div>
+      {mode === "write" ? (
+        <MarkdownTextarea value={value} onChange={onChange} placeholder={placeholder} />
+      ) : (
+        <div className="bg-v3-bg border border-a-border rounded-[5px] px-5 py-4 min-h-[320px]">
+          {value.trim() ? (
+            <Markdown source={value} />
+          ) : (
+            <span className="text-a-text-dim italic text-[12px] font-mono">Nothing to preview yet.</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

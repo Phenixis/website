@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import type { Project } from "../../data";
+import { Markdown } from "../../_components/Markdown";
 import { ViewCounter } from "../../_components/ViewCounter";
 import { DetailFooter } from "../../_components/portfolio/DetailFooter";
 
@@ -148,13 +149,7 @@ export function ProjectDetail({
 
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />
 
-      <div className="flex flex-col gap-[22px] max-[720px]:gap-[18px]">
-        {project.body.map((para, i) => (
-          <p key={i} className="font-mono text-[13.5px] leading-[1.85] text-v3-text m-0 text-pretty whitespace-pre-line max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]">
-            {para}
-          </p>
-        ))}
-      </div>
+      <Markdown source={project.body} />
 
       <DetailFooter
         sign={

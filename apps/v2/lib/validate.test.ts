@@ -9,7 +9,7 @@ describe("validateProject", () => {
     kind: "App",
     status: "shipping",
     blurb: "A note-taking app.",
-    body: ["Paragraph one."],
+    body: "Paragraph one.\n\nParagraph **two**.",
     stack: ["SwiftUI"],
     color: "#a78bfa",
   };
@@ -50,6 +50,10 @@ describe("validateProject", () => {
     expect(() => validateProject({ ...base, stack: [1, 2] })).toThrow(ValidationError);
   });
 
+  it("rejects a non-string (legacy paragraph array) body", () => {
+    expect(() => validateProject({ ...base, body: ["Paragraph one."] })).toThrow(ValidationError);
+  });
+
   it("rejects an invalid category", () => {
     expect(() => validateProject({ ...base, category: "bonus" })).toThrow(ValidationError);
   });
@@ -72,11 +76,15 @@ describe("validatePost", () => {
     readTime: "8 min",
     tags: ["craft"],
     excerpt: "Three years in.",
-    body: ["Paragraph one."],
+    body: "Paragraph one.\n\nParagraph **two**.",
   };
 
   it("accepts a well-formed post", () => {
     expect(validatePost(base)).toMatchObject({ id: "slow-building" });
+  });
+
+  it("accepts an empty body (drafts)", () => {
+    expect(validatePost({ ...base, body: "" }).body).toBe("");
   });
 
   it("rejects tags that aren't strings", () => {

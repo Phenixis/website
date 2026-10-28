@@ -27,6 +27,14 @@ export default function MediaPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const copyMarkdown = async (item: MediaItem) => {
+    const alt = item.pathname.replace(/\.[^.]+$/, "").replace(/[[\]]/g, "");
+    await navigator.clipboard.writeText(`![${alt}](${item.url})`);
+    setCopied(item.url);
+    setTimeout(() => setCopied((c) => (c === item.url ? null : c)), 1500);
+  };
 
   const load = () => {
     fetch("/api/media")
@@ -100,7 +108,7 @@ export default function MediaPage() {
           <div className={emptyCls.wrap}>
             <span className={emptyCls.icon}>◻</span>
             <span className={emptyCls.label}>No media yet</span>
-            <span className={emptyCls.hint}>Upload an image to use as a hero or thumbnail.</span>
+            <span className={emptyCls.hint}>Upload an image to use as a hero, thumbnail, or in a post body.</span>
           </div>
         ) : (
           <div className={mediaCls.grid}>
@@ -127,6 +135,15 @@ export default function MediaPage() {
                 <div className={mediaCls.info}>
                   <span className={mediaCls.name}>{item.pathname}</span>
                   <span className={mediaCls.size}>{formatSize(item.size)}</span>
+                  {isImage(item.pathname) && (
+                    <button
+                      className="mt-[6px] bg-transparent border-0 p-0 font-mono text-[10px] text-a-accent cursor-pointer hover:text-a-accent-2"
+                      onClick={() => copyMarkdown(item)}
+                      title="Copy a Markdown image tag to paste into a post or project body"
+                    >
+                      {copied === item.url ? "✓ Copied" : "Copy Markdown"}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

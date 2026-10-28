@@ -5,7 +5,8 @@ export type Project = {
   kind: string;
   status: "shipping" | "paused" | "archived";
   blurb: string;
-  body: string[];
+  /** Markdown. */
+  body: string;
   stack: string[];
   color: string;
   role?: string;
@@ -26,7 +27,8 @@ export type Post = {
   readTime: string;
   tags: string[];
   excerpt: string;
-  body: string[];
+  /** Markdown. */
+  body: string;
   published?: boolean;
   /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
   hasDraftPassword?: boolean;
