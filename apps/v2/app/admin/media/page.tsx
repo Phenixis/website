@@ -5,7 +5,10 @@ import { upload } from "@vercel/blob/client";
 import { Btn, PageHead, Toolbar, pageBodyCls, mediaCls, emptyCls, kbdCls } from "../_components/ui";
 
 type MediaItem = {
+  /** Blob URL — private, only used to identify the file for deletion. */
   url: string;
+  /** Where the site serves the file (/media/…). */
+  src: string;
   pathname: string;
   size: number;
   uploadedAt: string;
@@ -31,15 +34,19 @@ export default function MediaPage() {
 
   const copyMarkdown = async (item: MediaItem) => {
     const alt = item.pathname.replace(/\.[^.]+$/, "").replace(/[[\]]/g, "");
-    await navigator.clipboard.writeText(`![${alt}](${item.url})`);
+    await navigator.clipboard.writeText(`![${alt}](${item.src})`);
     setCopied(item.url);
     setTimeout(() => setCopied((c) => (c === item.url ? null : c)), 1500);
   };
 
   const load = () => {
     fetch("/api/media")
-      .then((r) => r.json())
-      .then((data: MediaItem[]) => setItems(data))
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error ?? "Could not load media");
+        setItems(data as MediaItem[]);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load media"))
       .finally(() => setLoading(false));
   };
 
@@ -49,7 +56,7 @@ export default function MediaPage() {
     setUploading(true);
     setError(null);
     try {
-      await upload(file.name, file, { access: "public", handleUploadUrl: "/api/media/upload" });
+      await upload(file.name, file, { access: "private", handleUploadUrl: "/api/media/upload" });
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
@@ -58,14 +65,20 @@ export default function MediaPage() {
     }
   };
 
-  const handleDelete = async (url: string) => {
+  const handleDelete = async (item: MediaItem) => {
     if (!window.confirm("Delete this file?")) return;
-    setItems((prev) => prev.filter((i) => i.url !== url));
-    await fetch("/api/media", {
+    const previous = items;
+    setItems((prev) => prev.filter((i) => i.url !== item.url));
+    setError(null);
+    const res = await fetch("/api/media", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
+      body: JSON.stringify({ url: item.url }),
+    }).catch(() => null);
+    if (!res?.ok) {
+      setItems(previous);
+      setError(`Could not delete ${item.pathname}`);
+    }
   };
 
   return (
@@ -118,16 +131,16 @@ export default function MediaPage() {
                   className="absolute top-1 right-1 z-10 w-5 h-5 rounded-[3px] bg-black/60 text-white/80 text-[12px] leading-none opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-black/80"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(item.url);
+                    handleDelete(item);
                   }}
                   title="Delete"
                 >
                   ×
                 </button>
-                <a href={item.url} target="_blank" rel="noreferrer" className={mediaCls.thumb}>
+                <a href={item.src} target="_blank" rel="noreferrer" className={mediaCls.thumb}>
                   {isImage(item.pathname) ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- external blob URL, not a local asset
-                    <img src={item.url} alt={item.pathname} className="w-full h-full object-cover" />
+                    // eslint-disable-next-line @next/next/no-img-element -- streamed from the Blob store by /media, not a static asset
+                    <img src={item.src} alt={item.pathname} className="w-full h-full object-cover" />
                   ) : (
                     <span className={mediaCls.thumbIcon}>◻</span>
                   )}
