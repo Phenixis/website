@@ -1,9 +1,30 @@
-import { del, list } from "@vercel/blob";
+import { del, list, type ListBlobResultBlob } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { mediaPath } from "@/lib/media";
 
 export async function GET() {
-  const { blobs } = await list();
-  return NextResponse.json(blobs);
+  try {
+    const blobs: ListBlobResultBlob[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await list({ cursor });
+      blobs.push(...page.blobs);
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor);
+
+    return NextResponse.json(
+      blobs.map((b) => ({
+        url: b.url,
+        src: mediaPath(b.pathname),
+        pathname: b.pathname,
+        size: b.size,
+        uploadedAt: b.uploadedAt,
+      })),
+    );
+  } catch (err) {
+    console.error("Failed to list blobs:", err);
+    return NextResponse.json({ error: "Could not load media" }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: Request) {

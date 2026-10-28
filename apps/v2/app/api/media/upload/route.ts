@@ -5,9 +5,8 @@ const ALLOWED_CONTENT_TYPES = ["image/png", "image/jpeg", "image/webp", "image/g
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const body = (await request.json()) as HandleUploadBody;
-
   try {
+    const body = (await request.json()) as HandleUploadBody;
     const jsonResponse = await handleUpload({
       body,
       request,
