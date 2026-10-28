@@ -3,6 +3,7 @@ import type { Project, Post, Experience, Profile } from "../../data";
 import { ProjectsList, ProjectDetail } from "../../(portfolio)/projects/ProjectsPane";
 import { BlogList, PostDetail } from "../../(portfolio)/writing/WritingPane";
 import { ExperiencesList } from "../../(portfolio)/itinerary/ItineraryPane";
+import { AdminEditLink } from "./AdminEditLink";
 
 type Pane = { id: string; label: string; num: string; count: number; sub: string };
 
@@ -88,6 +89,7 @@ export function PaneFocused({
                 <span>{selectedPost.date}</span>
                 <span className="text-v3-text-dim tabular-nums">{selectedPost.readTime}</span>
               </span>
+              <AdminEditLink href={`/admin/posts/${encodeURIComponent(selectedPost.id)}`} />
             </div>
             <h1 className="font-serif font-light text-[72px] tracking-[-0.02em] m-0 text-v3-text leading-none text-pretty max-w-[920px] text-[56px] leading-[1.05] max-[1100px]:text-[48px] max-[920px]:text-[40px] max-[720px]:text-[32px] max-[720px]:leading-[1.1] max-[480px]:text-[26px]">
               {selectedPost.title}
@@ -102,6 +104,7 @@ export function PaneFocused({
                 <span style={{ color: selectedProject.color }}>● {selectedProject.kind}</span>
                 <span className="text-v3-text-dim tabular-nums">{selectedProject.year}</span>
               </span>
+              <AdminEditLink href={`/admin/projects/${encodeURIComponent(selectedProject.id)}`} />
             </div>
             <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
               {selectedProject.title}
@@ -116,6 +119,7 @@ export function PaneFocused({
                 <span style={{ color: selectedSideQuest.color }}>● {selectedSideQuest.kind}</span>
                 <span className="text-v3-text-dim tabular-nums">{selectedSideQuest.year}</span>
               </span>
+              <AdminEditLink href={`/admin/side-quests/${encodeURIComponent(selectedSideQuest.id)}`} />
             </div>
             <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
               {selectedSideQuest.title}
