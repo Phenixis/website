@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import { config } from 'dotenv'
 import path from 'path'
 
-config({ path: path.resolve(__dirname, '../../.env.local'), override: false })
+config({ path: path.resolve(__dirname, '../../.env.local'), override: false, quiet: true })
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.137.1'],
