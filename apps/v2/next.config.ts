@@ -8,6 +8,7 @@ config({ path: path.resolve(__dirname, '.env.local'), override: false, quiet: tr
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@libsql/client"],
+  allowedDevOrigins: ["mdserv-1.tail46603a.ts.net", "192.168.1.21"],
 };
 
 export default nextConfig;

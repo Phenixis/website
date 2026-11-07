@@ -1,5 +1,6 @@
 import type { Experience } from "../../data";
 import { formatDuration, formatMonth, hasGapAfter, isOngoing, sortByStartDesc } from "@/lib/experience-dates";
+import { HashHighlight } from "./HashHighlight";
 
 const DOT_CLASS: Record<Experience["kind"], string> = {
   self: "bg-v3-accent shadow-[0_0_0_3px_rgba(183,148,246,0.18)]",
@@ -12,6 +13,22 @@ const KIND_TEXT_CLASS: Record<Experience["kind"], string> = {
   role: "text-v3-text-2",
   edu: "text-[#f1c45b]",
 };
+
+/** Card behind an entry when it's the target of the URL hash (set by HashHighlight). */
+const HIGHLIGHT_CLASS =
+  "relative isolate before:absolute before:-z-10 before:-inset-x-4 before:-inset-y-3 before:rounded-lg before:border before:border-transparent before:pointer-events-none before:transition-colors before:duration-500 group-data-[highlighted]:before:bg-v3-accent/[0.06] group-data-[highlighted]:before:border-v3-accent/30 max-[480px]:before:-inset-x-2";
+
+function Permalink({ id }: { id: string }) {
+  return (
+    <a
+      href={`#${id}`}
+      aria-label="Link to this entry"
+      className="font-mono text-[13px] text-v3-text-dim no-underline opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100 hover:text-v3-accent group-data-[highlighted]:opacity-100 group-data-[highlighted]:text-v3-accent max-[720px]:opacity-60"
+    >
+      #
+    </a>
+  );
+}
 
 function DateStack({ e, size }: { e: Experience; size: "outer" | "inner" }) {
   const labelCls =
@@ -48,29 +65,36 @@ function EntryDot({ e }: { e: Experience }) {
 
 function EntryContent({ e }: { e: Experience }) {
   return (
-    <div className="col-start-3 row-start-1 flex flex-col gap-[10px] pt-1 pb-[26px] max-[720px]:pb-[22px] max-[480px]:pb-[18px]">
-      <div className="flex items-baseline gap-[10px] flex-wrap max-[480px]:gap-[6px]">
-        <span className="font-serif font-normal text-[26px] tracking-[-0.015em] text-v3-text max-[720px]:text-[22px] max-[480px]:text-[19px]">
-          {e.role}
-        </span>
-        <span className="font-serif italic font-light text-[18px] text-v3-text-dim max-[720px]:text-[16px] max-[480px]:text-[14px]">
-          at
-        </span>
-        <span className="font-serif font-normal text-[22px] tracking-[-0.01em] text-v3-accent-2 max-[720px]:text-[19px] max-[480px]:text-[17px]">
-          {e.where}
-        </span>
-      </div>
-      <p className="font-mono text-[12.5px] text-v3-text-2 m-0 leading-[1.7] max-w-[600px] text-pretty whitespace-pre-line max-[720px]:text-[12px] max-[720px]:max-w-full">
-        {e.blurb}
-      </p>
-      <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase mt-[2px] flex-wrap">
-        <span className={KIND_TEXT_CLASS[e.kind]}>{e.kind}</span>
-        {e.stack.length > 0 && (
-          <>
-            <span className="text-v3-text-dim">·</span>
-            <span className="text-v3-text-mute normal-case tracking-normal tabular-nums">{e.stack.join(" / ")}</span>
-          </>
-        )}
+    <div
+      id={e.id}
+      data-entry
+      className="group col-start-3 row-start-1 pt-1 pb-[26px] scroll-mt-24 max-[720px]:pb-[22px] max-[480px]:pb-[18px]"
+    >
+      <div className={`flex flex-col gap-[10px] ${HIGHLIGHT_CLASS}`}>
+        <div className="flex items-baseline gap-[10px] flex-wrap max-[480px]:gap-[6px]">
+          <span className="font-serif font-normal text-[26px] tracking-[-0.015em] text-v3-text max-[720px]:text-[22px] max-[480px]:text-[19px]">
+            {e.role}
+          </span>
+          <span className="font-serif italic font-light text-[18px] text-v3-text-dim max-[720px]:text-[16px] max-[480px]:text-[14px]">
+            at
+          </span>
+          <span className="font-serif font-normal text-[22px] tracking-[-0.01em] text-v3-accent-2 max-[720px]:text-[19px] max-[480px]:text-[17px]">
+            {e.where}
+          </span>
+          <Permalink id={e.id} />
+        </div>
+        <p className="font-mono text-[12.5px] text-v3-text-2 m-0 leading-[1.7] max-w-[600px] text-pretty whitespace-pre-line max-[720px]:text-[12px] max-[720px]:max-w-full">
+          {e.blurb}
+        </p>
+        <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase mt-[2px] flex-wrap">
+          <span className={KIND_TEXT_CLASS[e.kind]}>{e.kind}</span>
+          {e.stack.length > 0 && (
+            <>
+              <span className="text-v3-text-dim">·</span>
+              <span className="text-v3-text-mute normal-case tracking-normal tabular-nums">{e.stack.join(" / ")}</span>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -120,27 +144,30 @@ function InnerEntryRow({ e }: { e: Experience }) {
           <div className={`w-[4px] h-[4px] rounded-full ${DOT_CLASS[e.kind]}`} />
         </div>
       </div>
-      <div className="flex flex-col gap-2 min-w-0 pb-1">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-serif font-normal text-[21px] tracking-[-0.01em] text-v3-text max-[480px]:text-[18px]">
-            {e.role}
-          </span>
-          <span className="font-serif italic font-light text-[14px] text-v3-text-dim">at</span>
-          <span className="font-serif font-normal text-[18px] text-v3-accent-2 max-[480px]:text-[16px]">
-            {e.where}
-          </span>
-        </div>
-        <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.6] max-w-[480px] text-pretty whitespace-pre-line">
-          {e.blurb}
-        </p>
-        <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase flex-wrap">
-          <span className={KIND_TEXT_CLASS[e.kind]}>{e.kind}</span>
-          {e.stack.length > 0 && (
-            <>
-              <span className="text-v3-text-dim">·</span>
-              <span className="text-v3-text-mute normal-case tracking-normal tabular-nums">{e.stack.join(" / ")}</span>
-            </>
-          )}
+      <div id={e.id} data-entry className="group min-w-0 pb-1 scroll-mt-24">
+      <div className={`flex flex-col gap-2 ${HIGHLIGHT_CLASS}`}>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="font-serif font-normal text-[21px] tracking-[-0.01em] text-v3-text max-[480px]:text-[18px]">
+              {e.role}
+            </span>
+            <span className="font-serif italic font-light text-[14px] text-v3-text-dim">at</span>
+            <span className="font-serif font-normal text-[18px] text-v3-accent-2 max-[480px]:text-[16px]">
+              {e.where}
+            </span>
+            <Permalink id={e.id} />
+          </div>
+          <p className="font-mono text-[12px] text-v3-text-2 m-0 leading-[1.6] max-w-[480px] text-pretty whitespace-pre-line">
+            {e.blurb}
+          </p>
+          <div className="flex items-center gap-2 text-[10.5px] text-v3-text-mute tracking-[0.08em] uppercase flex-wrap">
+            <span className={KIND_TEXT_CLASS[e.kind]}>{e.kind}</span>
+            {e.stack.length > 0 && (
+              <>
+                <span className="text-v3-text-dim">·</span>
+                <span className="text-v3-text-mute normal-case tracking-normal tabular-nums">{e.stack.join(" / ")}</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -204,6 +231,7 @@ export function ExperiencesList({ experiences }: { experiences: Experience[] }) 
 
   return (
     <div className="relative max-w-[760px] mx-auto pt-3 pb-8 max-[920px]:max-w-full">
+      <HashHighlight />
       {topLevel.map((e, i) => (
         <div key={e.id}>
           <TopLevelBlock e={e} parallel={childrenOf(e.id)} />

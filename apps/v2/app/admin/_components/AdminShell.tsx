@@ -85,7 +85,7 @@ export function AdminShell({
 
   return (
     <div className="fixed inset-0 grid grid-rows-[44px_1fr] grid-cols-[232px_1fr] [grid-template-areas:'topbar_topbar'_'sidebar_main'] bg-a-bg text-a-text font-mono text-[13px] leading-[1.55] antialiased max-[900px]:grid-cols-1 max-[900px]:[grid-template-areas:'topbar'_'main']">
-      <header className="[grid-area:topbar] flex items-center border-b border-a-border px-[18px] bg-a-bg-2 text-[11.5px] gap-5 z-[11] relative max-[980px]:gap-3 max-[980px]:px-[14px] max-[560px]:px-[10px] max-[560px]:gap-2">
+      <header className="[grid-area:topbar] flex items-center border-b border-a-border px-[18px] bg-a-bg-2 text-[11.5px] gap-5 z-30 relative max-[980px]:gap-3 max-[980px]:px-[14px] max-[560px]:px-[10px] max-[560px]:gap-2">
         <button
           className="hidden max-[900px]:flex w-8 h-8 flex-none bg-transparent border border-a-border rounded-[5px] cursor-pointer p-0 items-center justify-center flex-col gap-[3px] mr-1 transition-colors duration-[140ms] hover:border-a-border-focus"
           onClick={() => setSidebarOpen((v) => !v)}
@@ -155,7 +155,7 @@ export function AdminShell({
       <aside
         className={[
           "[grid-area:sidebar] bg-a-bg-2 border-r border-a-border flex flex-col pt-[18px] pb-[14px] overflow-y-auto scroll-thin-a",
-          "max-[900px]:fixed max-[900px]:left-0 max-[900px]:top-11 max-[900px]:bottom-0 max-[900px]:w-[264px] max-[900px]:z-10 max-[900px]:transition-transform max-[900px]:duration-[260ms] max-[900px]:ease-a-drawer",
+          "max-[900px]:fixed max-[900px]:left-0 max-[900px]:top-11 max-[900px]:bottom-0 max-[900px]:w-[264px] max-[900px]:z-[25] max-[900px]:transition-transform max-[900px]:duration-[260ms] max-[900px]:ease-a-drawer",
           sidebarOpen
             ? "max-[900px]:translate-x-0 max-[900px]:shadow-[8px_0_32px_rgba(0,0,0,0.5)]"
             : "max-[900px]:-translate-x-full",
@@ -203,7 +203,7 @@ export function AdminShell({
       </aside>
 
       <div
-        className={`fixed inset-0 bg-black/55 z-[9] transition-opacity duration-[240ms] ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 bg-black/55 z-20 transition-opacity duration-[240ms] ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={() => setSidebarOpen(false)}
       />
 
