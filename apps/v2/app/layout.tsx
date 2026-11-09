@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Fraunces } from "next/font/google";
+import { JetBrains_Mono, Fraunces, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import { getProfile } from "@/lib/db";
@@ -18,6 +18,13 @@ const fraunces = Fraunces({
   weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
   variable: "--font-fraunces",
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
+  variable: "--font-source-serif",
   display: "swap",
 });
 
@@ -67,7 +74,7 @@ export default async function RootLayout({
   const sameAs = [profile.github, profile.linkedin].filter((url): url is string => Boolean(url));
 
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${jetbrainsMono.variable} ${fraunces.variable} ${sourceSerif.variable}`}>
       <head>
         <script
           type="application/ld+json"

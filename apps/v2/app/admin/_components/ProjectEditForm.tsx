@@ -5,7 +5,7 @@ import { useRouter, useParams, usePathname } from "next/navigation";
 import type { Project } from "../../data";
 import {
   Badge, DraftAccessSection, FormBar, FormSection, Field, PageHead,
-  TextInput, Textarea, Select, Segmented, Chips, Swatches, LinkList, MarkdownEditor,
+  TextInput, Textarea, Segmented, Swatches, MarkdownEditor,
   COLOR_OPTIONS, editPageCls,
 } from "./ui";
 
@@ -139,11 +139,6 @@ export function ProjectEditForm() {
               <MarkdownEditor value={p.body} onChange={(v) => update("body", v)} />
             </Field>
           </FormSection>
-          <FormSection title="Links">
-            <Field label="External links">
-              <LinkList value={p.links ?? []} onChange={(v) => update("links", v)} />
-            </Field>
-          </FormSection>
           <FormBar
             onSave={() => save()}
             onDiscard={back}
@@ -209,7 +204,7 @@ export function ProjectEditForm() {
               />
             </Field>
           </FormSection>
-          <FormSection title="Status & Kind">
+          <FormSection title="Status & Year">
             <Field label="Status">
               <Segmented
                 value={p.status}
@@ -221,23 +216,13 @@ export function ProjectEditForm() {
                 ]}
               />
             </Field>
-            <Field label="Kind">
-              <Select
-                value={p.kind}
-                onChange={(v) => update("kind", v)}
-                options={["App", "Tool", "Writing", "Music", "Library", "Other"]}
-              />
-            </Field>
             <Field label="Year">
               <TextInput value={p.year} onChange={(v) => update("year", v)} placeholder="2025" />
             </Field>
           </FormSection>
-          <FormSection title="People & Stack">
+          <FormSection title="People">
             <Field label="Role">
               <TextInput value={p.role ?? ""} onChange={(v) => update("role", v)} placeholder="Solo · Design + Engineering" />
-            </Field>
-            <Field label="Stack">
-              <Chips value={p.stack} onChange={(v) => update("stack", v)} />
             </Field>
           </FormSection>
           <FormSection title="Appearance">

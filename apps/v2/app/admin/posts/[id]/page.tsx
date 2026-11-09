@@ -212,9 +212,6 @@ export default function PostEditPage() {
             <Field label="Date">
               <TextInput value={p.date} onChange={(v) => update("date", v)} placeholder="Apr 02, 2026" />
             </Field>
-            <Field label="Read time">
-              <TextInput value={p.readTime} onChange={(v) => update("readTime", v)} placeholder="8 min" />
-            </Field>
             <Field label="Tags">
               <Chips value={p.tags} onChange={(v) => update("tags", v)} />
             </Field>

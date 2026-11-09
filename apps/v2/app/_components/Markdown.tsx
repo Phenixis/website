@@ -2,8 +2,19 @@ import React from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import { createSlugger } from "@/lib/reading";
 
-const text = "font-mono text-[13.5px] leading-[1.85] text-v3-text text-pretty max-[480px]:text-[12.5px] max-[480px]:leading-[1.75]";
+// Long-form reading text: a proportional serif at ~19px / 1.7, in a slightly
+// softened white so the dark background doesn't glare. Measure is capped by
+// the wrapper below (~70 characters per line).
+const text = "font-reading text-[19px] leading-[1.7] text-v3-body text-pretty max-[720px]:text-[18px] max-[480px]:text-[17px] max-[480px]:leading-[1.65]";
+
+function nodeText(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeText).join("");
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) return nodeText(node.props.children);
+  return "";
+}
 
 function isExternal(href: string | undefined): boolean {
   return !!href && /^https?:\/\//.test(href);
@@ -11,18 +22,9 @@ function isExternal(href: string | undefined): boolean {
 
 // Raw HTML in the source is not rendered (no rehype-raw): bodies only ever
 // contain Markdown.
-const components: Components = {
+const baseComponents: Components = {
   p: ({ children }) => <p className={`${text} m-0`}>{children}</p>,
-  h1: ({ children }) => <h2 className="font-serif font-light text-[28px] leading-[1.2] tracking-[-0.01em] text-v3-text mt-4 mb-0 max-[480px]:text-[22px]">{children}</h2>,
-  h2: ({ id, className, children }) =>
-    // remark-gfm's visually hidden "Footnotes" label above the notes list.
-    className?.includes("sr-only") ? (
-      <h2 id={id} className="sr-only">{children}</h2>
-    ) : (
-      <h2 className="font-serif font-light text-[24px] leading-[1.25] tracking-[-0.01em] text-v3-text mt-4 mb-0 max-[480px]:text-[20px]">{children}</h2>
-    ),
-  h3: ({ children }) => <h3 className="font-serif italic font-light text-[20px] leading-[1.3] text-v3-text mt-2 mb-0 max-[480px]:text-[17px]">{children}</h3>,
-  h4: ({ children }) => <h4 className="font-mono text-[11px] tracking-[0.14em] uppercase text-v3-text-mute mt-2 mb-0">{children}</h4>,
+
   a: ({ href, id, children, ...rest }) => {
     // Footnote reference (the superscript number) and its back-link (↩).
     if (href?.startsWith("#user-content-fn")) {
@@ -51,15 +53,15 @@ const components: Components = {
   sup: ({ children }) => <sup className="text-[0.7em] leading-none align-super scroll-mt-24">{children}</sup>,
   section: ({ className, children }) =>
     className?.includes("footnotes") ? (
-      <section className="mt-2 pt-5 border-t border-v3-rule [&_ol]:text-[12px] [&_ol]:leading-[1.7] [&_ol]:text-v3-text-2 [&_p]:text-[12px] [&_p]:leading-[1.7] [&_p]:text-v3-text-2">
+      <section className="mt-2 pt-5 border-t border-v3-rule [&_ol]:text-[15px] [&_ol]:leading-[1.6] [&_ol]:text-v3-text-2 [&_p]:text-[15px] [&_p]:leading-[1.6] [&_p]:text-v3-text-2">
         {children}
       </section>
     ) : (
       <section>{children}</section>
     ),  strong: ({ children }) => <strong className="font-semibold text-v3-text">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
-  ul: ({ children }) => <ul className={`${text} m-0 pl-5 list-disc marker:text-v3-accent flex flex-col gap-2`}>{children}</ul>,
-  ol: ({ children }) => <ol className={`${text} m-0 pl-6 list-decimal marker:text-v3-accent marker:tabular-nums flex flex-col gap-2`}>{children}</ol>,
+  ul: ({ children }) => <ul className={`${text} m-0 pl-5 list-disc marker:text-v3-accent flex flex-col gap-[10px]`}>{children}</ul>,
+  ol: ({ children }) => <ol className={`${text} m-0 pl-6 list-decimal marker:text-v3-accent marker:tabular-nums flex flex-col gap-[10px]`}>{children}</ol>,
   li: ({ id, className, children }) =>
     // GFM task list item ("- [ ] …"): the checkbox replaces the bullet.
     className?.includes("task-list-item") ? (
@@ -72,7 +74,7 @@ const components: Components = {
       <input type="checkbox" checked={!!checked} disabled className="accent-v3-accent translate-y-[1px] shrink-0" />
     ) : null,
   blockquote: ({ children }) => (
-    <blockquote className="m-0 border-l-2 border-v3-accent/55 pl-5 font-serif italic font-light text-[17px] leading-[1.6] text-v3-text-2 [&_p]:font-serif [&_p]:text-[17px] [&_p]:leading-[1.6] [&_p]:text-v3-text-2 max-[480px]:text-[15px] max-[480px]:[&_p]:text-[15px]">
+    <blockquote className="m-0 border-l-2 border-v3-accent/55 pl-5 font-serif italic font-light text-[20px] leading-[1.6] text-v3-text-2 [&_p]:font-serif [&_p]:text-[20px] [&_p]:leading-[1.6] [&_p]:text-v3-text-2 max-[480px]:text-[17px] max-[480px]:[&_p]:text-[17px]">
       {children}
     </blockquote>
   ),
@@ -80,7 +82,7 @@ const components: Components = {
     <code className="font-mono text-[0.92em] bg-v3-bg-3 border border-v3-border rounded-[3px] px-[5px] py-px text-v3-accent-2">{children}</code>
   ),
   pre: ({ children }) => (
-    <pre className="m-0 overflow-x-auto scroll-thin bg-v3-bg-2 border border-v3-border rounded-[6px] px-4 py-3 font-mono text-[12.5px] leading-[1.7] text-v3-text-2 [&_code]:bg-transparent [&_code]:border-0 [&_code]:p-0 [&_code]:text-inherit [&_code]:text-[length:inherit]">
+    <pre className="m-0 overflow-x-auto scroll-thin bg-v3-bg-2 border border-v3-border rounded-[6px] px-4 py-3 font-mono text-[13.5px] leading-[1.7] text-v3-text-2 [&_code]:bg-transparent [&_code]:border-0 [&_code]:p-0 [&_code]:text-inherit [&_code]:text-[length:inherit]">
       {children}
     </pre>
   ),
@@ -93,12 +95,36 @@ const components: Components = {
   ),
   table: ({ children }) => (
     <div className="overflow-x-auto scroll-thin">
-      <table className={`${text} w-full border-collapse text-[12.5px]`}>{children}</table>
+      <table className={`${text} w-full border-collapse !text-[15px] !leading-[1.55]`}>{children}</table>
     </div>
   ),
   th: ({ children }) => <th className="text-left font-semibold border-b border-v3-border-strong px-3 py-2">{children}</th>,
   td: ({ children }) => <td className="border-b border-v3-border px-3 py-2 align-top">{children}</td>,
 };
+
+// Headings get stable, unique ids (matching extractHeadings) so the table of
+// contents and URL hashes can target them.
+function headingComponents(): Components {
+  const slug = createSlugger();
+  return {
+    h1: ({ children }) => (
+      <h2 id={slug(nodeText(children))} className="font-serif font-light text-[30px] leading-[1.2] tracking-[-0.01em] text-v3-text mt-8 mb-0 scroll-mt-24 max-[480px]:text-[24px]">{children}</h2>
+    ),
+    h2: ({ id, className, children }) =>
+      // remark-gfm's visually hidden "Footnotes" label above the notes list.
+      className?.includes("sr-only") ? (
+        <h2 id={id} className="sr-only">{children}</h2>
+      ) : (
+        <h2 id={slug(nodeText(children))} className="font-serif font-light text-[26px] leading-[1.25] tracking-[-0.01em] text-v3-text mt-8 mb-0 scroll-mt-24 max-[480px]:text-[22px]">{children}</h2>
+      ),
+    h3: ({ children }) => (
+      <h3 id={slug(nodeText(children))} className="font-serif italic font-light text-[22px] leading-[1.3] text-v3-text mt-5 mb-0 scroll-mt-24 max-[480px]:text-[19px]">{children}</h3>
+    ),
+    h4: ({ children }) => (
+      <h4 id={slug(nodeText(children))} className="font-mono text-[11px] tracking-[0.14em] uppercase text-v3-text-mute mt-4 mb-0 scroll-mt-24">{children}</h4>
+    ),
+  };
+}
 
 // Writing's drop cap: the first letter of the body's opening paragraph.
 // Purely CSS, so it survives inline Markdown (links, bold) in that paragraph.
@@ -125,8 +151,9 @@ const dropCapCls = [
 const remarkPlugins = [remarkGfm, remarkBreaks];
 
 export function Markdown({ source, dropCap = false }: { source: string; dropCap?: boolean }) {
+  const components = { ...baseComponents, ...headingComponents() };
   return (
-    <div className={`flex flex-col gap-[22px] max-[720px]:gap-[18px] ${dropCap ? dropCapCls : ""}`}>
+    <div className={`flex flex-col gap-[1.4rem] max-w-[40rem] max-[720px]:gap-[1.2rem] ${dropCap ? dropCapCls : ""}`}>
       <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
         {source}
       </ReactMarkdown>
