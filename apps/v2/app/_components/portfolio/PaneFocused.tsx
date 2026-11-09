@@ -59,6 +59,8 @@ export function PaneFocused({
     ? sideQuests.find((p) => p.id === selectedSideQuestId) ?? null
     : null;
 
+  const isDetail = !!selectedPost || !!selectedProject || !!selectedSideQuest;
+
   const centeredHead =
     pane.id === "blog" ||
     !!selectedProject ||
@@ -75,9 +77,11 @@ export function PaneFocused({
           "max-[920px]:px-9 max-[920px]:pt-9 max-[920px]:pb-6",
           "max-[720px]:px-[22px] max-[720px]:pt-7 max-[720px]:pb-[18px]",
           "max-[480px]:px-4 max-[480px]:pt-[22px] max-[480px]:pb-[14px]",
-          centeredHead
-            ? "max-w-[760px] mx-auto w-full !px-0 max-[920px]:max-w-full"
-            : "",
+          isDetail
+            ? "[&>*]:max-w-[40rem] [&>*]:mx-auto"
+            : centeredHead
+              ? "max-w-[760px] mx-auto w-full !px-0 max-[920px]:max-w-full"
+              : "",
         ].join(" ")}
       >
         {selectedPost ? (
@@ -91,7 +95,7 @@ export function PaneFocused({
               </span>
               <AdminEditLink href={`/admin/posts/${encodeURIComponent(selectedPost.id)}`} />
             </div>
-            <h1 className="font-serif font-light text-[72px] tracking-[-0.02em] m-0 text-v3-text leading-none text-pretty max-w-[920px] text-[56px] leading-[1.05] max-[1100px]:text-[48px] max-[920px]:text-[40px] max-[720px]:text-[32px] max-[720px]:leading-[1.1] max-[480px]:text-[26px]">
+            <h1 className="font-serif font-light text-[72px] tracking-[-0.02em] m-0 text-v3-text leading-none text-pretty text-[48px] leading-[1.08] max-[920px]:text-[40px] max-[720px]:text-[32px] max-[720px]:leading-[1.1] max-[480px]:text-[26px]">
               {selectedPost.title}
             </h1>
           </>
@@ -106,7 +110,7 @@ export function PaneFocused({
               </span>
               <AdminEditLink href={`/admin/projects/${encodeURIComponent(selectedProject.id)}`} />
             </div>
-            <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
+            <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[52px] max-[920px]:text-[44px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
               {selectedProject.title}
             </h1>
           </>
@@ -121,7 +125,7 @@ export function PaneFocused({
               </span>
               <AdminEditLink href={`/admin/side-quests/${encodeURIComponent(selectedSideQuest.id)}`} />
             </div>
-            <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[64px] max-[1100px]:text-[54px] max-[920px]:text-[48px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
+            <h1 className="font-serif font-light tracking-[-0.02em] m-0 text-v3-text leading-none text-[52px] max-[920px]:text-[44px] max-[720px]:text-[36px] max-[480px]:text-[30px]">
               {selectedSideQuest.title}
             </h1>
           </>

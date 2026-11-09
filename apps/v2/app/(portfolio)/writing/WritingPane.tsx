@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import type { Post, Profile } from "../../data";
 import { Markdown } from "../../_components/Markdown";
+import { TableOfContents } from "../../_components/TableOfContents";
 import { DetailFooter } from "../../_components/portfolio/DetailFooter";
 
 export function BlogList({ posts }: { posts: Post[] }) {
@@ -60,7 +61,7 @@ export function PostDetail({
   const next = idx < posts.length - 1 ? posts[idx + 1] : null;
 
   return (
-    <article className="max-w-[720px] mx-auto pt-2">
+    <article className="max-w-[40rem] mx-auto pt-2">
       <div className="flex items-center gap-3 text-[10.5px] tracking-[0.12em] uppercase text-v3-text-mute mb-[22px]">
         {post.tags.map((t) => (
           <span key={t} className="text-v3-accent font-mono">#{t}</span>
@@ -75,7 +76,10 @@ export function PostDetail({
       </p>
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />
 
-      <Markdown source={post.body} dropCap />
+      <div className="relative">
+        <TableOfContents source={post.body} />
+        <Markdown source={post.body} dropCap />
+      </div>
 
       <DetailFooter
         sign={

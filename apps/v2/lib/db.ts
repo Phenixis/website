@@ -2,6 +2,7 @@ import { createClient } from "@libsql/client";
 import { cache } from "react";
 import type { Project, Post, Experience } from "@/app/data";
 import { parseBody } from "./body";
+import { readingTime } from "./reading";
 
 const databaseUrl = process.env.TURSO_DATABASE_URL;
 if (!databaseUrl) {
@@ -179,7 +180,7 @@ function rowToPost(row: Record<string, unknown>): Post {
     id: row.id as string,
     title: row.title as string,
     date: row.date as string,
-    readTime: row.read_time as string,
+    readTime: readingTime(parseBody(row.body)),
     tags: JSON.parse(row.tags as string),
     excerpt: row.excerpt as string,
     body: parseBody(row.body),
