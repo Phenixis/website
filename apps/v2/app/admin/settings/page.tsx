@@ -49,7 +49,6 @@ export default function SettingsPage() {
     <>
       <PageHead
         title="Settings"
-        sub="Profile and site metadata."
       />
       <div className={pageBodyCls}>
         <div className={editPageCls.form} style={{ maxWidth: 720 }}>
@@ -69,7 +68,7 @@ export default function SettingsPage() {
                   placeholder="@handle"
                 />
               </Field>
-              <Field label="Tagline" hint="Shown in the portfolio header">
+              <Field label="Tagline">
                 <TextInput
                   value={profile.tagline}
                   onChange={(v) => update("tagline", v)}
@@ -83,14 +82,14 @@ export default function SettingsPage() {
                   placeholder="Saint-Brieuc · 48.51, -2.77"
                 />
               </Field>
-              <Field label="GitHub" hint="Used in the site's structured data (SEO)">
+              <Field label="GitHub">
                 <TextInput
                   value={profile.github ?? ""}
                   onChange={(v) => update("github", v)}
                   placeholder="https://github.com/..."
                 />
               </Field>
-              <Field label="LinkedIn" hint="Used in the site's structured data (SEO)">
+              <Field label="LinkedIn">
                 <TextInput
                   value={profile.linkedin ?? ""}
                   onChange={(v) => update("linkedin", v)}

@@ -70,7 +70,6 @@ export default function ProjectsListPage() {
     <>
       <PageHead
         title="Main Projects"
-        sub="What I made — apps, tools, libraries, the occasional experiment."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/projects/new")}>
             + New project <span className={kbdCls}>N</span>

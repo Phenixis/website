@@ -127,7 +127,7 @@ export function ProjectEditForm() {
       <div className={editPageCls.form}>
         <div className={editPageCls.formMain}>
           <FormSection title="Content">
-            <Field label="Blurb" hint="One-liner shown on card and in meta">
+            <Field label="Blurb">
               <Textarea
                 value={p.blurb}
                 onChange={(v) => update("blurb", v)}
@@ -135,7 +135,7 @@ export function ProjectEditForm() {
                 placeholder="Short description…"
               />
             </Field>
-            <Field label="Body" hint="Markdown · blank line between paragraphs · images from the media page">
+            <Field label="Body">
               <MarkdownEditor value={p.body} onChange={(v) => update("body", v)} />
             </Field>
           </FormSection>
@@ -173,7 +173,7 @@ export function ProjectEditForm() {
             </div>
           </div>
           <FormSection title="Visibility">
-            <Field label="Visibility" hint="Drafts never show up on the public site">
+            <Field label="Visibility">
               <Segmented
                 value={p.published === false ? "draft" : "published"}
                 onChange={(v) => update("published", v === "published")}
@@ -193,7 +193,7 @@ export function ProjectEditForm() {
             />
           )}
           <FormSection title="Panel">
-            <Field label="Panel" hint="Which public panel this shows up under">
+            <Field label="Panel">
               <Segmented
                 value={p.category === "side" ? "side" : "main"}
                 onChange={(v) => update("category", v)}
