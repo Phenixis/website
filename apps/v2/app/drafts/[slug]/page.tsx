@@ -19,7 +19,7 @@ export default async function DraftPostPage({ params }: { params: Promise<{ slug
   const { slug } = await params;
 
   const post = await getPost(slug);
-  if (!post) notFound();
+  if (!post || post.archived) notFound();
   // Once published, an old draft link just lands on the real post.
   if (post.published !== false) redirect(`/writing/${encodeURIComponent(slug)}`);
 

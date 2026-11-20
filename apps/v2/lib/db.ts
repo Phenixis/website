@@ -102,6 +102,11 @@ const MIGRATIONS: Array<{ name: string; sql: string }> = [
             SELECT group_concat(value, char(10) || char(10)) FROM json_each(posts.body)
           ), '') WHERE json_valid(body) AND json_type(body) = 'array'`,
   },
+  // Additive and defaulted, so the code currently in production ignores it.
+  {
+    name: "017_add_archived_to_posts",
+    sql: "ALTER TABLE posts ADD COLUMN archived INTEGER DEFAULT 0",
+  },
 ];
 
 /** SQLite's wording for "this DDL is a no-op because the schema already has it". */
@@ -185,6 +190,7 @@ function rowToPost(row: Record<string, unknown>): Post {
     excerpt: row.excerpt as string,
     body: parseBody(row.body),
     published: row.published == null ? true : Boolean(row.published),
+    archived: Boolean(row.archived),
     hasDraftPassword: row.draft_password_hash != null,
   };
 }
@@ -285,7 +291,7 @@ export async function getPosts(): Promise<Post[]> {
 
 export async function getPublishedPosts(): Promise<Post[]> {
   const r = await db.execute({
-    sql: "SELECT * FROM posts WHERE published IS NULL OR published != 0 ORDER BY sort_order ASC, rowid ASC LIMIT ?",
+    sql: "SELECT * FROM posts WHERE (published IS NULL OR published != 0) AND (archived IS NULL OR archived = 0) ORDER BY sort_order ASC, rowid ASC LIMIT ?",
     args: [LIST_LIMIT],
   });
   return r.rows.map((row) => rowToPost(row as unknown as Record<string, unknown>));
@@ -299,7 +305,7 @@ export async function getPost(id: string): Promise<Post | null> {
 
 export async function getPublishedPost(id: string): Promise<Post | null> {
   const r = await db.execute({
-    sql: "SELECT * FROM posts WHERE id = ? AND (published IS NULL OR published != 0)",
+    sql: "SELECT * FROM posts WHERE id = ? AND (published IS NULL OR published != 0) AND (archived IS NULL OR archived = 0)",
     args: [id],
   });
   if (!r.rows.length) return null;
@@ -308,14 +314,15 @@ export async function getPublishedPost(id: string): Promise<Post | null> {
 
 export async function upsertPost(p: Post): Promise<void> {
   const published = p.published === false ? 0 : 1;
+  const archived = p.archived ? 1 : 0;
   await db.execute({
-    sql: `INSERT INTO posts (id, title, date, read_time, tags, excerpt, body, published)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO posts (id, title, date, read_time, tags, excerpt, body, published, archived)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(id) DO UPDATE SET
             title=excluded.title, date=excluded.date, read_time=excluded.read_time,
             tags=excluded.tags, excerpt=excluded.excerpt, body=excluded.body,
-            published=excluded.published`,
-    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, p.body, published],
+            published=excluded.published, archived=excluded.archived`,
+    args: [p.id, p.title, p.date, p.readTime, JSON.stringify(p.tags), p.excerpt, p.body, published, archived],
   });
 }
 

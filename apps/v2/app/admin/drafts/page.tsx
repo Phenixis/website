@@ -16,7 +16,7 @@ export default function DraftsPage() {
   useEffect(() => {
     fetch("/api/posts")
       .then((r) => r.json())
-      .then((data: Post[]) => setItems(byDateDesc(data.filter((p) => p.published === false))));
+      .then((data: Post[]) => setItems(byDateDesc(data.filter((p) => p.published === false && !p.archived))));
   }, []);
 
   const { open: openMenu, menu, isOpen } = useContextMenu();

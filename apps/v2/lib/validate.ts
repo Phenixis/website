@@ -86,6 +86,7 @@ export function validatePost(body: unknown): Post {
     excerpt: strAllowEmpty(b.excerpt, "excerpt"),
     body: strAllowEmpty(b.body, "body"),
     ...(b.published != null ? { published: bool(b.published, "published") } : {}),
+    ...(b.archived != null ? { archived: bool(b.archived, "archived") } : {}),
   };
 }
 

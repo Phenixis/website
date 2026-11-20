@@ -30,6 +30,8 @@ export type Post = {
   /** Markdown. */
   body: string;
   published?: boolean;
+  /** Set aside: hidden everywhere on the site, kept in the back-office. `published` is left as it was, so un-archiving restores it. */
+  archived?: boolean;
   /** Read-only: whether a password guards this draft's private link (the hash never leaves the server). */
   hasDraftPassword?: boolean;
 };

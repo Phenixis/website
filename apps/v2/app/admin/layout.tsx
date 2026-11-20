@@ -27,7 +27,7 @@ export default async function AdminLayout({
     sideQuests: projects.filter((p) => p.category === "side").length,
     posts: posts.length,
     experiences: experiences.length,
-    drafts: posts.filter((p) => p.published === false).length,
+    drafts: posts.filter((p) => p.published === false && !p.archived).length,
     archived: projects.filter((p) => p.status === "archived").length,
     tags: new Set(posts.flatMap((p) => p.tags)).size,
   };

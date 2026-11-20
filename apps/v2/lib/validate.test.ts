@@ -83,6 +83,10 @@ describe("validatePost", () => {
     expect(validatePost(base)).toMatchObject({ id: "slow-building" });
   });
 
+  it("keeps the archived flag and rejects non-booleans", () => {
+    expect(validatePost({ ...base, archived: true }).archived).toBe(true);
+    expect(() => validatePost({ ...base, archived: "yes" })).toThrow(ValidationError);  });
+
   it("accepts an empty body (drafts)", () => {
     expect(validatePost({ ...base, body: "" }).body).toBe("");
   });

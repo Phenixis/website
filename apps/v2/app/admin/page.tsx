@@ -20,8 +20,9 @@ export default async function DashboardPage() {
   const sqPaused = sideQuests.filter((p) => p.status === "paused").length;
   const sqArchived = sideQuests.filter((p) => p.status === "archived").length;
 
-  const drafts = posts.filter((p) => p.published === false);
-  const published = posts.length - drafts.length;
+  const live = posts.filter((p) => !p.archived);
+  const drafts = live.filter((p) => p.published === false);
+  const published = live.length - drafts.length;
 
   const selfCount = experiences.filter((e) => e.kind === "self").length;
   const roleCount = experiences.filter((e) => e.kind === "role").length;
