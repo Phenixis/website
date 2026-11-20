@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
 import { byYearDesc } from "@/lib/admin-sort";
+import { Copy, Pencil, Trash2 } from "lucide-react";
+import { useContextMenu, saveEntity, deleteEntity, type MenuEntry } from "../_components/ContextMenu";
 import { Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function ArchivePage() {
@@ -16,6 +18,29 @@ export default function ArchivePage() {
       .then((r) => r.json())
       .then((data: Project[]) => setItems(byYearDesc(data.filter((p) => p.status === "archived"))));
   }, []);
+
+  const { open: openMenu, menu, isOpen } = useContextMenu();
+  const editPath = (p: Project) => `${p.category === "side" ? "/admin/side-quests" : "/admin/projects"}/${p.id}`;
+  const remove = async (p: Project) => {
+    if (!confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    const err = await deleteEntity("/api/projects", p.id);
+    if (err) alert(err); else setItems((prev) => prev.filter((x) => x.id !== p.id));
+  };
+  const setStatus = async (p: Project, status: Project["status"]) => {
+    const err = await saveEntity("/api/projects", { ...p, status });
+    if (err) { alert(err); return; }
+    setItems((prev) => prev.filter((x) => x.id !== p.id));
+  };
+  const menuFor = (p: Project): MenuEntry[] => [
+    { label: "Edit", icon: Pencil, hint: "↵", onSelect: () => router.push(editPath(p)) },
+    { type: "separator" },
+    { type: "heading", label: "Restore as" },
+    { label: "Paused", dot: "text-a-amber", onSelect: () => setStatus(p, "paused") },
+    { label: "Shipping", dot: "text-a-green", onSelect: () => setStatus(p, "shipping") },
+    { type: "separator" },
+    { label: "Copy id", icon: Copy, onSelect: () => navigator.clipboard?.writeText(p.id) },
+    { label: "Delete…", icon: Trash2, danger: true, onSelect: () => remove(p) },
+  ];
 
   const restore = async (p: Project) => {
     setRestoring(p.id);
@@ -62,7 +87,7 @@ export default function ArchivePage() {
             </thead>
             <tbody>
               {items.map((p, i) => (
-                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`${p.category === "side" ? "/admin/side-quests" : "/admin/projects"}/${p.id}`)}>
+                <tr className={`${tableCls.tr} ${isOpen(p.id) ? "bg-a-bg-2" : ""}`} key={p.id} onClick={() => router.push(editPath(p))} onContextMenu={(e) => openMenu(e, menuFor(p), p.id)}>
                   <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                   <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                     <div className={tableCls.tdTitleInner}>
@@ -100,6 +125,7 @@ export default function ArchivePage() {
           </table>
         )}
       </div>
+      {menu}
     </>
   );
 }
