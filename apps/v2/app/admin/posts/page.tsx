@@ -11,7 +11,7 @@ import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdC
 export default function PostsListPage() {
   const router = useRouter();
   const [items, setItems] = useState<Post[]>([]);
-  const [filter, setFilter] = useState<"all" | "published" | "drafts">("all");
+  const [filter, setFilter] = useState<"all" | "published" | "drafts" | "archived">("all");
 
   useKeyShortcut("n", () => router.push("/admin/posts/new"));
   const { open: openMenu, menu, isOpen } = useContextMenu();
@@ -29,13 +29,15 @@ export default function PostsListPage() {
   };
   const menuFor = (p: Post): MenuEntry[] => {
     const isDraft = p.published === false;
+    const isArchived = !!p.archived;
     return [
       { label: "Edit", icon: Pencil, hint: "↵", onSelect: () => router.push(`/admin/posts/${p.id}`) },
-      ...(isDraft ? [] : [{ label: "View on site", icon: ArrowUpRight, onSelect: () => window.open(`/writing/${p.id}`, "_blank") }]),
+      ...(isDraft || isArchived ? [] : [{ label: "View on site", icon: ArrowUpRight, onSelect: () => window.open(`/writing/${p.id}`, "_blank") }]),
       { type: "separator" },
       { type: "heading", label: "Status" },
-      { label: "Published", dot: "text-a-green", checked: !isDraft, onSelect: () => update(p, { published: true }) },
-      { label: "Draft", dot: "text-a-amber", checked: isDraft, onSelect: () => update(p, { published: false }) },
+      { label: "Published", dot: "text-a-green", checked: !isDraft && !isArchived, onSelect: () => update(p, { published: true, archived: false }) },
+      { label: "Draft", dot: "text-a-amber", checked: isDraft && !isArchived, onSelect: () => update(p, { published: false, archived: false }) },
+      { label: "Archived", dot: "text-a-text-mute", checked: isArchived, onSelect: () => update(p, { archived: true }) },
       { type: "separator" },
       { label: "Copy id", icon: Copy, onSelect: () => navigator.clipboard?.writeText(p.id) },
       { label: "Delete…", icon: Trash2, danger: true, onSelect: () => remove(p) },
@@ -46,11 +48,18 @@ export default function PostsListPage() {
     fetch("/api/posts").then((r) => r.json()).then((data: Post[]) => setItems(byDateDesc(data)));
   }, []);
 
-  const published = items.filter((p) => p.published !== false).length;
-  const drafts = items.filter((p) => p.published === false).length;
+  const live = items.filter((p) => !p.archived);
+  const published = live.filter((p) => p.published !== false).length;
+  const drafts = live.filter((p) => p.published === false).length;
+  const archived = items.length - live.length;
 
+  // "All" leaves out archived posts; they have their own filter.
   const visible = items.filter((p) =>
-    filter === "all" ? true : filter === "drafts" ? p.published === false : p.published !== false,
+    filter === "archived" ? p.archived
+      : p.archived ? false
+      : filter === "all" ? true
+      : filter === "drafts" ? p.published === false
+      : p.published !== false,
   );
 
   return (
@@ -69,9 +78,10 @@ export default function PostsListPage() {
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "all", label: "All", count: items.length },
+            { value: "all", label: "All", count: live.length },
             { value: "published", label: "Published", count: published },
             { value: "drafts", label: "Drafts", count: drafts },
+            { value: "archived", label: "Archived", count: archived },
           ]}
         />
       </Toolbar>
@@ -102,8 +112,8 @@ export default function PostsListPage() {
                   </div>
                 </td>
                 <td className={tableCls.td}>
-                  <Badge kind={p.published === false ? "draft" : "published"}>
-                    {p.published === false ? "draft" : "published"}
+                  <Badge kind={p.archived ? "archived" : p.published === false ? "draft" : "published"}>
+                    {p.archived ? "archived" : p.published === false ? "draft" : "published"}
                   </Badge>
                 </td>
                 <td className={`${tableCls.td} ${tableCls.tdActions}`}><span className={tableCls.rowArrow}>→</span></td>

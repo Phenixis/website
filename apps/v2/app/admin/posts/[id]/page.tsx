@@ -53,6 +53,13 @@ export default function PostEditPage() {
     setP((prev) => ({ ...prev, [key]: val }));
   };
 
+  const status = p.archived ? "archived" : p.published === false ? "draft" : "published";
+  // Archiving leaves `published` alone so un-archiving restores the previous state.
+  const setStatus = (v: string) => {
+    rev.current += 1;
+    setP((prev) => (v === "archived" ? { ...prev, archived: true } : { ...prev, archived: false, published: v === "published" }));
+  };
+
   const back = () => router.push("/admin/posts");
 
   useEffect(() => {
@@ -182,20 +189,19 @@ export default function PostEditPage() {
             <div className={editPageCls.sideCardRow}>
               <span className={editPageCls.sideCardKey}>Status</span>
               <span className={editPageCls.sideCardVal}>
-                <Badge kind={p.published === false ? "draft" : "published"}>
-                  {p.published === false ? "draft" : "published"}
-                </Badge>
+                <Badge kind={status}>{status}</Badge>
               </span>
             </div>
           </div>
           <FormSection title="Visibility">
             <Field label="Status">
               <Segmented
-                value={p.published === false ? "draft" : "published"}
-                onChange={(v) => update("published", v === "published")}
+                value={status}
+                onChange={setStatus}
                 options={[
                   { value: "published", label: "Published", dot: "#74e893" },
                   { value: "draft", label: "Draft", dot: "#f1c45b" },
+                  { value: "archived", label: "Archived", dot: "#6e6e80" },
                 ]}
               />
             </Field>
