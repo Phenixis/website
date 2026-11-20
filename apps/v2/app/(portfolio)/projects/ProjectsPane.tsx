@@ -72,6 +72,7 @@ export function ProjectDetail({
 
   return (
     <article className="max-w-[40rem] mx-auto pt-1" style={{ "--c": project.color } as React.CSSProperties}>
+      <div className="min-[1280px]:-ml-[248px] min-[1280px]:w-[calc(100%+248px)]">
       <div className="relative h-60 rounded-md bg-v3-bg-2 border border-v3-border overflow-hidden mb-8 flex items-center justify-center max-[720px]:h-[200px] max-[480px]:h-40">
         <div className="font-serif font-light text-[220px] leading-[0.85] text-[var(--c)] opacity-85 tracking-[-0.04em] relative z-[1] select-none max-[720px]:text-[180px] max-[480px]:text-[140px]">
           {project.title[0]}
@@ -93,6 +94,7 @@ export function ProjectDetail({
       </p>
 
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />
+      </div>
 
       <div className="relative">
         <TableOfContents source={project.body} />
