@@ -61,7 +61,7 @@ export function PostDetail({
   const next = idx < posts.length - 1 ? posts[idx + 1] : null;
 
   return (
-    <article className="max-w-[40rem] mx-auto pt-2">
+    <article className="max-w-[40rem] min-[1280px]:max-w-[calc(40rem+248px)] mx-auto pt-2">
       <div className="flex items-center gap-3 text-[10.5px] tracking-[0.12em] uppercase text-v3-text-mute mb-[22px]">
         {post.tags.map((t) => (
           <span key={t} className="text-v3-accent font-mono">#{t}</span>
@@ -76,7 +76,7 @@ export function PostDetail({
       </p>
       <div className="w-14 h-px bg-v3-accent opacity-55 mb-8" />
 
-      <div className="relative">
+      <div className="relative min-[1280px]:ml-[248px]">
         <TableOfContents source={post.body} />
         <Markdown source={post.body} dropCap />
       </div>
