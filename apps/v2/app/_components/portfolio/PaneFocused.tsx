@@ -78,7 +78,7 @@ export function PaneFocused({
           "max-[720px]:px-[22px] max-[720px]:pt-7 max-[720px]:pb-[18px]",
           "max-[480px]:px-4 max-[480px]:pt-[22px] max-[480px]:pb-[14px]",
           isDetail
-            ? "[&>*]:max-w-[40rem] [&>*]:mx-auto"
+            ? "[&>*]:max-w-[40rem] min-[1280px]:[&>*]:max-w-[calc(40rem+248px)] [&>*]:mx-auto"
             : centeredHead
               ? "max-w-[760px] mx-auto w-full !px-0 max-[920px]:max-w-full"
               : "",

@@ -30,8 +30,7 @@ export default async function DraftPostPage({ params }: { params: Promise<{ slug
     const profile = (await getProfile()) ?? PROFILE;
     content = (
       <div className="w-full">
-        <div className="max-w-[40rem] mx-auto">
-        <div className="min-[1280px]:-ml-[248px] min-[1280px]:w-[calc(100%+248px)]">
+        <div className="max-w-[40rem] min-[1280px]:max-w-[calc(40rem+248px)] mx-auto">
         <div className="mb-8 flex items-center gap-3 text-[10.5px] tracking-[0.18em] uppercase text-v3-text-mute">
           <span className="text-v3-accent">Draft</span>
           <span>· not published</span>
@@ -39,7 +38,6 @@ export default async function DraftPostPage({ params }: { params: Promise<{ slug
         <h1 className="font-serif font-normal text-[40px] tracking-[-0.015em] leading-[1.1] text-v3-text text-pretty m-0 mb-8 max-[720px]:text-[30px]">
           {post.title}
         </h1>
-        </div>
         </div>
         <PostDetail post={post} posts={[post]} profile={profile} />
       </div>
