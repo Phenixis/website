@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
 import { byDateDesc } from "@/lib/admin-sort";
+import { Copy, Pencil, Trash2, Send } from "lucide-react";
+import { useContextMenu, deleteEntity, type MenuEntry } from "../_components/ContextMenu";
 import { Badge, Btn, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, emptyCls } from "../_components/ui";
 
 export default function DraftsPage() {
@@ -16,6 +18,20 @@ export default function DraftsPage() {
       .then((r) => r.json())
       .then((data: Post[]) => setItems(byDateDesc(data.filter((p) => p.published === false))));
   }, []);
+
+  const { open: openMenu, menu, isOpen } = useContextMenu();
+  const remove = async (p: Post) => {
+    if (!confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    const err = await deleteEntity("/api/posts", p.id);
+    if (err) alert(err); else setItems((prev) => prev.filter((x) => x.id !== p.id));
+  };
+  const menuFor = (p: Post): MenuEntry[] => [
+    { label: "Edit", icon: Pencil, hint: "↵", onSelect: () => router.push(`/admin/posts/${p.id}`) },
+    { label: "Publish", icon: Send, onSelect: () => publish(p) },
+    { type: "separator" },
+    { label: "Copy id", icon: Copy, onSelect: () => navigator.clipboard?.writeText(p.id) },
+    { label: "Delete…", icon: Trash2, danger: true, onSelect: () => remove(p) },
+  ];
 
   const publish = async (p: Post) => {
     setPublishing(p.id);
@@ -62,7 +78,7 @@ export default function DraftsPage() {
             </thead>
             <tbody>
               {items.map((p, i) => (
-                <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)}>
+                <tr className={`${tableCls.tr} ${isOpen(p.id) ? "bg-a-bg-2" : ""}`} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)} onContextMenu={(e) => openMenu(e, menuFor(p), p.id)}>
                   <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                   <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                     <span className={tableCls.tdTitleName}>{p.title}</span>
@@ -92,6 +108,7 @@ export default function DraftsPage() {
           </table>
         )}
       </div>
+      {menu}
     </>
   );
 }

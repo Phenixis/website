@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Post } from "../../data";
 import { byDateDesc } from "@/lib/admin-sort";
+import { ArrowUpRight, Copy, Pencil, Trash2 } from "lucide-react";
+import { useContextMenu, saveEntity, deleteEntity, type MenuEntry } from "../_components/ContextMenu";
 import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 
 export default function PostsListPage() {
@@ -12,6 +14,33 @@ export default function PostsListPage() {
   const [filter, setFilter] = useState<"all" | "published" | "drafts">("all");
 
   useKeyShortcut("n", () => router.push("/admin/posts/new"));
+  const { open: openMenu, menu, isOpen } = useContextMenu();
+
+  const update = async (p: Post, patch: Partial<Post>) => {
+    const next = { ...p, ...patch };
+    setItems((prev) => prev.map((x) => (x.id === p.id ? next : x)));
+    const err = await saveEntity("/api/posts", next);
+    if (err) { setItems((prev) => prev.map((x) => (x.id === p.id ? p : x))); alert(err); }
+  };
+  const remove = async (p: Post) => {
+    if (!confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    const err = await deleteEntity("/api/posts", p.id);
+    if (err) alert(err); else setItems((prev) => prev.filter((x) => x.id !== p.id));
+  };
+  const menuFor = (p: Post): MenuEntry[] => {
+    const isDraft = p.published === false;
+    return [
+      { label: "Edit", icon: Pencil, hint: "↵", onSelect: () => router.push(`/admin/posts/${p.id}`) },
+      ...(isDraft ? [] : [{ label: "View on site", icon: ArrowUpRight, onSelect: () => window.open(`/writing/${p.id}`, "_blank") }]),
+      { type: "separator" },
+      { type: "heading", label: "Status" },
+      { label: "Published", dot: "text-a-green", checked: !isDraft, onSelect: () => update(p, { published: true }) },
+      { label: "Draft", dot: "text-a-amber", checked: isDraft, onSelect: () => update(p, { published: false }) },
+      { type: "separator" },
+      { label: "Copy id", icon: Copy, onSelect: () => navigator.clipboard?.writeText(p.id) },
+      { label: "Delete…", icon: Trash2, danger: true, onSelect: () => remove(p) },
+    ];
+  };
 
   useEffect(() => {
     fetch("/api/posts").then((r) => r.json()).then((data: Post[]) => setItems(byDateDesc(data)));
@@ -60,7 +89,7 @@ export default function PostsListPage() {
           </thead>
           <tbody>
             {visible.map((p, i) => (
-              <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)}>
+              <tr className={`${tableCls.tr} ${isOpen(p.id) ? "bg-a-bg-2" : ""}`} key={p.id} onClick={() => router.push(`/admin/posts/${p.id}`)} onContextMenu={(e) => openMenu(e, menuFor(p), p.id)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                   <span className={tableCls.tdTitleName}>{p.title}</span>
@@ -83,6 +112,7 @@ export default function PostsListPage() {
           </tbody>
         </table>
       </div>
+      {menu}
     </>
   );
 }

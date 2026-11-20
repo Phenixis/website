@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Project } from "../../data";
 import { byYearDesc, timeAgo } from "@/lib/admin-sort";
+import { ArrowUpRight, Copy, Pencil, Trash2, ArrowLeftRight } from "lucide-react";
+import { useContextMenu, saveEntity, deleteEntity, type MenuEntry } from "../_components/ContextMenu";
 import { Badge, Btn, FilterChips, PageHead, Toolbar, tableCls, pageBodyCls, kbdCls, useKeyShortcut } from "../_components/ui";
 
 export default function ProjectsListPage() {
@@ -12,6 +14,43 @@ export default function ProjectsListPage() {
   const [filter, setFilter] = useState<"all" | Project["status"]>("all");
 
   useKeyShortcut("n", () => router.push("/admin/projects/new"));
+  const { open: openMenu, menu, isOpen } = useContextMenu();
+
+  const update = async (p: Project, patch: Partial<Project>) => {
+    const next = { ...p, ...patch };
+    const drop = patch.category !== undefined && patch.category !== "main";
+    setItems((prev) => (drop ? prev.filter((x) => x.id !== p.id) : prev.map((x) => (x.id === p.id ? next : x))));
+    const err = await saveEntity("/api/projects", next);
+    if (err) {
+      setItems((prev) => (drop ? byYearDesc([...prev, p]) : prev.map((x) => (x.id === p.id ? p : x))));
+      alert(err);
+    }
+  };
+  const remove = async (p: Project) => {
+    if (!confirm(`Delete "${p.title}"? This can't be undone.`)) return;
+    const err = await deleteEntity("/api/projects", p.id);
+    if (err) alert(err); else setItems((prev) => prev.filter((x) => x.id !== p.id));
+  };
+  const menuFor = (p: Project): MenuEntry[] => {
+    const isDraft = p.published === false;
+    return [
+      { label: "Edit", icon: Pencil, hint: "↵", onSelect: () => router.push(`/admin/projects/${p.id}`) },
+      ...(isDraft ? [] : [{ label: "View on site", icon: ArrowUpRight, onSelect: () => window.open(`/projects/${p.id}`, "_blank") }]),
+      { type: "separator" },
+      { type: "heading", label: "Status" },
+      { label: "Shipping", dot: "text-a-green", checked: p.status === "shipping", onSelect: () => update(p, { status: "shipping" }) },
+      { label: "Paused", dot: "text-a-amber", checked: p.status === "paused", onSelect: () => update(p, { status: "paused" }) },
+      { label: "Archived", dot: "text-a-text-mute", checked: p.status === "archived", onSelect: () => update(p, { status: "archived" }) },
+      { type: "separator" },
+      { type: "heading", label: "Visibility" },
+      { label: "Published", dot: "text-a-green", checked: !isDraft, onSelect: () => update(p, { published: true }) },
+      { label: "Draft", dot: "text-a-amber", checked: isDraft, onSelect: () => update(p, { published: false }) },
+      { type: "separator" },
+      { label: "Move to Side Quests", icon: ArrowLeftRight, onSelect: () => update(p, { category: "side" }) },
+      { label: "Copy id", icon: Copy, onSelect: () => navigator.clipboard?.writeText(p.id) },
+      { label: "Delete…", icon: Trash2, danger: true, onSelect: () => remove(p) },
+    ];
+  };
 
   useEffect(() => {
     fetch("/api/projects")
@@ -66,7 +105,7 @@ export default function ProjectsListPage() {
           </thead>
           <tbody>
             {visible.map((p, i) => (
-              <tr className={tableCls.tr} key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)}>
+              <tr className={`${tableCls.tr} ${isOpen(p.id) ? "bg-a-bg-2" : ""}`} key={p.id} onClick={() => router.push(`/admin/projects/${p.id}`)} onContextMenu={(e) => openMenu(e, menuFor(p), p.id)}>
                 <td className={`${tableCls.td} ${tableCls.tdNum}`}>{String(i + 1).padStart(2, "0")}</td>
                 <td className={`${tableCls.td} ${tableCls.tdTitle}`}>
                   <div className={tableCls.tdTitleInner}>
@@ -106,6 +145,7 @@ export default function ProjectsListPage() {
           </tbody>
         </table>
       </div>
+      {menu}
     </>
   );
 }
