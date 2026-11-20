@@ -70,7 +70,6 @@ export default function SideQuestsListPage() {
     <>
       <PageHead
         title="Side Quests"
-        sub="Smaller, looser projects — icon libraries, homelab tinkering, whatever else didn't need to be a whole thing."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/side-quests/new")}>
             + New side quest <span className={kbdCls}>N</span>

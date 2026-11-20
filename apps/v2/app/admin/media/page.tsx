@@ -111,7 +111,6 @@ export default function MediaPage() {
     <>
       <PageHead
         title="Media"
-        sub="Images and files used across projects and posts."
         actions={
           <>
             <input

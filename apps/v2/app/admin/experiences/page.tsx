@@ -65,7 +65,6 @@ export default function ExperiencesListPage() {
     <>
       <PageHead
         title="Itinerary"
-        sub="Where I went, what I did, who I worked with."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/experiences/new")}>
             + New entry <span className={kbdCls}>N</span>

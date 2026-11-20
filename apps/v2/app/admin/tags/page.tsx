@@ -32,7 +32,6 @@ export default function TagsPage() {
     <>
       <PageHead
         title="Tags"
-        sub="All tags used across writing — counts and post associations."
       />
       <Toolbar>
         <Btn size="sm">All <span className={kbdCls}>{tags.length}</span></Btn>
