@@ -105,12 +105,10 @@ const BADGE_COLORS: Record<string, string> = {
 
 export function PageHead({
   title,
-  sub,
   actions,
   crumbs,
 }: {
   title: React.ReactNode;
-  sub?: string;
   actions?: React.ReactNode;
   crumbs?: { label: string; onClick?: () => void }[];
 }) {
@@ -144,7 +142,6 @@ export function PageHead({
           ) : (
             title
           )}
-          {sub && <p className="mt-1 mb-0 text-[12px] text-a-text-mute italic font-serif font-light">{sub}</p>}
         </div>
         {actions && (
           <div className="flex items-center gap-2 max-[720px]:[&>button:not([data-variant=primary])]:hidden">

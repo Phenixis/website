@@ -32,7 +32,6 @@ export default function DraftsPage() {
     <>
       <PageHead
         title="Drafts"
-        sub="Posts in progress — publish when ready."
       />
       <Toolbar>
         <Btn size="sm">Drafts <span className={kbdCls}>{items.length}</span></Btn>

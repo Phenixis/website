@@ -32,7 +32,6 @@ export default function ArchivePage() {
     <>
       <PageHead
         title="Archive"
-        sub="Projects set aside — restore to bring them back."
       />
       <Toolbar>
         <Btn size="sm">Archived <span className={kbdCls}>{items.length}</span></Btn>

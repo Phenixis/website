@@ -196,8 +196,7 @@ export function AdminShell({
           </div>
         ))}
         <div className="flex-1" />
-        <div className="px-[22px] pt-[14px] pb-1 text-[10px] text-a-text-dim tracking-[0.1em] flex items-center justify-between">
-          <span>v2.0 · Saint-Brieuc</span>
+        <div className="px-[22px] pt-[14px] pb-1 text-[10px] text-a-text-dim tracking-[0.1em] flex items-center justify-end">
           <button className="bg-transparent border-0 text-a-text-dim font-mono text-[14px] cursor-pointer px-[6px] py-1 rounded-[4px] transition-colors duration-[120ms] leading-none hover:text-a-text-mute hover:bg-a-bg-3" onClick={signOut} title="Sign out">↩</button>
         </div>
       </aside>

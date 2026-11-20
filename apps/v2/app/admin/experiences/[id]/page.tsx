@@ -115,7 +115,7 @@ export default function ExperienceEditPage() {
       <div className={editPageCls.form}>
         <div className={editPageCls.formMain}>
           <FormSection title="Details">
-            <Field label="Blurb" hint="One or two sentences">
+            <Field label="Blurb">
               <Textarea value={e.blurb} onChange={(v) => update("blurb", v)} variant="lede" placeholder="What you did there…" />
             </Field>
             <Field label="Stack / Tags">
@@ -152,7 +152,7 @@ export default function ExperienceEditPage() {
             </div>
           </div>
           <FormSection title="Visibility">
-            <Field label="Visibility" hint="Drafts never show up on the public site">
+            <Field label="Visibility">
               <Segmented
                 value={e.published === false ? "draft" : "published"}
                 onChange={(v) => update("published", v === "published")}
@@ -167,7 +167,7 @@ export default function ExperienceEditPage() {
             <Field label="Start date">
               <TextInput type="month" value={e.startDate} onChange={(v) => update("startDate", v)} />
             </Field>
-            <Field label="End date" hint="Leave empty if this is ongoing">
+            <Field label="End date">
               <TextInput type="month" value={e.endDate ?? ""} onChange={(v) => update("endDate", v || null)} />
             </Field>
             <Field label="Where">

@@ -156,10 +156,10 @@ export default function PostEditPage() {
       <div className={editPageCls.form}>
         <div className={editPageCls.formMain}>
           <FormSection title="Content">
-            <Field label="Excerpt" hint="Lede shown in the list and as the article intro">
+            <Field label="Excerpt">
               <Textarea value={p.excerpt} onChange={(v) => update("excerpt", v)} variant="lede" placeholder="Opening line…" />
             </Field>
-            <Field label="Body" hint="Markdown · blank line between paragraphs · images from the media page">
+            <Field label="Body">
               <MarkdownEditor value={p.body} onChange={(v) => update("body", v)} />
             </Field>
           </FormSection>

@@ -34,11 +34,6 @@ export default async function DashboardPage() {
           <h2 className="font-serif font-light text-[36px] tracking-[-0.02em] m-0 text-a-text max-[560px]:text-[28px]">
             Good evening, <span className="text-a-accent">Maxime.</span>
           </h2>
-          <p className="mt-[6px] mb-0 text-a-text-mute italic font-serif font-light text-[14px]">
-            {drafts.length === 0
-              ? "Everything published — no drafts open."
-              : `${drafts.length} draft${drafts.length === 1 ? "" : "s"} open.`}
-          </p>
         </div>
 
         <div className="grid grid-cols-4 gap-[14px] max-[1000px]:grid-cols-2 max-[560px]:grid-cols-1">

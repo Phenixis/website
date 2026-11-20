@@ -28,7 +28,6 @@ export default function PostsListPage() {
     <>
       <PageHead
         title="Writing"
-        sub="Essays, notes, observations — things that needed to be written."
         actions={
           <Btn variant="primary" onClick={() => router.push("/admin/posts/new")}>
             + New post <span className={kbdCls}>N</span>
